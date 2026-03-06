@@ -1,3 +1,14 @@
+import sys
+import os
+
+# Get the current script's directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Get the parent directory (whisper-modeling)
+parent_dir = os.path.dirname(current_dir)
+
+# Add parent directory to sys.path
+sys.path.append(parent_dir)
+
 from models.whisper import WhisperWrapper
 from scripts.convert_output import get_timestamps, majority_filter
 import torch, torchaudio, argparse
@@ -61,10 +72,17 @@ if __name__ == '__main__':
     # model = WhisperWrapper()
     # model.to('cpu')
     # model.backbone_model.encoder.embed_positions = model.backbone_model.encoder.embed_positions.from_pretrained(model.embed_positions[:500])
-    # model.load_state_dict(torch.load("whisper-base_rank8_pretrained_50k.pt", map_location='cpu'))
+    # script_dir = os.path.dirname(os.path.abspath(__file__))
+    # project_root = os.path.dirname(script_dir)
+    # model_path = os.path.join(project_root, "whisper-base_rank8_pretrained_50k.pt")
+    # model.load_state_dict(torch.load(model_path, map_location='cpu'))
     
     # get predictions
     child_pred, adult_pred, overlap_pred = process_wav_file(args.wav_file, model)
+    # if len(child_pred) > 0:
+    #     print(1)
+    # else:
+    #     print(0)
     print("Predicted child speech segments:")
     print(child_pred)
     print("Predicted adult speech segments:")

@@ -201,7 +201,8 @@ class WhisperWrapper(nn.Module):
                 sampling_rate=16000,
                 max_length=len(x[0])
             )
-            features = features.input_features.cuda()
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            features = features.input_features.to(device)
         # 2. get length and mask
         if length is not None:
             length = self.get_feat_extract_output_lengths(length.detach().cpu())
