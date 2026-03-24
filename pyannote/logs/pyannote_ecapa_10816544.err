@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/pyannote_ecapa.py", line 21, in <module>
+    from speechbrain.inference.speaker import EncoderClassifier
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/speechbrain/__init__.py", line 6, in <module>
+    from .core import Brain, Stage, create_experiment_directory, parse_arguments
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/speechbrain/core.py", line 39, in <module>
+    from speechbrain.dataio.dataloader import LoopedLoader, SaveableDataLoader
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/speechbrain/dataio/dataloader.py", line 46, in <module>
+    from speechbrain.dataio.dataset import DynamicItemDataset
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/speechbrain/dataio/dataset.py", line 15, in <module>
+    from speechbrain.dataio.dataio import load_data_csv, load_data_json
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/speechbrain/dataio/dataio.py", line 36, in <module>
+    check_torchaudio_backend()
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/speechbrain/utils/torch_audio_backend.py", line 57, in check_torchaudio_backend
+    available_backends = torchaudio.list_audio_backends()
+AttributeError: module 'torchaudio' has no attribute 'list_audio_backends'

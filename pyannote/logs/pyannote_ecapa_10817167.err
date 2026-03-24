@@ -1,0 +1,102 @@
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/speechbrain/utils/torch_audio_backend.py:57: UserWarning: torchaudio._backend.list_audio_backends has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+  available_backends = torchaudio.list_audio_backends()
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/pyannote/audio/core/io.py:47: UserWarning: 
+torchcodec is not installed correctly so built-in audio decoding will fail. Solutions are:
+* use audio preloaded in-memory as a {'waveform': (channel, time) torch.Tensor, 'sample_rate': int} dictionary;
+* fix torchcodec installation. Error message was:
+
+Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.8.0+cu128) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/_ops.py", line 1478, in load_library
+    ctypes.CDLL(path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /orcd/home/002/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torchcodec/libtorchcodec_core8.so: undefined symbol: _ZN3c1013MessageLogger6streamB5cxx11Ev
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/_ops.py", line 1478, in load_library
+    ctypes.CDLL(path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/_ops.py", line 1478, in load_library
+    ctypes.CDLL(path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/_ops.py", line 1478, in load_library
+    ctypes.CDLL(path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/_ops.py", line 1478, in load_library
+    ctypes.CDLL(path)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/ctypes/__init__.py", line 374, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+[end of libtorchcodec loading traceback].
+  warnings.warn(
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/speechbrain/utils/torch_audio_backend.py:57: UserWarning: torchaudio._backend.list_audio_backends has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+  available_backends = torchaudio.list_audio_backends()
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/speechbrain/utils/autocast.py:188: FutureWarning: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+  wrapped_fwd = torch.cuda.amp.custom_fwd(fwd, cast_inputs=cast_inputs)
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+  warnings.warn(
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/pyannote/audio/utils/reproducibility.py:74: ReproducibilityWarning: TensorFloat-32 (TF32) has been disabled as it might lead to reproducibility issues and lower accuracy.
+It can be re-enabled by calling
+   >>> import torch
+   >>> torch.backends.cuda.matmul.allow_tf32 = True
+   >>> torch.backends.cudnn.allow_tf32 = True
+See https://github.com/pyannote/pyannote-audio/issues/1370 for more details.
+
+  warnings.warn(
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/pyannote/audio/models/blocks/pooling.py:103: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at /pytorch/aten/src/ATen/native/ReduceOps.cpp:1839.)
+  std = sequences.std(dim=-1, correction=1)
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/pyannote_ecapa.py", line 451, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/pyannote_ecapa.py", line 403, in main
+    prototypes, child_stats_df = build_child_prototypes_from_pyannote(
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/pyannote_ecapa.py", line 268, in build_child_prototypes_from_pyannote
+    segs = get_pyannote_segments(audio_path, pyannote_pipeline, cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/pyannote_ecapa.py", line 223, in get_pyannote_segments
+    rttm_path = run_pyannote_inference(audio_path, pipeline, cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/pyannote_ecapa.py", line 190, in run_pyannote_inference
+    diarization.write_rttm(f)
+AttributeError: 'DiarizeOutput' object has no attribute 'write_rttm'

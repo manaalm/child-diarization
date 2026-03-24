@@ -1,0 +1,57 @@
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/huggingface_hub/file_download.py:942: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+Some weights of the model checkpoint at microsoft/wavlm-base-plus were not used when initializing WavLMModel: ['encoder.pos_conv_embed.conv.weight_v', 'encoder.pos_conv_embed.conv.weight_g']
+- This IS expected if you are initializing WavLMModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing WavLMModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of WavLMModel were not initialized from the model checkpoint at microsoft/wavlm-base-plus and are newly initialized: ['encoder.pos_conv_embed.conv.parametrizations.weight.original0', 'encoder.pos_conv_embed.conv.parametrizations.weight.original1']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/utils/data/dataloader.py:558: UserWarning: This DataLoader will create 4 worker processes in total. Our suggested max number of worker in current system is 2, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/conv.py:306: UserWarning: Plan failed with a cudnnException: CUDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR: cudnnFinalize Descriptor Failed cudnn_status: CUDNN_STATUS_NOT_SUPPORTED (Triggered internally at ../aten/src/ATen/native/cudnn/Conv_v8.cpp:919.)
+  return F.conv1d(input, weight, bias, self.stride,
+/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/functional.py:5137: UserWarning: Support for mismatched key_padding_mask and attn_mask is deprecated. Use same type for both instead.
+  warnings.warn(
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/baseline_encoders.py", line 825, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/baseline_encoders.py", line 821, in main
+    run_experiment(exp_cfg, train_df, val_df, test_df)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/baseline_encoders.py", line 686, in run_experiment
+    train_loss = train_one_epoch(
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/baseline_encoders.py", line 649, in train_one_epoch
+    logits = model(inputs, attention_mask=attention_mask, timepoint_feature=timepoint_features)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/baseline_encoders.py", line 429, in forward
+    out = self.backbone(input_values=input_values, attention_mask=attention_mask)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 1245, in forward
+    encoder_outputs = self.encoder(
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 730, in forward
+    layer_outputs = layer(
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 610, in forward
+    hidden_states, attn_weights, position_bias = self.attention(
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 475, in forward
+    attn_output, attn_weights = self.torch_multi_head_self_attention(
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/transformers/models/wavlm/modeling_wavlm.py", line 499, in torch_multi_head_self_attention
+    attn_output, attn_weights = F.multi_head_attention_forward(
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/site-packages/torch/nn/functional.py", line 5504, in multi_head_attention_forward
+    attn_output = scaled_dot_product_attention(q, k, v, attn_mask, dropout_p, is_causal)
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 5.95 GiB. GPU 

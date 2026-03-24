@@ -1,0 +1,20 @@
+Train rows: 1469 | children: 97
+Val rows:   412 | children: 21
+Test rows:  496 | children: 21
+Epoch 01 | train_loss=0.4803 | val_loss=0.4236 | f1=0.8866 | prec=0.8292 | rec=0.9525 | auroc=0.8263 | auprc=0.9326
+Saved best model to whisper_small_best_model.pt
+Epoch 02 | train_loss=0.4036 | val_loss=0.4070 | f1=0.8815 | prec=0.8801 | rec=0.8829 | auroc=0.8456 | auprc=0.9408
+Epoch 03 | train_loss=0.4001 | val_loss=0.4395 | f1=0.8863 | prec=0.8216 | rec=0.9620 | auroc=0.8495 | auprc=0.9404
+Epoch 04 | train_loss=0.3810 | val_loss=0.3896 | f1=0.8924 | prec=0.8924 | rec=0.8924 | auroc=0.8615 | auprc=0.9446
+Saved best model to whisper_small_best_model.pt
+Epoch 05 | train_loss=0.3746 | val_loss=0.4078 | f1=0.8780 | prec=0.9030 | rec=0.8544 | auroc=0.8568 | auprc=0.9435
+Epoch 06 | train_loss=0.3538 | val_loss=0.4115 | f1=0.8878 | prec=0.8864 | rec=0.8892 | auroc=0.8574 | auprc=0.9434
+Epoch 07 | train_loss=0.3530 | val_loss=0.3987 | f1=0.8970 | prec=0.8605 | rec=0.9367 | auroc=0.8613 | auprc=0.9445
+Saved best model to whisper_small_best_model.pt
+Epoch 08 | train_loss=0.3464 | val_loss=0.4019 | f1=0.8814 | prec=0.8929 | rec=0.8703 | auroc=0.8612 | auprc=0.9443
+Epoch 09 | train_loss=0.3351 | val_loss=0.4238 | f1=0.8991 | prec=0.8698 | rec=0.9304 | auroc=0.8616 | auprc=0.9447
+Saved best model to whisper_small_best_model.pt
+Epoch 10 | train_loss=0.3275 | val_loss=0.4293 | f1=0.8937 | prec=0.8709 | rec=0.9177 | auroc=0.8570 | auprc=0.9425
+
+Final evaluation on test split:
+{'f1': 0.8804204993429697, 'precision': 0.8656330749354005, 'recall': 0.8957219251336899, 'auroc': 0.8527439291663015, 'auprc': 0.9499987383380526, 'loss': 0.4548538394174689}

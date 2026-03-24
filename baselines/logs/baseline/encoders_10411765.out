@@ -1,0 +1,43 @@
+Train rows: 1469 | children: 97
+Val rows:   412 | children: 21
+Test rows:  496 | children: 21
+
+================================================================================
+Running experiment: wavlm_mean
+================================================================================
+[wavlm_mean] Epoch 01 | train_loss=0.5950 | val_loss=0.5393 | f1@0.5=0.8682 | prec=0.7932 | rec=0.9589 | auroc=0.7254 | auprc=0.8753
+[wavlm_mean] Saved best checkpoint to ./baseline_results/wavlm_mean/best_model.pt
+[wavlm_mean] Epoch 02 | train_loss=0.5632 | val_loss=0.6502 | f1@0.5=0.8467 | prec=0.8134 | rec=0.8829 | auroc=0.7210 | auprc=0.8694
+[wavlm_mean] Epoch 03 | train_loss=0.5610 | val_loss=0.5806 | f1@0.5=0.8631 | prec=0.8146 | rec=0.9177 | auroc=0.7376 | auprc=0.8853
+[wavlm_mean] Epoch 04 | train_loss=0.5473 | val_loss=0.6157 | f1@0.5=0.8644 | prec=0.8169 | rec=0.9177 | auroc=0.7450 | auprc=0.8949
+[wavlm_mean] Epoch 05 | train_loss=0.5465 | val_loss=0.6246 | f1@0.5=0.8424 | prec=0.8308 | rec=0.8544 | auroc=0.7362 | auprc=0.8882
+[wavlm_mean] Epoch 06 | train_loss=0.5416 | val_loss=0.5704 | f1@0.5=0.8768 | prec=0.8169 | rec=0.9462 | auroc=0.7440 | auprc=0.8899
+[wavlm_mean] Saved best checkpoint to ./baseline_results/wavlm_mean/best_model.pt
+[wavlm_mean] Epoch 07 | train_loss=0.5459 | val_loss=0.5331 | f1@0.5=0.8594 | prec=0.8399 | rec=0.8797 | auroc=0.7553 | auprc=0.9004
+[wavlm_mean] Epoch 08 | train_loss=0.5433 | val_loss=0.5657 | f1@0.5=0.8757 | prec=0.8059 | rec=0.9589 | auroc=0.7600 | auprc=0.9030
+[wavlm_mean] Epoch 09 | train_loss=0.5401 | val_loss=0.5033 | f1@0.5=0.8785 | prec=0.8174 | rec=0.9494 | auroc=0.7587 | auprc=0.9020
+[wavlm_mean] Saved best checkpoint to ./baseline_results/wavlm_mean/best_model.pt
+[wavlm_mean] Epoch 10 | train_loss=0.5139 | val_loss=0.5527 | f1@0.5=0.8741 | prec=0.8217 | rec=0.9335 | auroc=0.7630 | auprc=0.9052
+
+[wavlm_mean] Tuned threshold on val: 0.465
+[wavlm_mean] Final test metrics: {'f1': 0.8710462287104622, 'precision': 0.7991071428571429, 'recall': 0.9572192513368984, 'auroc': 0.7999474007188567, 'auprc': 0.9241309614256513, 'loss': 0.4533160036981797, 'threshold': 0.4649999999999999}
+
+================================================================================
+Running experiment: wavlm_attn
+================================================================================
+[wavlm_attn] Epoch 01 | train_loss=0.7478 | val_loss=0.5354 | f1@0.5=0.8649 | prec=0.7855 | rec=0.9620 | auroc=0.7254 | auprc=0.8683
+[wavlm_attn] Saved best checkpoint to ./baseline_results/wavlm_attn/best_model.pt
+[wavlm_attn] Epoch 02 | train_loss=0.7140 | val_loss=0.8189 | f1@0.5=0.8633 | prec=0.7916 | rec=0.9494 | auroc=0.7453 | auprc=0.8855
+[wavlm_attn] Epoch 03 | train_loss=0.7064 | val_loss=0.6280 | f1@0.5=0.8662 | prec=0.8252 | rec=0.9114 | auroc=0.7465 | auprc=0.8869
+[wavlm_attn] Saved best checkpoint to ./baseline_results/wavlm_attn/best_model.pt
+[wavlm_attn] Epoch 04 | train_loss=0.7317 | val_loss=0.7542 | f1@0.5=0.8765 | prec=0.8187 | rec=0.9430 | auroc=0.7523 | auprc=0.8950
+[wavlm_attn] Saved best checkpoint to ./baseline_results/wavlm_attn/best_model.pt
+[wavlm_attn] Epoch 05 | train_loss=0.7258 | val_loss=0.8010 | f1@0.5=0.8746 | prec=0.8108 | rec=0.9494 | auroc=0.7510 | auprc=0.8948
+[wavlm_attn] Epoch 06 | train_loss=0.7211 | val_loss=0.7324 | f1@0.5=0.8730 | prec=0.8103 | rec=0.9462 | auroc=0.7451 | auprc=0.8938
+[wavlm_attn] Epoch 07 | train_loss=0.6946 | val_loss=0.9318 | f1@0.5=0.8717 | prec=0.7863 | rec=0.9778 | auroc=0.7475 | auprc=0.8940
+[wavlm_attn] Epoch 08 | train_loss=0.6958 | val_loss=0.8277 | f1@0.5=0.8737 | prec=0.8070 | rec=0.9525 | auroc=0.7522 | auprc=0.8992
+[wavlm_attn] Epoch 09 | train_loss=0.6742 | val_loss=0.8973 | f1@0.5=0.8750 | prec=0.8091 | rec=0.9525 | auroc=0.7515 | auprc=0.8982
+[wavlm_attn] Epoch 10 | train_loss=0.6546 | val_loss=0.7841 | f1@0.5=0.8658 | prec=0.8271 | rec=0.9082 | auroc=0.7555 | auprc=0.9001
+
+[wavlm_attn] Tuned threshold on val: 0.560
+[wavlm_attn] Final test metrics: {'f1': 0.8760951188986232, 'precision': 0.8235294117647058, 'recall': 0.9358288770053476, 'auroc': 0.7887481371087929, 'auprc': 0.91549275894882, 'loss': 0.6501369894718488, 'threshold': 0.5599999999999999}
