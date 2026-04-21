@@ -1,0 +1,229 @@
+# Thesis table definitions
+#
+# Each table entry defines:
+#   name:        Short identifier used as the output CSV filename
+#   title:       Human-readable table title
+#   columns:     Ordered list of column names to include in the output CSV
+#   rows:        List of row definitions (label + source file + key mappings)
+#
+# Source files are relative to the repository root.
+# "key_map" maps output column names to JSON keys inside the source file.
+# For CSV sources, "csv_filter" may specify a column=value filter to select rows.
+#
+# required_files: flat list of all result files that must exist before assembly.
+# The aggregate script exits 1 with a missing-file report if any are absent.
+
+# ---------------------------------------------------------------------------
+# Table 1: Encoder Baseline Results (cross-child split)
+# ---------------------------------------------------------------------------
+- name: table1_encoder_baselines
+  title: "Encoder baseline models — cross-child held-out test set"
+  columns: [model, pooling, f1, precision, recall, auroc, auprc]
+  rows:
+    - label: "Whisper-Base / mean"
+      source: baselines/baseline_results/whisper_mean/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {model: "Whisper-Base", pooling: "mean"}
+    - label: "Whisper-Base / attn"
+      source: baselines/baseline_results/whisper_attn/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {model: "Whisper-Base", pooling: "attn"}
+    - label: "WavLM-Base / mean"
+      source: baselines/baseline_results/wavlm_mean/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {model: "WavLM-Base", pooling: "mean"}
+    - label: "WavLM-Base / attn"
+      source: baselines/baseline_results/wavlm_attn/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {model: "WavLM-Base", pooling: "attn"}
+
+# ---------------------------------------------------------------------------
+# Table 2: Diarizer Enrollment Results (seen-child split)
+# ---------------------------------------------------------------------------
+- name: table2_enrollment_baselines
+  title: "Diarizer enrollment — seen-child held-out test set"
+  columns: [diarizer, f1, precision, recall, auroc, auprc, threshold]
+  rows:
+    - label: "USC-SAIL"
+      source: whisper-modeling/usc_sail_enrollment_runs/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {diarizer: "USC-SAIL"}
+    - label: "Pyannote"
+      source: pyannote/pyannote_enrollment_runs/test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {diarizer: "Pyannote"}
+    - label: "BabAR"
+      source: babar_ecapa_enrollment_runs/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {diarizer: "BabAR"}
+    - label: "VTC (KCHI+OCH)"
+      source: vtc_ecapa_enrollment_runs/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {diarizer: "VTC (KCHI+OCH)"}
+    - label: "VTC (KCHI only)"
+      source: vtc_kchi_ecapa_enrollment_runs/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {diarizer: "VTC (KCHI only)"}
+    - label: "VBx"
+      source: vbx_ecapa_enrollment_runs/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {diarizer: "VBx"}
+
+# ---------------------------------------------------------------------------
+# Table 3: Age-Stratified Enrollment (BabAR)
+# ---------------------------------------------------------------------------
+- name: table3_age_stratified_babar
+  title: "BabAR enrollment — age-stratified test set"
+  columns: [age_group, f1, precision, recall, auroc, auprc]
+  rows:
+    - label: "12-16 months"
+      source: pyannote/babar_age_stratified/12_16m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "12_16m"}
+    - label: "34-38 months"
+      source: pyannote/babar_age_stratified/34_38m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "34_38m"}
+
+# ---------------------------------------------------------------------------
+# Table 4: Age-Stratified Enrollment (USC-SAIL)
+# ---------------------------------------------------------------------------
+- name: table4_age_stratified_usc_sail
+  title: "USC-SAIL enrollment — age-stratified test set"
+  columns: [age_group, f1, precision, recall, auroc, auprc]
+  rows:
+    - label: "12-16 months"
+      source: pyannote/usc_sail_age_stratified/12_16m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "12_16m"}
+    - label: "34-38 months"
+      source: pyannote/usc_sail_age_stratified/34_38m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "34_38m"}
+
+# ---------------------------------------------------------------------------
+# Table 5: Age-Stratified Enrollment (Pyannote)
+# ---------------------------------------------------------------------------
+- name: table5_age_stratified_pyannote
+  title: "Pyannote enrollment — age-stratified test set"
+  columns: [age_group, f1, precision, recall, auroc, auprc]
+  rows:
+    - label: "12-16 months"
+      source: pyannote/pyannote_age_stratified/12_16m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "12_16m"}
+    - label: "34-38 months"
+      source: pyannote/pyannote_age_stratified/34_38m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "34_38m"}
+
+# ---------------------------------------------------------------------------
+# Table 6: Age-Stratified Enrollment (VTC / VBx)
+# ---------------------------------------------------------------------------
+- name: table6_age_stratified_vtc_vbx
+  title: "VTC / VBx enrollment — age-stratified test set"
+  columns: [diarizer, age_group, f1, precision, recall, auroc, auprc]
+  rows:
+    - label: "VTC 12-16m"
+      source: pyannote/vtc_age_stratified/12_16m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {diarizer: "VTC (KCHI+OCH)", age_group: "12_16m"}
+    - label: "VTC 34-38m"
+      source: pyannote/vtc_age_stratified/34_38m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {diarizer: "VTC (KCHI+OCH)", age_group: "34_38m"}
+    - label: "VBx 12-16m"
+      source: pyannote/vbx_age_stratified/12_16m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {diarizer: "VBx", age_group: "12_16m"}
+    - label: "VBx 34-38m"
+      source: pyannote/vbx_age_stratified/34_38m/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {diarizer: "VBx", age_group: "34_38m"}
+
+# ---------------------------------------------------------------------------
+# Table 7: Synthesis Evaluation
+# ---------------------------------------------------------------------------
+- name: table7_synthesis_eval
+  title: "Synthesis quality evaluation"
+  columns: [age_group, model, mcd_mean, mcd_std, speaker_similarity_mean, age_classifier_accuracy, f0_mean, f0_std]
+  rows:
+    - label: "VAE 12-16m"
+      source: synthesis/eval_results/12_16m/eval_results.json
+      key_map:
+        mcd_mean: mcd_mean
+        mcd_std: mcd_std
+        speaker_similarity_mean: speaker_similarity_mean
+        age_classifier_accuracy: age_classifier_accuracy
+        f0_mean: f0_stats.mean
+        f0_std: f0_stats.std
+      meta: {age_group: "12_16m", model: "VAE"}
+    - label: "VITS 34-38m"
+      source: synthesis/eval_results/34_38m/eval_results.json
+      key_map:
+        mcd_mean: mcd_mean
+        mcd_std: mcd_std
+        speaker_similarity_mean: speaker_similarity_mean
+        age_classifier_accuracy: age_classifier_accuracy
+        f0_mean: f0_stats.mean
+        f0_std: f0_stats.std
+      meta: {age_group: "34_38m", model: "VITS"}
+
+# ---------------------------------------------------------------------------
+# Table 8: Augmentation Evaluation (BabAR, ratio 1.0)
+# ---------------------------------------------------------------------------
+- name: table8_augmentation_eval
+  title: "Data augmentation effect on enrollment (BabAR, aug-ratio=1.0)"
+  columns: [age_group, condition, f1, precision, recall, auroc, auprc]
+  rows:
+    - label: "12-16m baseline"
+      source: babar_ecapa_enrollment_runs/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "12_16m", condition: "no augmentation"}
+    - label: "12-16m augmented"
+      source: pyannote/babar_augmented/12_16m_ratio1.0/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "12_16m", condition: "aug ratio=1.0"}
+    - label: "34-38m baseline"
+      source: babar_ecapa_enrollment_runs/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "34_38m", condition: "no augmentation"}
+    - label: "34-38m augmented"
+      source: pyannote/babar_augmented/34_38m_ratio1.0/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {age_group: "34_38m", condition: "aug ratio=1.0"}
+
+# ---------------------------------------------------------------------------
+# required_files: all files that must exist for a complete table assembly
+# Files listed here that are missing cause the script to exit 1
+# ---------------------------------------------------------------------------
+- required_files:
+    # Table 1 — encoder baselines (all should already exist)
+    - baselines/baseline_results/whisper_mean/test_metrics_tuned.json
+    - baselines/baseline_results/whisper_attn/test_metrics_tuned.json
+    - baselines/baseline_results/wavlm_mean/test_metrics_tuned.json
+    - baselines/baseline_results/wavlm_attn/test_metrics_tuned.json
+    # Table 2 — enrollment baselines (all should already exist)
+    - whisper-modeling/usc_sail_enrollment_runs/enroll_test_metrics.json
+    - pyannote/pyannote_enrollment_runs/test_metrics.json
+    - babar_ecapa_enrollment_runs/enroll_test_metrics.json
+    - vtc_ecapa_enrollment_runs/enroll_test_metrics.json
+    - vtc_kchi_ecapa_enrollment_runs/enroll_test_metrics.json
+    - vbx_ecapa_enrollment_runs/enroll_test_metrics.json
+    # Table 3-6 — age-stratified (produced by unified_age_stratified.py runs)
+    - pyannote/babar_age_stratified/12_16m/test_metrics_tuned.json
+    - pyannote/babar_age_stratified/34_38m/test_metrics_tuned.json
+    - pyannote/usc_sail_age_stratified/12_16m/test_metrics_tuned.json
+    - pyannote/usc_sail_age_stratified/34_38m/test_metrics_tuned.json
+    - pyannote/pyannote_age_stratified/12_16m/test_metrics_tuned.json
+    - pyannote/pyannote_age_stratified/34_38m/test_metrics_tuned.json
+    - pyannote/vtc_age_stratified/12_16m/test_metrics_tuned.json
+    - pyannote/vtc_age_stratified/34_38m/test_metrics_tuned.json
+    - pyannote/vbx_age_stratified/12_16m/test_metrics_tuned.json
+    - pyannote/vbx_age_stratified/34_38m/test_metrics_tuned.json
+    # Table 7 — synthesis eval (produced by synthesis/evaluate.py)
+    - synthesis/eval_results/12_16m/eval_results.json
+    - synthesis/eval_results/34_38m/eval_results.json
+    # Table 8 — augmentation eval (produced by augmentation_eval.py)
+    - pyannote/babar_augmented/12_16m_ratio1.0/test_metrics_tuned.json
+    - pyannote/babar_augmented/34_38m_ratio1.0/test_metrics_tuned.json

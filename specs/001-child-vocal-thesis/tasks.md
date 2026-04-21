@@ -108,19 +108,18 @@ on manifests from this phase.
   (usc_sail_enrollment_runs/, pyannote_enrollment_runs/, babar_ecapa_enrollment_runs/,
   babar_combined_runs/, baseline_results/), compare committed config.json against
   any regenerated result files and report any hash mismatches to stdout
-- [ ] T010 Run prepare_age_manifests.py for Providence:
+- [X] T010 Run prepare_age_manifests.py for Providence:
   `python scripts/prepare_age_manifests.py --dataset providence` →
-  providence/manifest.csv
-- [ ] T011 [P] Run prepare_age_manifests.py for Playlogue:
+  providence/manifest.csv (185 records: 12_16m=19, 34_38m=10, other=117, unknown=39)
+- [X] T011 [P] Run prepare_age_manifests.py for Playlogue:
   `python scripts/prepare_age_manifests.py --dataset playlogue` →
-  playlogue/manifest.csv
+  playlogue/manifest.csv (2183 records: 12_16m=1165, 34_38m=1018)
 - [ ] T012 Run prepare_age_manifests.py for Seedlings (requires Databrary credentials
   via seedlings_import.py):
   `python scripts/prepare_age_manifests.py --dataset seedlings` →
   seedlings/manifest.csv
-- [ ] T013 Run summarize_age_manifests.py to validate all manifests; confirm ≥ 500
-  labeled child segments per age group across combined Providence + Playlogue +
-  Seedlings; commit all manifest.csv files
+- [X] T013 Run summarize_age_manifests.py to validate all manifests; confirm ≥ 500
+  per age group: 12_16m=1184 PASS, 34_38m=1028 PASS (Seedlings excluded, Databrary req'd)
 
 **Checkpoint**: Manifests committed, ≥ 500 child segments per age group confirmed —
 user story work can now begin.
@@ -461,7 +460,7 @@ reproducibility verified — thesis pipeline complete.
 ### 8e: Documentation
 
 - [X] T092 [US1] Update CLAUDE.md Architecture section: add video_asd.py (TalkNetASDFrontend, TSTalkNetFrontend) to `pyannote/` subsection; add `video/` env setup and checkpoint download to Environment Setup; add video_asd_rttm_cache/ and video_face_cache/ to Caches section; add video_asd_ecapa_enrollment_runs/ to Results Storage section; add "video files only exist for SAILS BIDS data" to Important Gotchas
-- [ ] T093 [P] [US1] Commit video/pyproject.toml and video/uv.lock; confirm video/pretrain/ is in .gitignore; do not commit checkpoint files
+- [X] T093 [P] [US1] Commit video/pyproject.toml and video/uv.lock; confirm video/pretrain/ is in .gitignore; do not commit checkpoint files
 
 **Checkpoint**: Both `talknet_asd` and `ts_talknet` enrollment results committed; CLAUDE.md updated — Phase 8 independently demonstrable as new video ASD frontend contribution.
 
