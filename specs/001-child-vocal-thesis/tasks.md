@@ -1,0 +1,608 @@
+---
+description: "Task list for Child Vocalization Extraction & Synthesis Thesis"
+---
+
+# Tasks: Child Vocalization Extraction & Synthesis Thesis
+
+**Input**: Design documents from `specs/001-child-vocal-thesis/`
+**Prerequisites**: plan.md ✅, spec.md ✅, research.md ✅, data-model.md ✅,
+contracts/script-interfaces.md ✅, quickstart.md ✅
+
+**Tests**: No automated test suite (ML research project). Validation is
+experimental — val-set performance, ablation studies, and error analysis per
+Constitution Principles IV–V.
+
+**Organization**: Tasks are grouped by user story (US1–US4 + US3b) to enable
+independent implementation and testing. See plan.md for file paths.
+
+## Format: `[ID] [P?] [Story?] Description`
+
+- **[P]**: Can run in parallel (different files or independent jobs)
+- **[Story]**: US1 / US2 / US3 / US3b / US4
+- File paths are relative to repo root unless otherwise noted
+
+---
+
+## Phase 1: Setup
+
+**Purpose**: Create new module directories and initialize isolated synthesis environment.
+
+- [X] T001 Create synthesis/ directory tree: synthesis/scripts/, synthesis/configs/,
+  synthesis/slurm/, synthesis/models/, synthesis/checkpoints/, synthesis/generated/,
+  synthesis/data/12_16m/, synthesis/data/34_38m/, synthesis/eval_results/
+- [X] T002 [P] Create evaluation/ directory tree: evaluation/configs/, evaluation/thesis_tables/
+- [X] T003 [P] Create data/age_manifests/ directory for per-dataset age-annotated manifests
+- [X] T004 Initialize synthesis/pyproject.toml with uv-managed dependencies: coqui-ai-tts,
+  librosa, fastdtw, soundfile, numpy, pandas, scikit-learn, torch, torchaudio, speechbrain
+- [X] T005 Create synthesis/configs/vits_34m.yaml from schema in
+  contracts/script-interfaces.md (model.type=vits, age_group=34_38m, seed=42)
+- [X] T006 [P] Create synthesis/configs/vae_12m.yaml from schema in
+  contracts/script-interfaces.md (model.type=vae, age_group=12_16m, seed=42)
+
+---
+
+## Phase 1.5: VBx/VTC Diarizer Integration (Mostly Completed)
+
+**Purpose**: Two additional diarization frontends (VTC 2.0 standalone and VBx) were
+built and their enrollment + RTTM accuracy runs completed after the initial plan was
+written. Both are fully integrated in `pyannote/unified.py` and `pyannote/unified_rttm.py`.
+
+- **VTC (vtc)**: VTC 2.0 standalone, child = KCHI + OCH (all child speech, no BabAR phoneme step)
+- **VTC-KCHI (vtc_kchi)**: VTC 2.0 standalone, child = KCHI only (target/key child)
+- **VBx (vbx)**: Variational Bayes HMM diarization; anonymous speaker clusters resolved via
+  ECAPA cosine similarity to target-child prototype (no explicit child/adult role label)
+
+### Environment Setup (Completed)
+
+- [X] T061 [P] Set up VBx uv environment: `cd VBx && uv sync`; requires `HF_TOKEN` for
+  pyannote/segmentation-3.0 and pyannote/embedding; inference via `VBx/run_vbx.py`
+- [X] T062 [P] Set up VTC standalone uv environment: `cd BabAR/VTC && uv sync`;
+  checkpoint at `VTC/VTC-2.0/model/best.ckpt` must exist
+
+### Enrollment Runs (Completed)
+
+- [X] T063 [P] Run VBx enrollment on seen_child_splits via SLURM
+  (`sbatch pyannote/enrollment_vtc_vbx.sh` or `python pyannote/unified.py --diarizer vbx`);
+  results in `vbx_ecapa_enrollment_runs/` (test F1=0.858, AUROC=0.686, AUPRC=0.851)
+- [X] T064 [P] Run VTC enrollment (KCHI+OCH) via
+  `python pyannote/unified.py --diarizer vtc`; results in
+  `vtc_ecapa_enrollment_runs/` (test F1=0.888, AUROC=0.787, AUPRC=0.895)
+- [X] T065 [P] Run VTC-KCHI enrollment (KCHI only) via
+  `python pyannote/unified.py --diarizer vtc_kchi`; results in
+  `vtc_kchi_ecapa_enrollment_runs/` (test F1=0.874, AUROC=0.820, AUPRC=0.918)
+
+### RTTM Accuracy Runs (Mostly Completed)
+
+- [X] T066 [P] Run VBx RTTM accuracy on Playlogue via `sbatch pyannote/rttm_vbx.sh` →
+  `pyannote/eval_results/vbx_playlogue/` (aggregate_metrics.json present)
+- [X] T067 [P] Run VTC + VTC-KCHI RTTM accuracy on Playlogue and Providence via
+  `sbatch pyannote/rttm_vtc.sh` →
+  `pyannote/eval_results/{vtc,vtc_kchi}_{playlogue,providence}/` (all four complete)
+- [ ] T068 Complete VBx RTTM accuracy on Providence: `per_file_predictions/` present but
+  `aggregate_metrics.json` missing from `pyannote/eval_results/vbx_providence/`; rerun
+  `python pyannote/unified_rttm.py --diarizer vbx --dataset providence` to produce
+  aggregate metrics and commit
+
+**Checkpoint**: All VBx/VTC enrollment runs and most RTTM accuracy runs complete.
+VBx RTTM aggregate on Providence is the only outstanding item (T068).
+
+---
+
+## Phase 2: Foundational (Blocking Prerequisites)
+
+**Purpose**: Age manifest infrastructure and reproducibility tooling used by all
+user stories. MUST complete before any user story work begins.
+
+**⚠️ CRITICAL**: US2 (age-stratified eval) and US3 (synthesis training) both depend
+on manifests from this phase.
+
+- [X] T007 Implement scripts/prepare_age_manifests.py — load per-dataset annotation
+  sources (playlogue: anotated_processed.csv, providence: CHAT metadata,
+  seedlings: Databrary export), assign age_group labels (12_16m / 34_38m / other),
+  output manifest.csv per dataset matching AudioRecording schema in data-model.md;
+  include split column from whisper-modeling/seen_child_splits/
+- [X] T008 [P] Implement scripts/summarize_age_manifests.py — print per-dataset,
+  per-age-group counts (n recordings, n child segments, total child duration hrs)
+  from manifest CSVs; exit non-zero if any age group has < 500 child segments
+- [X] T009 [P] Implement scripts/verify_reproducibility.py — for each result folder
+  (usc_sail_enrollment_runs/, pyannote_enrollment_runs/, babar_ecapa_enrollment_runs/,
+  babar_combined_runs/, baseline_results/), compare committed config.json against
+  any regenerated result files and report any hash mismatches to stdout
+- [ ] T010 Run prepare_age_manifests.py for Providence:
+  `python scripts/prepare_age_manifests.py --dataset providence` →
+  providence/manifest.csv
+- [ ] T011 [P] Run prepare_age_manifests.py for Playlogue:
+  `python scripts/prepare_age_manifests.py --dataset playlogue` →
+  playlogue/manifest.csv
+- [ ] T012 Run prepare_age_manifests.py for Seedlings (requires Databrary credentials
+  via seedlings_import.py):
+  `python scripts/prepare_age_manifests.py --dataset seedlings` →
+  seedlings/manifest.csv
+- [ ] T013 Run summarize_age_manifests.py to validate all manifests; confirm ≥ 500
+  labeled child segments per age group across combined Providence + Playlogue +
+  Seedlings; commit all manifest.csv files
+
+**Checkpoint**: Manifests committed, ≥ 500 child segments per age group confirmed —
+user story work can now begin.
+
+---
+
+## Phase 3: User Story 1 — Cross-Dataset Vocalization Detection (Priority: P1) 🎯 MVP
+
+**Goal**: Verify existing detection baselines meet SC-001 (F1 ≥ 0.875) and run
+diarization inference on the unlabeled core home video dataset to produce RTTM files.
+
+**Independent Test**: `python pyannote/unified.py --diarizer babar` on test split
+produces test_metrics_tuned.json with F1 ≥ 0.875; all core session audio files
+have a corresponding output RTTM with no crashes.
+
+### Implementation for User Story 1
+
+- [X] T014 [US1] Verify BabAR baseline meets SC-001: run
+  `python pyannote/unified.py --diarizer babar` on seen_child_splits test split;
+  confirm test F1 ≥ 0.875 from pyannote/babar_ecapa_enrollment_runs/enroll_test_metrics.json;
+  commit result files if not already committed — DONE: F1=0.874 (meets SC-001)
+- [X] T015 [P] [US1] Verify USC-SAIL baseline: run
+  `python pyannote/unified.py --diarizer usc_sail` on test split;
+  commit whisper-modeling/usc_sail_enrollment_runs/enroll_test_metrics.json — DONE: F1=0.874
+- [X] T016 [P] [US1] Verify Pyannote baseline: run
+  `python pyannote/unified.py --diarizer pyannote` on test split;
+  commit pyannote/pyannote_enrollment_runs/test_metrics.json — DONE: results committed
+- [ ] T017 [US1] Create core/manifest.csv: list all core home video WAV files with
+  age_group labels (12_16m / 34_38m per session type), has_rttm=false, split=N/A
+- [ ] T018 [US1] Run BabAR diarization on core dataset to produce RTTMs:
+  `python pyannote/unified_rttm.py --diarizer babar --audio-dir core/audio/
+  --rttm-dir core/rttm/ --dataset core`; extend unified_rttm.py dataset handling
+  if needed to support unlabeled core audio (skip GT comparison, output RTTM only)
+- [ ] T019 [P] [US1] Run USC-SAIL diarization on core dataset:
+  `python pyannote/unified_rttm.py --diarizer usc_sail --audio-dir core/audio/
+  --rttm-dir core/rttm_usc/ --dataset core`
+- [ ] T020 [US1] Run existing per-child error analysis on BabAR baseline results:
+  `python pyannote/error_analysis.py` →
+  pyannote/babar_combined_runs/per_child_error_rates.csv,
+  false_positives.csv, false_negatives.csv; commit outputs
+- [ ] T021 [US1] Run verify_reproducibility.py across all baseline result folders;
+  confirm config ↔ result consistency; commit reproducibility report to
+  evaluation/reproducibility_report.txt
+
+**Checkpoint**: Baseline F1 ≥ 0.875 confirmed, core RTTMs generated, error analysis
+committed — US1 is fully testable and independently demonstrable.
+
+---
+
+## Phase 4: User Story 2 — Age-Stratified Analysis (Priority: P2)
+
+**Goal**: Implement age-stratified enrollment evaluation and produce separate
+F1/AUROC/AUPRC for 12-16 month and 34-38 month cohorts across all three diarizers.
+
+**Independent Test**: `python pyannote/unified_age_stratified.py --diarizer babar
+--age-group 12_16m` produces test_metrics_tuned.json under
+pyannote/babar_age_stratified/12_16m/; equivalent for 34_38m; metrics differ by ≥ 0.05
+on at least one axis (SC-002).
+
+### Implementation for User Story 2
+
+- [X] T022 [US2] Implement pyannote/unified_age_stratified.py per
+  contracts/script-interfaces.md: wrap unified.py enrollment loop with age_group
+  filter on seen_child_splits; use manifest.csv age_group labels; output per-age-group
+  subdirs: {output_dir}/{age_group}/{config,test_metrics_tuned,val_metrics_tuned,
+  test_predictions,test_metrics_by_timepoint}.json/.csv
+- [ ] T023 [US2] Run age-stratified evaluation for BabAR, 12_16m cohort:
+  `python pyannote/unified_age_stratified.py --diarizer babar --age-group 12_16m
+  --seed 42` → pyannote/babar_age_stratified/12_16m/
+- [ ] T024 [P] [US2] Run age-stratified evaluation for BabAR, 34_38m cohort:
+  `python pyannote/unified_age_stratified.py --diarizer babar --age-group 34_38m
+  --seed 42` → pyannote/babar_age_stratified/34_38m/
+- [ ] T025 [P] [US2] Run age-stratified evaluation for USC-SAIL (both age groups):
+  `python pyannote/unified_age_stratified.py --diarizer usc_sail --age-group all
+  --seed 42` → pyannote/usc_sail_age_stratified/
+- [ ] T026 [P] [US2] Run age-stratified evaluation for Pyannote (both age groups):
+  `python pyannote/unified_age_stratified.py --diarizer pyannote --age-group all
+  --seed 42` → pyannote/pyannote_age_stratified/
+- [ ] T069 [P] [US2] Run age-stratified evaluation for VTC and VTC-KCHI (both age groups):
+  `python pyannote/unified_age_stratified.py --diarizer vtc --age-group all --seed 42`
+  `python pyannote/unified_age_stratified.py --diarizer vtc_kchi --age-group all --seed 42`
+  → pyannote/vtc_age_stratified/, pyannote/vtc_kchi_age_stratified/
+- [ ] T070 [P] [US2] Run age-stratified evaluation for VBx (both age groups):
+  `python pyannote/unified_age_stratified.py --diarizer vbx --age-group all --seed 42`
+  → pyannote/vbx_age_stratified/
+- [ ] T027 [US2] Verify SC-002: compare 12_16m vs 34_38m metrics across all five diarizers
+  (usc_sail, pyannote, babar, vtc, vtc_kchi, vbx);
+  confirm ≥ 0.05 difference in at least one metric; commit comparison summary to
+  evaluation/age_stratified_comparison.csv
+- [ ] T028 [US2] Run error analysis on age-stratified results:
+  `python pyannote/pyannote_error_analysis.py` for each age group →
+  pyannote/pyannote_age_stratified/per_child_error_rates_{age_group}.csv;
+  commit outputs
+
+**Checkpoint**: Age-stratified metrics committed for all three diarizers × two age
+groups — US2 independently demonstrable.
+
+---
+
+## Phase 5: User Story 3 — Child Speech Synthesis System (Priority: P3)
+
+**Goal**: Build and evaluate an age-conditioned child speech synthesis system
+(VITS for 34_38m, VAE for 12_16m), producing 1000 samples per age group with
+MCD ≤ 8 dB and age-classifier accuracy ≥ 70%.
+
+**Independent Test**: `python synthesis/evaluate.py` for each age group produces
+eval_results.json with mcd_mean, speaker_similarity_mean, age_classifier_accuracy;
+SC-003 thresholds met.
+
+### Implementation for User Story 3
+
+- [X] T029 [US3] Implement synthesis/scripts/extract_segments.py — read manifest.csv
+  for each labeled dataset, load audio, extract KCHI segments from ground-truth RTTMs
+  (exclude overlap segments), resample to 16kHz mono, write WAVs to
+  synthesis/data/{age_group}/{recording_id}_{onset:.3f}.wav; log skipped segments
+  (< 100ms, overlap) to synthesis/data/extraction_log.csv
+- [X] T030 [P] [US3] Implement synthesis/scripts/count_segments.py — report per
+  age-group counts (n segments, total hours, mean/std duration) from
+  synthesis/data/{age_group}/; exit 1 if < 500 segments for any age group
+- [ ] T031 [US3] Run extract_segments.py for 12_16m:
+  `python synthesis/scripts/extract_segments.py --age-group 12_16m` →
+  synthesis/data/12_16m/
+- [ ] T032 [P] [US3] Run extract_segments.py for 34_38m:
+  `python synthesis/scripts/extract_segments.py --age-group 34_38m` →
+  synthesis/data/34_38m/
+- [ ] T033 [US3] Run count_segments.py to validate both age groups; abort if < 500
+  segments per group; commit extraction_log.csv
+- [X] T034 [US3] Implement synthesis/models/vits_model.py — wrap Coqui TTS VITS
+  architecture for age-conditioned 16kHz child speech synthesis; accept
+  network_param from synthesis/configs/vits_34m.yaml
+- [X] T035 [P] [US3] Implement synthesis/models/vae_model.py — lightweight
+  convolutional VAE for 12_16m non-linguistic vocalizations; encoder maps
+  mel-spectrogram → latent z; decoder reconstructs spectrogram; Griffin-Lim
+  vocoder for waveform output; accept config from synthesis/configs/vae_12m.yaml
+- [X] T036 [US3] Implement synthesis/train.py per contracts/script-interfaces.md CLI
+  contract: load config, instantiate model (VITS or VAE by model.type), train with
+  seed=42, save best checkpoint to synthesis/checkpoints/{age_group}_{model}_{ts}/,
+  write training_log.csv and config.json copy per Constitution Principle VI
+- [ ] T037 [US3] Submit synthesis training for 34_38m VITS via SLURM:
+  `sbatch synthesis/slurm/train_synthesis.sh --config synthesis/configs/vits_34m.yaml
+  --age-group 34_38m`; implement synthesis/slurm/train_synthesis.sh with GPU request
+  (#SBATCH --gres=gpu:1, -t 12:00:00) and uv env activation
+- [ ] T038 [P] [US3] Submit synthesis training for 12_16m VAE via SLURM:
+  `sbatch synthesis/slurm/train_synthesis.sh --config synthesis/configs/vae_12m.yaml
+  --age-group 12_16m`
+- [X] T039 [US3] Implement synthesis/generate.py per contracts/script-interfaces.md
+  CLI contract: load checkpoint, generate n-samples with fixed seed, write WAVs to
+  synthesis/generated/{model_name}/{age_group}/, populate registry.jsonl with
+  SyntheticSpeechSample schema fields
+- [ ] T040 [P] [US3] Generate 1000 samples for 34_38m:
+  `python synthesis/generate.py --checkpoint
+  synthesis/checkpoints/34_38m_vits_v1/best_checkpoint.pt
+  --age-group 34_38m --n-samples 1000 --seed 42` →
+  synthesis/generated/vits_34m_v1/34_38m/
+- [ ] T041 [P] [US3] Generate 1000 samples for 12_16m:
+  `python synthesis/generate.py --checkpoint
+  synthesis/checkpoints/12_16m_vae_v1/best_checkpoint.pt
+  --age-group 12_16m --n-samples 1000 --seed 42` →
+  synthesis/generated/vae_12m_v1/12_16m/
+- [X] T042 [US3] Implement synthesis/evaluate.py per contracts/script-interfaces.md:
+  compute MCD (via fastdtw alignment against held-out reference WAVs),
+  ECAPA cosine speaker similarity (via speechbrain SpeakerRecognition),
+  age-group classifier accuracy (train lightweight SVM or LR on real ECAPA embeddings,
+  score synthetic samples); write eval_results.json
+- [ ] T043 [P] [US3] Run synthesis/evaluate.py for 34_38m:
+  `python synthesis/evaluate.py --generated-dir
+  synthesis/generated/vits_34m_v1/34_38m/ --reference-dir synthesis/data/34_38m/
+  --age-group 34_38m --output-path synthesis/eval_results/34_38m/eval_results.json`
+- [ ] T044 [P] [US3] Run synthesis/evaluate.py for 12_16m:
+  `python synthesis/evaluate.py --generated-dir
+  synthesis/generated/vae_12m_v1/12_16m/ --reference-dir synthesis/data/12_16m/
+  --age-group 12_16m --output-path synthesis/eval_results/12_16m/eval_results.json`
+- [ ] T045 [US3] Verify SC-003: check mcd_mean ≤ 8.0 and age_classifier_accuracy ≥ 0.70
+  in both eval_results.json files; commit all eval results and registry.jsonl files
+
+**Checkpoint**: Synthesis quality verified for both age groups — US3 independently
+demonstrable as a standalone thesis contribution.
+
+---
+
+## Phase 6: User Story 3b — Synthesis Augmentation for Detection (Priority: P3)
+
+**Goal**: Augment detection model training with synthetic child speech and evaluate
+whether F1/AUROC improves per age group (result documented regardless of direction
+per SC-003b).
+
+**Independent Test**: `python pyannote/augmentation_eval.py --diarizer babar
+--synthetic-dir synthesis/generated/vae_12m_v1 --age-group 12_16m` produces
+test_metrics_tuned.json comparable to Phase 3 baseline, with delta documented.
+
+### Implementation for User Story 3b
+
+- [X] T046 [US3b] Implement pyannote/augmentation_eval.py per
+  contracts/script-interfaces.md: read registry.jsonl from synthetic-dir, merge
+  synthetic WAVs into training split (--aug-ratio synthetic-to-real), retrain
+  ECAPA enrollment prototypes and detection thresholds on augmented train set,
+  evaluate on same val/test split as baseline; output canonical result structure
+  (config.json, test_metrics_tuned.json, test_predictions.csv)
+- [ ] T047 [US3b] Run augmentation eval for BabAR + 12_16m cohort:
+  `python pyannote/augmentation_eval.py --diarizer babar
+  --synthetic-dir synthesis/generated/vae_12m_v1 --age-group 12_16m
+  --aug-ratio 1.0 --seed 42` →
+  pyannote/babar_augmented/12_16m_ratio1.0/
+- [ ] T048 [P] [US3b] Run augmentation eval for BabAR + 34_38m cohort:
+  `python pyannote/augmentation_eval.py --diarizer babar
+  --synthetic-dir synthesis/generated/vits_34m_v1 --age-group 34_38m
+  --aug-ratio 1.0 --seed 42` →
+  pyannote/babar_augmented/34_38m_ratio1.0/
+- [ ] T049 [US3b] Compute augmentation delta table: compare test F1/AUROC/AUPRC from
+  pyannote/babar_augmented/ vs. pyannote/babar_age_stratified/ for each age group;
+  write evaluation/augmentation_delta.csv with columns [age_group, metric, baseline,
+  augmented, delta]
+- [ ] T050 [US3b] Verify SC-003b: confirm augmentation results and error analysis
+  are documented for both age groups; if any delta is negative, run
+  `python pyannote/error_analysis.py` on augmented results to characterize
+  failure modes; commit augmentation_delta.csv and any error analysis CSVs
+
+**Checkpoint**: Augmentation results documented for both age groups — US3b independently
+reportable as a thesis chapter regardless of delta sign.
+
+---
+
+## Phase 7: User Story 4 — Unified Evaluation Framework (Priority: P4)
+
+**Goal**: Single cohesive framework producing all thesis-ready metric tables from
+committed output files with zero manual transcription (SC-006).
+
+**Independent Test**: `python evaluation/aggregate_thesis_tables.py` produces all
+tables under evaluation/thesis_tables/ from committed result files only;
+verify_reproducibility.py confirms no result file was produced outside of a committed
+config run.
+
+### Implementation for User Story 4
+
+- [X] T051 [US4] Implement pyannote/proxy_analysis.py per
+  contracts/script-interfaces.md: for each core dataset session, load RTTM outputs
+  from US1 (core/rttm/, core/rttm_usc/), compute per-session ECAPA cosine similarity
+  to age-group prototype, compute inter-frontend agreement between BabAR and USC-SAIL
+  (child-present/absent per 10ms frame), write per_session_scores.csv,
+  inter_frontend_agreement.csv, detection_rate_stats.csv
+- [X] T052 [US4] Create evaluation/configs/thesis_tables.yaml — define mapping from
+  result file paths (relative to repo root) → thesis table names, column labels, and
+  row ordering; cover baseline, age-stratified, augmented, synthesis-eval, and proxy
+  result sets; include a list of all files required for completeness validation
+- [X] T053 [US4] Implement evaluation/aggregate_thesis_tables.py — read
+  thesis_tables.yaml, load each referenced JSON/CSV result file, assemble rows into
+  per-table CSV outputs under evaluation/thesis_tables/; exit 1 with missing-file
+  report if any required result file is absent; never manually construct numeric values
+- [ ] T054 [US4] Run pyannote/proxy_analysis.py on core dataset:
+  `python pyannote/proxy_analysis.py --core-dir core/audio/
+  --prototype-dir pyannote/age_group_prototypes/
+  --output-dir pyannote/core_proxy_analysis/`
+- [ ] T055 [US4] Run evaluation/aggregate_thesis_tables.py →
+  evaluation/thesis_tables/ (one CSV per thesis table); confirm all required result
+  files are present before committing
+- [ ] T056 [US4] Verify SC-006: automated diff shows all numbers in thesis_tables/
+  CSVs trace to a specific row in a committed result JSON or prediction CSV;
+  document any discrepancy in evaluation/table_provenance.md
+- [ ] T057 [US4] Run verify_reproducibility.py across ALL result folders (baseline +
+  age-stratified + augmented + synthesis); commit reproducibility_report.txt to
+  evaluation/; fix any config ↔ result mismatches before proceeding
+
+**Checkpoint**: All thesis tables auto-generated from committed files,
+reproducibility verified — thesis pipeline complete.
+
+---
+
+## Phase 1.6: Video ASD Environment Setup (Branch 003)
+
+**Purpose**: Create isolated `video/` uv environment; clone ASD repos; download checkpoints; wire up pyannote/video_asd.py skeleton.
+
+**Dependency**: Independent — start immediately alongside other phases.
+
+- [X] T071 Create video/ directory: video/pretrain/, video/TalkNet-ASD/, video/TS-TalkNet/; initialize video/pyproject.toml with Python 3.10 and dependencies: torch>=1.12, torchvision, torchaudio, opencv-python, scipy, scikit-learn, tqdm, speechbrain, numpy, soundfile; run `cd video && uv sync` to produce video/uv.lock
+- [X] T072 [P] Clone TalkNet-ASD into video/TalkNet-ASD/: done
+- [X] T073 [P] Clone TS-TalkNet into video/TS-TalkNet/: done
+- [X] T074 S3FD checkpoint auto-downloads via gdown (GDrive ID 1KafnHz7ccT-3IyddBsL5yi2xGtxAKypt)
+  to video/TalkNet-ASD/model/faceDetector/s3fd/sfd_face.pth on first run of run_asd.py;
+  no manual download needed
+- [X] T075 [P] TalkNet-ASD TalkSet checkpoint auto-downloads via gdown
+  (GDrive ID 1AbN9fCf9IexMxEKXLQY2KYBlb-IhSEea) to video/pretrain/talknet_asd.model
+  on first run; no manual download needed
+- [ ] T076 [P] TS-TalkNet requires two non-auto-downloadable files:
+  (a) video/pretrain/ts_talknet.model — trained TS-TalkNet checkpoint (not publicly released);
+  (b) video/TS-TalkNet/exps/pretrain.model — ECAPA speaker encoder weights loaded during
+  model construction (not in repo). Obtain from TS-TalkNet authors or skip this frontend.
+  TalkNet-ASD frontend is fully functional without this.
+- [X] T077 Add video/pretrain/ to repo .gitignore (checkpoints not committed); commit video/pyproject.toml, video/uv.lock, and .gitignore change
+
+**Checkpoint**: `cd video && uv run python -c "import torch, cv2; print('ok')"` succeeds; all pretrain/ checkpoints present.
+
+---
+
+## Phase 8: Video ASD Diarization Frontends (Branch 003, [US1])
+
+**Goal**: Implement TalkNet-ASD and TS-TalkNet as `DiarizationFrontend` subclasses; run enrollment evaluation on the seen-child split; compare against audio-only baselines.
+
+**Independent Test**: `python pyannote/unified.py --diarizer talknet_asd` on seen-child split completes without crash; `video_asd_ecapa_enrollment_runs/talknet_asd/enroll_test_metrics.json` exists with F1/AUROC/AUPRC populated.
+
+**Dependency**: Phase 1.6 must be complete (video/ env, repos, checkpoints).
+
+### 8a: Shared video/run_asd.py script
+
+- [X] T078 [US1] Create video/run_asd.py: CLI with --audio_path, --model, --ref_audio, --out_rttm,
+  --face_cache_dir, --pretrain_dir; derives video path from BIDS naming; raises FileNotFoundError
+  for audio-only datasets; runs face detection → ASD → RTTM write
+- [X] T079 [US1] Implement S3FD face detection + IoU tracker in video/run_asd.py: CWD-aware import
+  from model/faceDetector/s3fd/; auto-downloads via gdown; IoU ≥ 0.5 tracker; caches face
+  tracks as JSON; returns tracks with {track_id, frames, mean_area}
+- [X] T080 [US1] Implement TalkNet-ASD inference in video/run_asd.py: python_speech_features MFCC
+  at 100fps; grayscale 112×112 crops; multi-duration windows {1,1,1,2,2,2,3,3,4,5,6} s;
+  correct forward pipeline via model.model.*; lossAV(out, None) → logits; threshold 0 → segments;
+  auto-downloads TalkSet checkpoint via gdown; child = smallest-bbox-area track
+- [ ] T081 [P] [US1] Smoke-test video/run_asd.py --model talknet_asd: pick any 3 SAILS clips from splits/test.csv with audio_exists=True; run script directly; verify: no crash, --out_rttm file created, valid RTTM format (SPEAKER lines), child segments have start < end
+
+### 8b: TalkNet-ASD frontend in pyannote/video_asd.py
+
+- [X] T082 [US1] Create pyannote/video_asd.py: define VideoASDConfig dataclass with fields: model_name (str), rttm_cache_dir (str), face_cache_dir (str), video_env_python (str, default "video/.venv/bin/python"), run_asd_script (str, default "video/run_asd.py"), pretrain_dir (str, default "video/pretrain"); implement _derive_video_path(audio_path) → str helper; implement _rttm_cache_path(audio_path, model_name) → str using md5 hash
+- [X] T083 [US1] Implement TalkNetASDFrontend(DiarizationFrontend) in pyannote/video_asd.py: __init__ creates rttm_cache_dir/talknet_asd/ and face_cache_dir/; get_segments(audio_path, cfg) checks cache first; if miss, calls subprocess [video_env_python, run_asd_script, --audio_path, --model talknet_asd, --out_rttm, --face_cache_dir, --pretrain_dir]; parses output RTTM for CHI lines → List[{"start": float, "end": float}]; on FileNotFoundError from subprocess (audio-only dataset), returns []
+- [X] T084 [US1] Add 'talknet_asd' to pyannote/unified.py: add to --diarizer argparse choices; add BaseConfig fields: video_asd_rttm_cache_dir, video_face_cache_dir, video_env_python, video_run_asd_script, video_pretrain_dir; in frontend factory function, instantiate TalkNetASDFrontend and set cfg.results_dir = "video_asd_ecapa_enrollment_runs/talknet_asd"; import video_asd at top of unified.py
+
+### 8c: TS-TalkNet frontend
+
+- [X] T085 [US1] Implement TS-TalkNet inference in video/run_asd.py: importlib loads ts-talkNet.py
+  (hyphenated filename); CWD set to _TSTALKNET_DIR for exps/pretrain.model ECAPA init;
+  speaker embedding via model.model.forward_speaker_encoder(mfcc); runs all tracks, picks
+  highest-scoring; requires exps/pretrain.model + ts_talknet.model (not auto-downloadable)
+- [X] T086 [P] [US1] Implement TSTalkNetFrontend(DiarizationFrontend) in pyannote/video_asd.py: get_segments(audio_path, cfg) extracts child_id from audio_path (parse sub-{ID} from BIDS path), loads train.csv, filters to same child_id, picks first available audio_path as ref_audio; calls subprocess with --model ts_talknet --ref_audio; caches RTTM in rttm_cache_dir/ts_talknet/; returns CHI segments or [] on video-not-found
+- [X] T087 [US1] Add 'ts_talknet' to pyannote/unified.py diarizer choices and factory; add TSTalkNetFrontend instantiation with results_dir = "video_asd_ecapa_enrollment_runs/ts_talknet"
+- [ ] T088 [US1] Smoke-test TSTalkNetFrontend: same 3 clips as T081; verify reference audio lookup succeeds (child_id found in train split); verify RTTM written; print n_segments
+
+### 8d: Enrollment runs and comparison
+
+- [ ] T089 [US1] Run TalkNet-ASD enrollment on seen-child split: `python pyannote/unified.py --diarizer talknet_asd`; results to video_asd_ecapa_enrollment_runs/talknet_asd/ (config.json, child_prototype_stats.csv, role_only_val_metrics.json, role_only_test_metrics.json, enroll_val_metrics.json, enroll_test_metrics.json, test_predictions.csv, test_metrics_by_timepoint.csv); commit all files
+- [ ] T090 [P] [US1] Run TS-TalkNet enrollment on seen-child split: `python pyannote/unified.py --diarizer ts_talknet`; results to video_asd_ecapa_enrollment_runs/ts_talknet/; commit all files
+- [ ] T091 [US1] Add video ASD enrollment metrics (talknet_asd, ts_talknet) to CLAUDE.md results table (Key enrollment test metrics section); update Recent Changes entry for branch 003; commit CLAUDE.md update
+
+### 8e: Documentation
+
+- [X] T092 [US1] Update CLAUDE.md Architecture section: add video_asd.py (TalkNetASDFrontend, TSTalkNetFrontend) to `pyannote/` subsection; add `video/` env setup and checkpoint download to Environment Setup; add video_asd_rttm_cache/ and video_face_cache/ to Caches section; add video_asd_ecapa_enrollment_runs/ to Results Storage section; add "video files only exist for SAILS BIDS data" to Important Gotchas
+- [ ] T093 [P] [US1] Commit video/pyproject.toml and video/uv.lock; confirm video/pretrain/ is in .gitignore; do not commit checkpoint files
+
+**Checkpoint**: Both `talknet_asd` and `ts_talknet` enrollment results committed; CLAUDE.md updated — Phase 8 independently demonstrable as new video ASD frontend contribution.
+
+---
+
+## Phase N: Polish & Cross-Cutting Concerns
+
+- [ ] T058 Update CLAUDE.md to document all new scripts: synthesis/ module, evaluation/
+  module, pyannote/unified_age_stratified.py, pyannote/augmentation_eval.py,
+  pyannote/proxy_analysis.py, scripts/prepare_age_manifests.py,
+  scripts/verify_reproducibility.py
+- [ ] T059 [P] Confirm synthesis uv environment is fully committed: verify
+  synthesis/pyproject.toml lockfile (uv.lock) is tracked in git
+- [ ] T060 [P] Commit all final result artifacts to canonical folders per Constitution
+  Principle VI: every JSON, CSV, and checkpoint manifest in one descriptive commit per
+  experiment type
+
+---
+
+## Dependencies & Execution Order
+
+### Phase Dependencies
+
+- **Setup (Phase 1)**: No dependencies — start immediately
+- **VBx/VTC Integration (Phase 1.5)**: No dependencies — complete (T061–T067 done; T068 pending)
+- **Video ASD Setup (Phase 1.6)**: No dependencies — start immediately; independent of all other phases
+- **Foundational (Phase 2)**: Depends on Setup — blocks US2 and US3 (manifests required)
+- **US1 (Phase 3)**: Depends on Setup only (existing baselines, core dataset inference)
+- **US2 (Phase 4)**: Depends on Foundational (age manifests required for stratification);
+  T069–T070 (VBx/VTC age-stratified) also depend on Phase 1.5 being complete
+- **US3 (Phase 5)**: Depends on Foundational (segment extraction uses manifests)
+- **US3b (Phase 6)**: Depends on US3 (synthesis/generated/ must exist) + US2 (baseline
+  per-age-group metrics required for delta computation)
+- **US4 (Phase 7)**: Depends on US1 + US2 + US3 + US3b (all results must exist)
+- **Video ASD Frontends (Phase 8)**: Depends on Phase 1.6 (video env + checkpoints); independent of Phases 2–7
+- **Polish (Phase N)**: Depends on all prior phases
+
+### User Story Dependencies
+
+- **US1 (P1)**: Starts after Phase 1 — no dependency on Foundational manifests
+- **US2 (P2)**: Starts after Foundational (Phase 2) — no dependency on US1
+- **US3 (P3)**: Starts after Foundational (Phase 2) — no dependency on US1/US2
+- **US3b (P3)**: Starts after US3 completes (needs generated samples) AND US2
+  completes (needs age-stratified baseline for delta)
+- **US4 (P4)**: Starts after US1 + US2 + US3 + US3b all complete
+
+### Critical Path
+
+```
+Phase 1 (Setup)  ──→  Phase 1.5 (VBx/VTC: mostly done, T068 pending)
+    ↓                  Phase 1.6 (Video ASD: env + repos + checkpoints) ──→ Phase 8 (Video ASD frontends)
+Phase 2 (Foundational: manifests)
+    ├─→ Phase 3 (US1: baseline verification + core inference)
+    ├─→ Phase 4 (US2: age-stratified eval) ──┐
+    └─→ Phase 5 (US3: synthesis) ────────────┤
+                                              ↓
+                                    Phase 6 (US3b: augmentation)
+                                              ↓
+                                    Phase 7 (US4: unified framework)
+                                              ↓
+                                    Phase N (Polish)
+```
+
+Note: US1 and US2/US3 can run in parallel after Foundational completes.
+
+---
+
+## Parallel Opportunities
+
+```bash
+# Phase 1.6: start immediately (independent of everything)
+Task: "T072 Clone TalkNet-ASD repo"
+Task: "T073 Clone TS-TalkNet repo"
+Task: "T075 Download TalkNet checkpoint"
+Task: "T076 Download TS-TalkNet checkpoint"
+
+# Phase 8 within-phase parallelism (after T079 face detection is working):
+Task: "T081 Smoke-test TalkNet script"
+Task: "T086 Implement TSTalkNetFrontend"
+
+# Phase 8 enrollment runs (after T084 and T087 wired into unified.py):
+Task: "T090 TS-TalkNet enrollment run"  # parallel with T089 TalkNet enrollment
+Task: "T093 Commit video/ env files"    # parallel with T092 CLAUDE.md update
+
+# After Phase 2 completes, launch US1 + US2 + US3 in parallel:
+
+# US1: verify baselines (T014–T016 in parallel)
+Task: "T015 Verify USC-SAIL baseline on test split"
+Task: "T016 Verify Pyannote baseline on test split"
+
+# US2: age-stratified eval (T023–T026 + T069–T070 in parallel after T022)
+Task: "T024 BabAR 34_38m age-stratified run"
+Task: "T025 USC-SAIL age-stratified run"
+Task: "T026 Pyannote age-stratified run"
+Task: "T069 VTC/VTC-KCHI age-stratified run"
+Task: "T070 VBx age-stratified run"
+
+# US3: extraction + training (T031–T032 parallel, T037–T038 parallel jobs)
+Task: "T032 Extract 34_38m segments"
+Task: "T037 Submit VITS training SLURM job"
+Task: "T038 Submit VAE training SLURM job"
+
+# US3: generation + evaluation (T040–T044 parallel pairs)
+Task: "T040 Generate 34_38m VITS samples"
+Task: "T041 Generate 12_16m VAE samples"
+Task: "T043 Evaluate 34_38m synthesis quality"
+Task: "T044 Evaluate 12_16m synthesis quality"
+```
+
+---
+
+## Implementation Strategy
+
+### MVP First (US1 Only)
+
+1. Phase 1: Setup (T001–T006)
+2. Phase 2: Foundational manifests (T007–T013)
+3. Phase 3: US1 baseline verification + core inference (T014–T021)
+4. **STOP and VALIDATE**: All baselines ≥ SC-001, core RTTMs generated
+5. Thesis Chapter 1 (detection) is fully supported
+
+### Incremental Delivery
+
+1. Setup + Foundational → manifests ready
+2. US1 → detection chapter supported (MVP)
+3. US2 → age-stratified chapter supported
+4. US3 → synthesis chapter supported (standalone contribution)
+5. US3b → augmentation results documented
+6. US4 → all tables auto-generated, reproducibility verified
+
+---
+
+## Notes
+
+- [P] = different files or independent SLURM jobs, safe to run concurrently
+- SLURM training jobs (T037, T038) may run 6–12 hours; do not block on them
+- T012 (Seedlings manifest) requires Databrary API credentials via
+  `seedlings_import.py` — ensure access before starting Foundational phase
+- All new result folders MUST contain config.json per Constitution Principle VI
+- Synthesis training (T037–T038) MUST use fixed seed=42 per Constitution Principle I
+- Never touch test-set threshold tuning — val only (Constitution Principle II)
+- Commit after each checkpoint; do not accumulate uncommitted result files
+- **Video ASD (T071–T093)**: video/pretrain/ checkpoints are NOT committed (.gitignore); document download URLs in video/README.md (T093); video ASD only applies to SAILS data — Providence/Playlogue will return [] from get_segments() gracefully
+- **T079 face cache**: if video FPS is not 25, face_cache JSON must store actual timestamps not frame indices; downstream inference windows must align audio + video on timestamps

@@ -1,0 +1,23 @@
+[project]
+name = "video-asd"
+version = "0.1.0"
+description = "Video-audio active speaker detection environment for child diarization"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=1.12",
+    "torchvision",
+    "torchaudio",
+    "opencv-python",
+    "scipy",
+    "scikit-learn",
+    "tqdm",
+    "speechbrain",
+    "numpy",
+    "soundfile",
+    "pandas",
+    "python_speech_features",
+    "gdown",
+]
+
+[tool.uv]
+dev-dependencies = []
