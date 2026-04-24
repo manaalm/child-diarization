@@ -1,0 +1,54 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.env*
+*.egg-info/
+dist/
+build/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+*.log
+*.out
+
+# Model checkpoints (large binary files)
+synthesis/checkpoints/
+synthesis/generated/
+*.pt
+*.pth
+
+# Video ASD pretrained checkpoints (download separately — see video/SETUP.md)
+video/pretrain/
+video/TalkNet-ASD/
+video/TS-TalkNet/
+
+# Video ASD inference caches
+pyannote/video_asd_rttm_cache/
+pyannote/video_face_cache/
+
+# Cached inference outputs
+whisper-modeling/usc_sail_rttm_cache/
+whisper-modeling/usc_sail_segment_cache/
+pyannote/pyannote_rttm_cache/
+
+# AV fusion caches (GPT-4o responses, face tracks)
+av_fusion/gpt4o_cache/*
+!av_fusion/gpt4o_cache/.gitkeep
+av_fusion/face_track_cache/
+
+# LocoNet and Light-ASD repos (download separately — see specs/007-av-extensions/quickstart.md)
+video/LoCoNet_ASD/
+video/Light-ASD/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# uv lock (synthesis env)
+synthesis/uv.lock

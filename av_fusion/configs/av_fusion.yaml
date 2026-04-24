@@ -1,0 +1,91 @@
+seed: 42
+sample_fps: 2
+visual_eligibility_threshold_method: balanced_accuracy
+audio_score_col: prob
+
+# Separate prediction files per split (relative to repo root); join key: audio_path
+# Train-set audio scores are NOT available (enrollment model was trained on train split).
+# Fusion models use late fusion: visual model trained on visual features; audio combined
+# at inference via val-tuned alpha (see late_fusion_alpha below).
+audio_scores_val_csv: babar_ecapa_enrollment_runs/enroll_val_predictions.csv
+audio_scores_test_csv: babar_ecapa_enrollment_runs/enroll_test_predictions.csv
+
+# Late fusion: final_prob = alpha * audio_prob + (1-alpha) * visual_prob
+# alpha = 0.5 is the starting point; tuned on val in train_av_fusion.py
+late_fusion_alpha_init: 0.5
+
+# Feature column definitions per model class
+feature_columns:
+  audio_only:
+    - existing_audio_score
+    - age_band_binary
+
+  visual_only:
+    # Manual BIDS annotation features (always available)
+    - manual_face_visibility_norm
+    - manual_quality_norm
+    - child_of_interest_clear_binary
+    - n_people_total
+    - multi_person_clip
+    - age_band_binary
+    # Automatic visual features (NaN if extract_visual_features.py not run)
+    - n_faces_detected_mean
+    - n_face_tracks
+    - max_face_track_fraction_clip
+    - child_visible_score
+    - off_camera_likely_score
+    - visual_eligibility_score
+
+  always_fuse:
+    # Audio NOT included as a training feature (no train-set audio scores).
+    # Audio is combined at inference via late_fusion_alpha.
+    - manual_face_visibility_norm
+    - manual_quality_norm
+    - child_of_interest_clear_binary
+    - n_people_total
+    - multi_person_clip
+    - age_band_binary
+    - n_faces_detected_mean
+    - n_face_tracks
+    - max_face_track_fraction_clip
+    - child_visible_score
+    - off_camera_likely_score
+    - visual_eligibility_score
+
+  gated_av:
+    # Same visual features as always_fuse; audio + gating applied at inference
+    - manual_face_visibility_norm
+    - manual_quality_norm
+    - child_of_interest_clear_binary
+    - n_people_total
+    - multi_person_clip
+    - age_band_binary
+    - n_faces_detected_mean
+    - n_face_tracks
+    - max_face_track_fraction_clip
+    - child_visible_score
+    - off_camera_likely_score
+    - visual_eligibility_score
+
+# XGBoost hyperparameters
+xgboost:
+  n_estimators: 100
+  max_depth: 3
+  learning_rate: 0.1
+  subsample: 0.8
+  colsample_bytree: 0.8
+  use_label_encoder: false
+  eval_metric: logloss
+
+# Logistic Regression hyperparameters (interpretable baseline)
+logistic_regression:
+  C: 1.0
+  max_iter: 1000
+  solver: lbfgs
+
+# Eligibility score formula weights (used when automatic features available)
+eligibility_weights:
+  child_visible: 0.40
+  track_fraction: 0.25
+  quality: 0.20
+  detection_confidence: 0.15

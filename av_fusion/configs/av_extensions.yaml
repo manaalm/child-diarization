@@ -1,0 +1,33 @@
+# av_fusion/configs/av_extensions.yaml
+# Config for 007-av-extensions experiments
+seed: 42
+
+asd_models:
+  loconet:
+    checkpoint: ""  # set at runtime via --loconet-checkpoint or env
+    batch_size: 16
+    device: cuda
+  light_asd:
+    checkpoint: ""  # set at runtime via --light-asd-checkpoint or env
+    batch_size: 32
+    device: cuda
+
+gpt4o:
+  model: gpt-4o-mini
+  sample_rate: 2        # frames per clip
+  max_tokens: 256
+  temperature: 0.0
+  cache_dir: av_fusion/gpt4o_cache/
+
+cascade:
+  vad_feature: kchi_total_dur
+  child_id_feature: prob       # enrollment score column (from BabAR)
+  vad_threshold_grid: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0, 1.5, 2.0]
+  child_id_threshold_grid: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+temporal_smoothing:
+  default_method: gaussian
+  gaussian_bandwidth_grid: [0.5, 1.0, 1.5, 2.0, 3.0]
+  majority_vote_window_grid: [3, 5, 7]
+  moving_average_window_grid: [3, 5, 7]
+  group_cols: [child_id, timepoint_norm]

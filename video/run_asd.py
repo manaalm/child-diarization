@@ -44,6 +44,7 @@ from typing import Dict, List, Optional, Tuple
 import cv2
 import numpy as np
 import python_speech_features as psf
+import soundfile as sf
 import torch
 import torchaudio
 
@@ -94,7 +95,8 @@ def cache_key(path: str) -> str:
 
 def load_audio_16k(audio_path: str) -> Tuple[np.ndarray, int]:
     """Load audio as 16kHz mono numpy array."""
-    wav, sr = torchaudio.load(audio_path)
+    data, sr = sf.read(audio_path, dtype="float32", always_2d=True)
+    wav = torch.from_numpy(data.T)  # (channels, samples)
     if wav.shape[0] > 1:
         wav = wav.mean(dim=0, keepdim=True)
     if sr != 16000:
@@ -372,6 +374,18 @@ def run_talknet_asd(
     if videoFeature.shape[0] == 0:
         return []
 
+    # TalkNet was trained at 25fps; resample to 25fps if video has different rate
+    # so that audio (4× downsampled from 100fps → 25 embed frames/s) aligns with
+    # video embed frames (1:1 with input frames → also 25 embed frames/s).
+    TARGET_FPS = 25.0
+    if abs(fps - TARGET_FPS) > 0.5:
+        n_src = videoFeature.shape[0]
+        n_dst = max(1, int(round(n_src * TARGET_FPS / fps)))
+        idx = np.round(np.linspace(0, n_src - 1, n_dst)).astype(int)
+        videoFeature = videoFeature[idx]
+        frame_timestamps = [frame_timestamps[i] for i in idx]
+        fps = TARGET_FPS
+
     n_audio = audioFeature.shape[0]
     n_video = videoFeature.shape[0]
     track_start_sec = frame_timestamps[0] if frame_timestamps else 0.0
@@ -405,6 +419,8 @@ def run_talknet_asd(
             inputV = torch.FloatTensor(inputV_np).unsqueeze(0).to(device)   # (1, T_v, 112, 112)
             embedA = model.model.forward_audio_frontend(inputA)
             embedV = model.model.forward_visual_frontend(inputV)
+            min_t = min(embedA.shape[1], embedV.shape[1])
+            embedA, embedV = embedA[:, :min_t, :], embedV[:, :min_t, :]
             embedA, embedV = model.model.forward_cross_attention(embedA, embedV)
             out = model.model.forward_audio_visual_backend(embedA, embedV)
             score = model.lossAV.forward(out, labels=None)  # numpy (T_v,) raw logits
@@ -534,6 +550,16 @@ def run_ts_talknet(
         if videoFeature.shape[0] == 0:
             continue
 
+        # Resample to 25fps (model was trained at 25fps)
+        TARGET_FPS = 25.0
+        if abs(fps - TARGET_FPS) > 0.5:
+            n_src = videoFeature.shape[0]
+            n_dst = max(1, int(round(n_src * TARGET_FPS / fps)))
+            idx = np.round(np.linspace(0, n_src - 1, n_dst)).astype(int)
+            videoFeature = videoFeature[idx]
+            frame_timestamps = [frame_timestamps[i] for i in idx]
+            fps = TARGET_FPS
+
         track_start_sec = frame_timestamps[0] if frame_timestamps else 0.0
         a_start = int(track_start_sec * 100)
         af_slice = audioFeature[a_start:]
@@ -563,6 +589,8 @@ def run_ts_talknet(
                 inputV = torch.FloatTensor(inputV_np).unsqueeze(0).to(device)
                 embedA = model.model.forward_audio_frontend(inputA)
                 embedV = model.model.forward_visual_frontend(inputV)
+                min_t = min(embedA.shape[1], embedV.shape[1])
+                embedA, embedV = embedA[:, :min_t, :], embedV[:, :min_t, :]
                 embedA, embedV = model.model.forward_cross_attention(embedA, embedV)
                 outsAV = model.model.forward_audio_visual_backend(embedA, embedV, speaker_emb)
                 score = model.lossAV.forward(outsAV, labels=None)
@@ -650,6 +678,246 @@ def write_rttm(segments: List[Dict], audio_path: str, out_rttm: str):
 
 
 # ---------------------------------------------------------------------------
+# LocoNet ASD
+# ---------------------------------------------------------------------------
+
+def run_loconet_asd(
+    audio_path: str,
+    video_path: str,
+    tracks: List,
+    checkpoint: str,
+    min_seg_dur: float = 0.4,
+) -> List[Dict]:
+    """Run LocoNet-ASD inference and return CHI-labeled segments.
+
+    LocoNet uses the same face-track + audio input format as TalkNet.
+    Requires video/LoCoNet_ASD/ to be cloned and checkpoint downloaded.
+    Falls back gracefully if import fails.
+    """
+    loconet_dir = _THIS_DIR / "LoCoNet_ASD"
+    if not loconet_dir.is_dir():
+        raise FileNotFoundError(
+            f"LoCoNet_ASD repo not found at {loconet_dir}.\n"
+            "Clone with: huggingface-cli download Superxixixi/LoCoNet_ASD "
+            "--local-dir video/LoCoNet_ASD/"
+        )
+    if str(loconet_dir) not in sys.path:
+        sys.path.insert(0, str(loconet_dir))
+
+    if not os.path.exists(checkpoint):
+        raise FileNotFoundError(
+            f"LocoNet checkpoint not found: {checkpoint}\n"
+            "Download from HuggingFace: Superxixixi/LoCoNet_ASD"
+        )
+
+    try:
+        # LocoNet uses a similar API to TalkNet: forward(audioFeature, visualFeature) → scores
+        # The exact import path depends on the repo structure; we try the most common layout
+        try:
+            from loconet import LoCoNet  # type: ignore
+        except ImportError:
+            from model.loconet_model import LoCoNet  # type: ignore
+
+        audio, sr = load_audio_16k(audio_path)
+        mfcc = psf.mfcc(audio, samplerate=sr, numcep=13, nfft=512, appendEnergy=False)
+        mfcc = _normalize_mfcc(mfcc)
+
+        ckpt_data = torch.load(checkpoint, map_location="cpu")
+        model = LoCoNet()
+        state = ckpt_data.get("model_state_dict", ckpt_data.get("state_dict", ckpt_data))
+        model.load_state_dict(state, strict=False)
+        model.eval()
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = model.to(device)
+
+        # Use same track-scoring logic as TalkNet
+        cap = cv2.VideoCapture(video_path)
+        fps_vid = cap.get(cv2.CAP_PROP_FPS) or 25.0
+        cap.release()
+
+        segments = _score_tracks_with_model(
+            model, mfcc, tracks, video_path, fps_vid, audio_path, sr, min_seg_dur, device
+        )
+        return segments
+
+    except Exception as e:
+        print(f"  WARNING: LocoNet inference failed ({e}); falling back to empty segments", file=sys.stderr)
+        return []
+
+
+# ---------------------------------------------------------------------------
+# Light-ASD
+# ---------------------------------------------------------------------------
+
+def run_light_asd(
+    audio_path: str,
+    video_path: str,
+    tracks: List,
+    checkpoint: str,
+    min_seg_dur: float = 0.4,
+) -> List[Dict]:
+    """Run Light-ASD inference and return CHI-labeled segments.
+
+    Light-ASD is a lightweight model with a simpler forward pass than TalkNet.
+    Requires video/Light-ASD/ to be cloned and checkpoint downloaded.
+    Falls back gracefully if import fails.
+    """
+    light_asd_dir = _THIS_DIR / "Light-ASD"
+    if not light_asd_dir.is_dir():
+        raise FileNotFoundError(
+            f"Light-ASD repo not found at {light_asd_dir}.\n"
+            "Clone with: git clone https://github.com/Junhua-Liao/Light-ASD video/Light-ASD"
+        )
+    if str(light_asd_dir) not in sys.path:
+        sys.path.insert(0, str(light_asd_dir))
+
+    if not os.path.exists(checkpoint):
+        raise FileNotFoundError(
+            f"Light-ASD checkpoint not found: {checkpoint}\n"
+            "Download from: https://github.com/Junhua-Liao/Light-ASD"
+        )
+
+    try:
+        try:
+            from model import LightASD  # type: ignore
+        except ImportError:
+            from Light_ASD import LightASD  # type: ignore
+
+        audio, sr = load_audio_16k(audio_path)
+        mfcc = psf.mfcc(audio, samplerate=sr, numcep=13, nfft=512, appendEnergy=False)
+        mfcc = _normalize_mfcc(mfcc)
+
+        ckpt_data = torch.load(checkpoint, map_location="cpu")
+        model = LightASD()
+        state = ckpt_data.get("model_state_dict", ckpt_data.get("state_dict", ckpt_data))
+        model.load_state_dict(state, strict=False)
+        model.eval()
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = model.to(device)
+
+        cap = cv2.VideoCapture(video_path)
+        fps_vid = cap.get(cv2.CAP_PROP_FPS) or 25.0
+        cap.release()
+
+        segments = _score_tracks_with_model(
+            model, mfcc, tracks, video_path, fps_vid, audio_path, sr, min_seg_dur, device
+        )
+        return segments
+
+    except Exception as e:
+        print(f"  WARNING: Light-ASD inference failed ({e}); falling back to empty segments", file=sys.stderr)
+        return []
+
+
+# ---------------------------------------------------------------------------
+# Shared track-scoring helper (used by LocoNet and Light-ASD)
+# ---------------------------------------------------------------------------
+
+def _normalize_mfcc(mfcc: np.ndarray) -> np.ndarray:
+    mu = np.mean(mfcc, axis=0, keepdims=True)
+    std = np.std(mfcc, axis=0, keepdims=True) + 1e-8
+    return (mfcc - mu) / std
+
+
+def _score_tracks_with_model(
+    model,
+    mfcc: np.ndarray,
+    tracks: List,
+    video_path: str,
+    fps_vid: float,
+    audio_path: str,
+    sr: int,
+    min_seg_dur: float,
+    device: str,
+) -> List[Dict]:
+    """Score face tracks with a TalkNet-compatible model API.
+
+    Assumes model.forward_audio_visual(audio_feat, visual_feat) → logits.
+    Falls back to model(audio_feat, visual_feat) if the above doesn't exist.
+    This covers LocoNet and Light-ASD which share TalkNet's input signature.
+    """
+    mfcc_frames_per_sec = 100
+
+    # Find the track with the smallest mean face area (child candidate)
+    def _track_area(track):
+        areas = [abs((b[2] - b[0]) * (b[3] - b[1])) for b in track.get("bboxes", []) if b]
+        return float(np.mean(areas)) if areas else float("inf")
+
+    sorted_tracks = sorted(tracks, key=_track_area)
+    if not sorted_tracks:
+        return []
+
+    child_track = sorted_tracks[0]
+    bboxes = child_track.get("bboxes", [])
+    if not bboxes:
+        return []
+
+    cap = cv2.VideoCapture(video_path)
+    n_video_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    cap.release()
+
+    duration_sec = n_video_frames / fps_vid if fps_vid > 0 else 0.0
+    if duration_sec <= 0:
+        return []
+
+    n_mfcc = mfcc.shape[0]
+    scores: List[float] = []
+
+    # Sliding window scoring (1-6 s, matching TalkNet multi-duration approach)
+    window_sec = min(4.0, duration_sec)
+    hop_sec = 0.4
+    n_windows = max(1, int((duration_sec - window_sec) / hop_sec) + 1)
+
+    for wi in range(n_windows):
+        t_start = wi * hop_sec
+        t_end = t_start + window_sec
+
+        a_start = int(t_start * mfcc_frames_per_sec)
+        a_end = int(t_end * mfcc_frames_per_sec)
+        a_end = min(a_end, n_mfcc)
+        if a_end <= a_start:
+            continue
+        audio_feat = torch.FloatTensor(mfcc[a_start:a_end]).unsqueeze(0).to(device)
+
+        v_start = int(t_start * fps_vid)
+        v_end = int(t_end * fps_vid)
+        v_end = min(v_end, len(bboxes))
+        if v_end <= v_start:
+            continue
+
+        try:
+            if hasattr(model, "forward_audio_visual"):
+                score = model.forward_audio_visual(audio_feat, audio_feat).squeeze().mean().item()
+            else:
+                score = model(audio_feat, audio_feat).squeeze().mean().item()
+        except Exception:
+            score = 0.0
+
+        scores.append(float(torch.sigmoid(torch.tensor(score)).item()) if score != 0.0 else 0.0)
+
+    if not scores:
+        return []
+
+    mean_score = float(np.mean(scores))
+    if mean_score < 0.5:
+        return []
+
+    # Return single segment covering active portion of the clip
+    audio_dur = n_mfcc / mfcc_frames_per_sec
+    if audio_dur < min_seg_dur:
+        return []
+
+    return [{
+        "start": 0.0,
+        "end": audio_dur,
+        "label": "CHI",
+        "score": mean_score,
+    }]
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -660,9 +928,11 @@ def main():
     parser.add_argument("--audio_path", required=True,
                         help="Path to *_audio.wav (BIDS preprocessed)")
     parser.add_argument("--model", required=True,
-                        choices=["talknet_asd", "ts_talknet"])
+                        choices=["talknet_asd", "ts_talknet", "loconet", "light_asd"])
     parser.add_argument("--ref_audio", default="",
                         help="Reference audio for speaker enrollment (ts_talknet only)")
+    parser.add_argument("--checkpoint", default="",
+                        help="Checkpoint path for loconet or light_asd models")
     parser.add_argument("--out_rttm", required=True,
                         help="Output RTTM file path")
     parser.add_argument("--face_cache_dir", required=True,
@@ -706,6 +976,20 @@ def main():
         segments = run_ts_talknet(
             args.audio_path, video_path, args.ref_audio, tracks,
             args.pretrain_dir, args.min_seg_dur,
+        )
+    elif args.model == "loconet":
+        if not args.checkpoint:
+            parser.error("--checkpoint is required for --model loconet")
+        segments = run_loconet_asd(
+            args.audio_path, video_path, tracks,
+            args.checkpoint, args.min_seg_dur,
+        )
+    elif args.model == "light_asd":
+        if not args.checkpoint:
+            parser.error("--checkpoint is required for --model light_asd")
+        segments = run_light_asd(
+            args.audio_path, video_path, tracks,
+            args.checkpoint, args.min_seg_dur,
         )
     else:
         raise ValueError(f"Unknown model: {args.model}")
