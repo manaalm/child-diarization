@@ -18,20 +18,17 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+REPO_ROOT="/orcd/scratch/orcd/008/manaal/child-adult-diarization"
 cd "$REPO_ROOT"
 
 mkdir -p logs
 
-# Activate synthesis uv environment
-# uv creates .venv inside synthesis/ directory
+# Activate synthesis uv environment (always sync to ensure correct state)
 SYNTH_DIR="$REPO_ROOT/synthesis"
-if [ ! -d "$SYNTH_DIR/.venv" ]; then
-    echo "Setting up synthesis uv environment..."
-    cd "$SYNTH_DIR"
-    uv sync
-    cd "$REPO_ROOT"
-fi
+echo "Running uv sync..."
+cd "$SYNTH_DIR"
+uv sync
+cd "$REPO_ROOT"
 
 PYTHON="$SYNTH_DIR/.venv/bin/python"
 if [ ! -f "$PYTHON" ]; then
