@@ -1,0 +1,22 @@
+model:
+  type: vae
+  age_group: "12_16m"
+  n_speakers: 1
+
+data:
+  train_manifest: synthesis/data/12_16m/train_manifest.csv
+  val_manifest: synthesis/data/12_16m/val_manifest.csv
+  sample_rate: 16000
+  max_duration_secs: 5.0
+  min_duration_secs: 0.5
+
+training:
+  seed: 42
+  batch_size: 32
+  max_epochs: 100
+  learning_rate: 0.0002
+  early_stopping_patience: 10
+
+output:
+  checkpoint_dir: synthesis/checkpoints/
+  log_interval: 100

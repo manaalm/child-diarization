@@ -1,0 +1,52 @@
+project:
+  name: hard_negatives
+  sample_rate: 16000
+  random_seed: 42
+
+scene:
+  duration_sec: 30.0
+  n_scenes: 2000
+  target_age_band: 14_18_months
+  max_speakers: 3
+
+sources:
+  child_segments: [providence, tinyvox]
+  adult_segments: [providence_adults, librispeech]
+  noise: [musan_noise, musan_music]
+  rirs: [rirs_noises]
+
+sampling:
+  positive_scene_probability: 0.0
+  adult_only_negative_probability: 0.50
+  background_speech_negative_probability: 0.40
+  noise_only_negative_probability: 0.10
+  overlap_probability: 0.0
+  short_child_vocalization_probability: 0.0
+  short_threshold_sec: 0.5
+  other_child_probability: 0.0
+
+turn_taking:
+  child_turn_duration_mean_sec: 0.6
+  child_turn_duration_std_sec: 0.3
+  adult_turn_duration_mean_sec: 3.5
+  adult_turn_duration_std_sec: 1.5
+  pause_mean_sec: 0.8
+  pause_std_sec: 0.3
+  n_turns_min: 2
+  n_turns_max: 20
+
+mixing:
+  snr_db_min: 0
+  snr_db_max: 25
+  apply_rir_probability: 0.7
+  apply_noise_probability: 0.8
+  crossfade_ms: 20.0
+  peak_normalize: true
+  save_stems: false
+  rir_dir: ""
+  noise_dir: ""
+
+labels:
+  generate_rttm: true
+  generate_clip_labels: true
+  target_child_label: TARGET_CHILD
