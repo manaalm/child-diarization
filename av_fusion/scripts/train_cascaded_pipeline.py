@@ -40,13 +40,21 @@ VAD_GRID = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0, 1.5, 2.0]
 CHILD_ID_GRID = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 
-def _load_config_grids(feature_dir: str) -> Tuple[List[float], List[float]]:
-    """Try to load grids from av_extensions.yaml; fall back to module defaults."""
+def _load_config(feature_dir: str) -> dict:
+    """Load av_extensions.yaml; return empty dict on failure."""
     try:
         import yaml
         cfg_path = os.path.join(_REPO, "av_fusion", "configs", "av_extensions.yaml")
         with open(cfg_path) as f:
-            cfg = yaml.safe_load(f)
+            return yaml.safe_load(f) or {}
+    except Exception:
+        return {}
+
+
+def _load_config_grids(feature_dir: str) -> Tuple[List[float], List[float]]:
+    """Try to load grids from av_extensions.yaml; fall back to module defaults."""
+    try:
+        cfg = _load_config(feature_dir)
         return (
             cfg["cascade"]["vad_threshold_grid"],
             cfg["cascade"]["child_id_threshold_grid"],
@@ -217,6 +225,16 @@ def main() -> None:
 
     val_df = pd.read_csv(val_csv, low_memory=False)
     print(f"Loaded {len(val_df)} val clips from {val_csv}")
+
+    # Pull feature/col names from config if not overridden on command line
+    _cfg = _load_config(feature_dir)
+    _cascade_cfg = _cfg.get("cascade", {})
+    if args.vad_feature == "kchi_total_dur" and "vad_feature" in _cascade_cfg:
+        args.vad_feature = _cascade_cfg["vad_feature"]
+    if args.child_id_feature == "prob" and "child_id_feature" in _cascade_cfg:
+        args.child_id_feature = _cascade_cfg["child_id_feature"]
+    if args.fusion_col == "proba_gated_av" and "fusion_col" in _cascade_cfg:
+        args.fusion_col = _cascade_cfg["fusion_col"]
 
     vad_grid, child_id_grid = _load_config_grids(feature_dir)
 

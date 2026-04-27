@@ -291,15 +291,23 @@ def main() -> None:
             sys.exit(1)
     elif args.model == "loconet":
         ckpt = args.loconet_checkpoint
+        # Auto-locate pytorch_model.bin if no explicit checkpoint given
         if not ckpt or not os.path.exists(ckpt):
-            print(
-                f"ERROR: LocoNet checkpoint not found: {ckpt}\n"
-                "Download with:\n"
-                "  huggingface-cli download Superxixixi/LoCoNet_ASD --local-dir video/LoCoNet_ASD/\n"
-                "Then pass --loconet-checkpoint video/LoCoNet_ASD/<checkpoint>.ckpt",
-                file=sys.stderr,
-            )
-            sys.exit(1)
+            repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            default_bin = os.path.join(repo_root, "video", "LoCoNet_ASD", "pytorch_model.bin")
+            if os.path.exists(default_bin):
+                args.loconet_checkpoint = default_bin
+                ckpt = default_bin
+                print(f"  Auto-located LocoNet checkpoint: {ckpt}")
+            else:
+                print(
+                    f"ERROR: LocoNet checkpoint not found: {ckpt}\n"
+                    "Download with:\n"
+                    "  huggingface-cli download Superxixixi/LoCoNet_ASD --local-dir video/LoCoNet_ASD/\n"
+                    "Then pass --loconet-checkpoint video/LoCoNet_ASD/pytorch_model.bin",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
     elif args.model == "light_asd":
         ckpt = args.light_asd_checkpoint
         if not ckpt or not os.path.exists(ckpt):

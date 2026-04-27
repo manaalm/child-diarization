@@ -369,6 +369,8 @@ def main() -> None:
                         help="If provided, evaluate cascade model using cascade_thresholds.json from model-dir")
     parser.add_argument("--smoothed-predictions", default=None,
                         help="Path to smoothed predictions CSV (output of smooth_predictions.py)")
+    parser.add_argument("--eval-val", action="store_true",
+                        help="Also run evaluation on av_val.csv and write predictions_val.csv")
     parser.add_argument("--plot", action="store_true")
     args = parser.parse_args()
 
@@ -435,6 +437,31 @@ def main() -> None:
         pred_df[f"proba_{name}"] = proba
         pred_df[f"pred_{name}"] = (proba >= thresholds[name]).astype(int)
     pred_df.to_csv(os.path.join(output_dir, "predictions_test.csv"), index=False)
+
+    # Optional val predictions (needed by smooth_predictions.py)
+    if args.eval_val:
+        val_csv = os.path.join(feature_dir, "av_val.csv")
+        if os.path.exists(val_csv):
+            val_df = pd.read_csv(val_csv, low_memory=False)
+            val_elig = val_df.get("visual_eligibility_score", pd.Series([0.0] * len(val_df))).fillna(0.0).values
+            val_df["visual_eligible"] = (val_elig >= elig_thresh).astype(int)
+            val_pred_df = val_df[["clip_id", "child_id", "age_band", "split", "label"]].copy() if "clip_id" in val_df.columns else val_df[["child_id", "age_band", "split", "label"]].copy()
+            val_pred_df["visual_eligible"] = val_df["visual_eligible"].values
+            for name in models_to_eval:
+                pkl_name = name if name != "always_fuse" else "always_fuse_av"
+                model = _load_model(model_dir, pkl_name)
+                if model is None:
+                    continue
+                try:
+                    p = _get_probas(model, name, val_df, val_elig)
+                except Exception:
+                    p = None
+                val_pred_df[f"proba_{name}"] = p if p is not None else float("nan")
+                val_pred_df[f"pred_{name}"] = (val_pred_df[f"proba_{name}"] >= thresholds.get(name, 0.5)).astype(int)
+            val_pred_df.to_csv(os.path.join(output_dir, "predictions_val.csv"), index=False)
+            print(f"Val predictions written: {len(val_pred_df)} clips")
+        else:
+            print(f"  WARNING: --eval-val set but {val_csv} not found; skipping", file=sys.stderr)
 
     # Stratified metrics
     strata_results = evaluate_strata(test_df, probas, thresholds)

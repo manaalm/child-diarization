@@ -25,6 +25,7 @@ Exit codes:
 """
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -80,6 +81,33 @@ _ASD_COLS = [
 ]
 
 
+def _kchi_total_dur_from_rttm(rttm_path: str) -> float:
+    """Sum durations of all KCHI segments in an RTTM file."""
+    total = 0.0
+    try:
+        with open(rttm_path) as f:
+            for line in f:
+                parts = line.strip().split()
+                if len(parts) >= 9 and parts[7] in ("KCHI", "CHI"):
+                    total += float(parts[4])
+    except Exception:
+        pass
+    return total
+
+
+def _lookup_babar_rttm(audio_path: str, rttm_dir: str) -> Optional[str]:
+    """Find the BabAR RTTM for an audio file, trying hash then plain stem."""
+    stem = os.path.splitext(os.path.basename(audio_path))[0]
+    md5 = hashlib.md5(audio_path.encode()).hexdigest()
+    hashed = os.path.join(rttm_dir, f"{stem}__{md5}.rttm")
+    if os.path.exists(hashed):
+        return hashed
+    plain = os.path.join(rttm_dir, f"{stem}.rttm")
+    if os.path.exists(plain):
+        return plain
+    return None
+
+
 def _clip_id(row: pd.Series) -> str:
     if "clip_id" in row.index:
         return str(row["clip_id"])
@@ -103,6 +131,7 @@ def build_table(
     asd_features_csv: Optional[str] = None,
     gpt4o_features_csv: Optional[str] = None,
     extra_asd_csvs: Optional[List[Tuple[str, str]]] = None,
+    babar_rttm_dir: Optional[str] = None,
     run_name: str = "default",
 ) -> pd.DataFrame:
     # Load metadata
@@ -179,6 +208,22 @@ def build_table(
                 df.loc[mask, "existing_audio_score"] = df.loc[mask, "audio_path"].map(audio_map)
             else:
                 print(f"WARNING: no 'audio_path' column in metadata; cannot join audio scores", file=sys.stderr)
+
+    # BabAR RTTM features: kchi_total_dur (needed for cascade stage 1 VAD gate)
+    df["kchi_total_dur"] = float("nan")
+    if babar_rttm_dir and os.path.isdir(babar_rttm_dir):
+        found = 0
+        for idx, row in df.iterrows():
+            ap = row.get("audio_path")
+            if not ap or pd.isna(ap):
+                continue
+            rttm_path = _lookup_babar_rttm(str(ap), babar_rttm_dir)
+            if rttm_path:
+                df.at[idx, "kchi_total_dur"] = _kchi_total_dur_from_rttm(rttm_path)
+                found += 1
+        print(f"  BabAR RTTM kchi_total_dur: {found}/{len(df)} clips matched")
+    else:
+        print("  kchi_total_dur: no --babar-rttm-dir provided; column will be NaN (cascade VAD stage inactive)")
 
     # Visual features (optional)
     for col in _AUTO_VISUAL_COLS:
@@ -302,6 +347,8 @@ def main() -> None:
                         metavar="MODEL:PATH",
                         help="Extra ASD model features: 'loconet:path/to/asd_features_loconet.csv'. "
                              "May be specified multiple times. Adds asd_{model}_max_score column.")
+    parser.add_argument("--babar-rttm-dir", default=None,
+                        help="Directory of BabAR RTTM files (stem__md5.rttm); used to compute kchi_total_dur")
     parser.add_argument("--run-name", default="default")
     args = parser.parse_args()
 
@@ -330,6 +377,8 @@ def main() -> None:
 
     os.makedirs(output_dir, exist_ok=True)
 
+    babar_rttm_dir = _resolve_path(args.babar_rttm_dir) if args.babar_rttm_dir else None
+
     try:
         df = build_table(
             metadata_csv=metadata_csv,
@@ -340,6 +389,7 @@ def main() -> None:
             asd_features_csv=asd_csv,
             gpt4o_features_csv=gpt4o_csv,
             extra_asd_csvs=extra_asd if extra_asd else None,
+            babar_rttm_dir=babar_rttm_dir,
             run_name=args.run_name,
         )
     except ValueError as e:

@@ -164,6 +164,11 @@ def save_json(data: Any, path: str) -> None:
         json.dump(data, f, indent=2)
 
 
+def save_csv(df: pd.DataFrame, path: str) -> None:
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    df.to_csv(path, index=False)
+
+
 def load_feature_csv(path: str, nan_fill: Optional[float] = None) -> pd.DataFrame:
     """Load a feature CSV; optionally fill numeric NaN values."""
     df = pd.read_csv(path, low_memory=False)

@@ -91,9 +91,20 @@ def _smooth_group(probs: np.ndarray, method: str, param: float) -> np.ndarray:
     raise ValueError(f"Unknown smoothing method: {method}")
 
 
+def _pick_prob_col(df: pd.DataFrame) -> str:
+    """Pick the best probability column, preferring gated_av then audio_only then any prob col."""
+    if "prob" in df.columns:
+        return "prob"
+    for pref in ("proba_gated_av", "proba_always_fuse", "proba_audio_only"):
+        if pref in df.columns:
+            return pref
+    candidates = [c for c in df.columns if "prob" in c.lower()]
+    return candidates[0] if candidates else df.columns[-1]
+
+
 def _apply_smoothing(df: pd.DataFrame, group_cols: List[str], method: str, param: float) -> np.ndarray:
     """Apply smoothing within each group; return smoothed prob array aligned with df index."""
-    prob_col = "prob" if "prob" in df.columns else df.columns[df.columns.str.contains("prob")][0]
+    prob_col = _pick_prob_col(df)
     probs = df[prob_col].fillna(0.5).values.copy()
     out = probs.copy()
 
@@ -121,12 +132,8 @@ def _apply_smoothing(df: pd.DataFrame, group_cols: List[str], method: str, param
 def _tune_param(val_df: pd.DataFrame, group_cols: List[str], method: str, grid: List[float]) -> float:
     """Grid-search param on val set maximising F1."""
     y = val_df["label"].values.astype(int)
-    prob_col = "prob" if "prob" in val_df.columns else "prob_raw"
+    prob_col = _pick_prob_col(val_df)
     val_df = val_df.copy()
-    if prob_col not in val_df.columns:
-        # Use first column containing "prob"
-        candidates = [c for c in val_df.columns if "prob" in c.lower()]
-        prob_col = candidates[0] if candidates else val_df.columns[-1]
 
     best_f1, best_param = -1.0, grid[0]
     for param in grid:
@@ -191,7 +198,7 @@ def main() -> None:
         print(f"  Best param: {param}")
 
         # Report val F1 before/after smoothing
-        prob_col_val = "prob" if "prob" in val_df.columns else "prob_raw"
+        prob_col_val = _pick_prob_col(val_df)
         y_val = val_df["label"].values.astype(int) if "label" in val_df.columns else None
         if y_val is not None:
             raw_probs_val = val_df[prob_col_val].fillna(0.5).values
@@ -212,7 +219,7 @@ def main() -> None:
     smoothed = _apply_smoothing(df, group_cols, args.method, param)
 
     # Build output dataframe
-    prob_col = "prob" if "prob" in df.columns else [c for c in df.columns if "prob" in c.lower()][0]
+    prob_col = _pick_prob_col(df)
     out_df = df.copy()
     out_df["prob_raw"] = df[prob_col].values
     out_df["prob_smoothed"] = np.clip(smoothed, 0.0, 1.0)

@@ -147,6 +147,23 @@ def _mean_bbox_area(frames: List[Dict]) -> float:
     return float(np.mean(areas)) if areas else 0.0
 
 
+def _track_to_bboxes(track: Dict) -> List:
+    """Convert a track dict to a flat per-frame bbox list.
+
+    detect_faces_in_video stores bboxes as track["frames"][i]["bbox"].
+    Legacy callers expect track["bboxes"] = [bbox_or_None, ...] indexed by frame.
+    This helper bridges both formats.
+    """
+    if "bboxes" in track:
+        return track["bboxes"]
+    frames = track.get("frames", [])
+    if not frames:
+        return []
+    max_idx = max(f["frame_idx"] for f in frames)
+    frame_to_bbox = {f["frame_idx"]: f["bbox"] for f in frames}
+    return [frame_to_bbox.get(i) for i in range(max_idx + 1)]
+
+
 # ---------------------------------------------------------------------------
 # S3FD face detection
 # ---------------------------------------------------------------------------
@@ -621,6 +638,37 @@ def run_ts_talknet(
 # Score → segments
 # ---------------------------------------------------------------------------
 
+def _scores_to_segments(
+    frame_scores: np.ndarray,
+    fps: float,
+    min_dur: float = 0.4,
+    threshold: float = 0.5,
+    merge_gap: float = 0.2,
+) -> List[Dict]:
+    """Convert per-frame score array to time segments with start/end keys."""
+    segs = []
+    in_seg = False
+    seg_start = 0.0
+    for fi, sc in enumerate(frame_scores):
+        t = fi / fps
+        if sc >= threshold and not in_seg:
+            seg_start = t
+            in_seg = True
+        elif sc < threshold and in_seg:
+            segs.append({"start": seg_start, "end": t})
+            in_seg = False
+    if in_seg:
+        segs.append({"start": seg_start, "end": len(frame_scores) / fps})
+
+    merged = []
+    for seg in segs:
+        if merged and (seg["start"] - merged[-1]["end"]) <= merge_gap:
+            merged[-1]["end"] = seg["end"]
+        else:
+            merged.append(dict(seg))
+    return [s for s in merged if (s["end"] - s["start"]) >= min_dur]
+
+
 def _scores_to_segments_by_time(
     per_frame_scores: Dict[float, float],
     threshold: float = 0.0,
@@ -690,59 +738,200 @@ def run_loconet_asd(
 ) -> List[Dict]:
     """Run LocoNet-ASD inference and return CHI-labeled segments.
 
-    LocoNet uses the same face-track + audio input format as TalkNet.
-    Requires video/LoCoNet_ASD/ to be cloned and checkpoint downloaded.
-    Falls back gracefully if import fails.
+    LocoNet (CVPR 2023) uses VGGish audio + ResNet visual frontends with
+    cross-attention. Requires video/LoCoNet_ASD/ from HuggingFace.
+
+    Audio: 13-coeff MFCC, 4 frames per video frame.
+    Visual: grayscale 112×112 face crops at video FPS.
+    Checkpoint: video/LoCoNet_ASD/pytorch_model.bin (HuggingFace format).
     """
     loconet_dir = _THIS_DIR / "LoCoNet_ASD"
     if not loconet_dir.is_dir():
         raise FileNotFoundError(
             f"LoCoNet_ASD repo not found at {loconet_dir}.\n"
-            "Clone with: huggingface-cli download Superxixixi/LoCoNet_ASD "
+            "Download with: huggingface-cli download Superxixixi/LoCoNet_ASD "
             "--local-dir video/LoCoNet_ASD/"
         )
+    # Accept either a .ckpt or .bin checkpoint
+    if not checkpoint or not os.path.exists(checkpoint):
+        # Fall back: look for pytorch_model.bin in the repo dir
+        default_bin = str(loconet_dir / "pytorch_model.bin")
+        if os.path.exists(default_bin):
+            checkpoint = default_bin
+        else:
+            raise FileNotFoundError(
+                f"LocoNet checkpoint not found: {checkpoint}\n"
+                f"Expected at: {default_bin}"
+            )
+
     if str(loconet_dir) not in sys.path:
         sys.path.insert(0, str(loconet_dir))
 
-    if not os.path.exists(checkpoint):
-        raise FileNotFoundError(
-            f"LocoNet checkpoint not found: {checkpoint}\n"
-            "Download from HuggingFace: Superxixixi/LoCoNet_ASD"
-        )
-
     try:
-        # LocoNet uses a similar API to TalkNet: forward(audioFeature, visualFeature) → scores
-        # The exact import path depends on the repo structure; we try the most common layout
-        try:
-            from loconet import LoCoNet  # type: ignore
-        except ImportError:
-            from model.loconet_model import LoCoNet  # type: ignore
+        from torchvggish import vggish_input as _vggish_input  # type: ignore
+        from config_loconet import LoCoNetConfig  # type: ignore
+        from modeling_loconet import loconet as LoconetModel  # type: ignore
+        from loss_multi import lossAV as LossAV  # type: ignore
 
-        audio, sr = load_audio_16k(audio_path)
-        mfcc = psf.mfcc(audio, samplerate=sr, numcep=13, nfft=512, appendEnergy=False)
-        mfcc = _normalize_mfcc(mfcc)
-
-        ckpt_data = torch.load(checkpoint, map_location="cpu")
-        model = LoCoNet()
-        state = ckpt_data.get("model_state_dict", ckpt_data.get("state_dict", ckpt_data))
+        # ----------------------------------------------------------------
+        # Load model
+        # ----------------------------------------------------------------
+        cfg = LoCoNetConfig.from_pretrained(str(loconet_dir))
+        model = LoconetModel(cfg)
+        state = torch.load(checkpoint, map_location="cpu")
+        # Plain state dict has keys like "model.visualFrontend.*"
+        if not any(k.startswith("model.") for k in state):
+            state = {"model." + k: v for k, v in state.items()}
         model.load_state_dict(state, strict=False)
         model.eval()
+
+        # The lossAV head (Linear 256→2) is part of the checkpoint
+        loss_av = model.lossAV
+        loss_av.eval()
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
         model = model.to(device)
 
-        # Use same track-scoring logic as TalkNet
+        # ----------------------------------------------------------------
+        # Pick child candidate (smallest face track)
+        # ----------------------------------------------------------------
+        def _track_area(t):
+            areas = [abs((b[2]-b[0])*(b[3]-b[1])) for b in _track_to_bboxes(t) if b]
+            return float(np.mean(areas)) if areas else float("inf")
+
+        sorted_tracks = sorted(tracks, key=_track_area)
+        if not sorted_tracks:
+            return []
+        child_track = sorted_tracks[0]
+        bboxes = _track_to_bboxes(child_track)
+        if not bboxes:
+            return []
+
+        # ----------------------------------------------------------------
+        # Video params
+        # ----------------------------------------------------------------
         cap = cv2.VideoCapture(video_path)
         fps_vid = cap.get(cv2.CAP_PROP_FPS) or 25.0
+        n_vid_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        cap.release()
+        duration_sec = n_vid_frames / fps_vid
+
+        # ----------------------------------------------------------------
+        # Audio features: VGGish log-mel spectrogram (matches LocoNet training).
+        # waveform_to_examples produces (n_vid_frames*4, 64) — 4 audio frames per
+        # video frame, 64 mel bins. VGGish Conv2d expects 4-D (B,1,T,64) input.
+        # ----------------------------------------------------------------
+        audio_raw, sr = load_audio_16k(audio_path)
+        mel_all = _vggish_input.waveform_to_examples(
+            audio_raw, sr, n_vid_frames, fps_vid, return_tensor=False
+        )  # (n_vid_frames*4, 64)
+
+        # ----------------------------------------------------------------
+        # Visual features: grayscale 112×112 crops at video FPS
+        # ----------------------------------------------------------------
+        cap = cv2.VideoCapture(video_path)
+        face_frames: List[np.ndarray] = []
+        frame_idx = 0
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            if frame_idx < len(bboxes) and bboxes[frame_idx]:
+                x1, y1, x2, y2 = [int(v) for v in bboxes[frame_idx]]
+                x1, y1 = max(0, x1), max(0, y1)
+                x2 = min(frame.shape[1], x2)
+                y2 = min(frame.shape[0], y2)
+                crop = frame[y1:y2, x1:x2]
+                if crop.size > 0:
+                    gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+                    face_frames.append(cv2.resize(gray, (112, 112)))
+                else:
+                    face_frames.append(np.zeros((112, 112), dtype=np.uint8))
+            else:
+                face_frames.append(np.zeros((112, 112), dtype=np.uint8))
+            frame_idx += 1
         cap.release()
 
-        segments = _score_tracks_with_model(
-            model, mfcc, tracks, video_path, fps_vid, audio_path, sr, min_seg_dur, device
-        )
+        if not face_frames:
+            return []
+
+        # ----------------------------------------------------------------
+        # Sliding-window inference (4s windows, 0.4s hop)
+        # ----------------------------------------------------------------
+        window_sec = min(4.0, duration_sec)
+        hop_sec = 0.4
+        n_windows = max(1, int((duration_sec - window_sec) / hop_sec) + 1)
+        all_frame_scores: dict = {}  # video_frame_idx → list of scores
+
+        for wi in range(n_windows):
+            t_start = wi * hop_sec
+            t_end = t_start + window_sec
+
+            v_s = int(t_start * fps_vid)
+            v_e = min(int(t_end * fps_vid), len(face_frames))
+            if v_e <= v_s:
+                continue
+
+            a_s = v_s * 4
+            a_e = v_e * 4
+            a_e = min(a_e, len(mel_all))
+            if a_e <= a_s:
+                continue
+
+            # (1, 1, T_audio, 64) — batch=1, channel=1, frames, mel_bins
+            audio_feat = torch.FloatTensor(mel_all[a_s:a_e]).unsqueeze(0).unsqueeze(0).to(device)
+
+            vis_chunk = np.stack(face_frames[v_s:v_e], axis=0)  # (T_vid, 112, 112)
+            visual_feat = torch.FloatTensor(vis_chunk).unsqueeze(0).to(device)
+            # (1, T_vid, 112, 112)
+
+            try:
+                with torch.no_grad():
+                    enc = model.model  # locoencoder
+                    a_emb = enc.forward_audio_frontend(audio_feat)   # (1, T, 128)
+                    v_emb = enc.forward_visual_frontend(visual_feat)  # (1, T, 128)
+                    # Align lengths
+                    T = min(a_emb.shape[1], v_emb.shape[1])
+                    a_emb = a_emb[:, :T, :]
+                    v_emb = v_emb[:, :T, :]
+                    # ConvLayer kernel height = cfg.num_speakers (=3); must repeat
+                    # the single track cfg.num_speakers times before cross-attention,
+                    # matching the training pattern where audio is shared across all s
+                    # speaker tracks. Take first T scores as the target speaker's.
+                    n_spk = cfg.num_speakers
+                    a_rep = a_emb.repeat(n_spk, 1, 1)  # (n_spk, T, 128)
+                    v_rep = v_emb.repeat(n_spk, 1, 1)  # (n_spk, T, 128)
+                    a_rep, v_rep = enc.forward_cross_attention(a_rep, v_rep)
+                    outsAV = enc.forward_audio_visual_backend(a_rep, v_rep, b=1, s=n_spk)
+                    scores_np = model.lossAV(outsAV)  # (n_spk*T,) numpy
+                    if hasattr(scores_np, "cpu"):
+                        scores_np = scores_np.cpu().numpy()
+                    scores_np = scores_np[:T]  # first T frames = target speaker slot
+
+                for fi, score in enumerate(scores_np):
+                    vid_fi = v_s + fi
+                    all_frame_scores.setdefault(vid_fi, []).append(float(score))
+            except Exception as _e:
+                print(f"  LocoNet window {wi} failed: {_e}", file=sys.stderr)
+                continue
+
+        if not all_frame_scores:
+            return []
+
+        # Average scores per frame, threshold at 0.5, merge into segments
+        n_frames_total = len(face_frames)
+        frame_scores = np.zeros(n_frames_total, dtype=np.float32)
+        for fi, sc_list in all_frame_scores.items():
+            if fi < n_frames_total:
+                frame_scores[fi] = float(np.mean(sc_list))
+
+        segments = _scores_to_segments(frame_scores, fps_vid, min_seg_dur, threshold=0.5)
         return segments
 
     except Exception as e:
-        print(f"  WARNING: LocoNet inference failed ({e}); falling back to empty segments", file=sys.stderr)
+        import traceback
+        print(f"  WARNING: LocoNet inference failed: {e}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
         return []
 
 
@@ -812,6 +1001,180 @@ def run_light_asd(
 
 
 # ---------------------------------------------------------------------------
+# Per-track LocoNet (used by LocoNetECAPAFrontend in video_asd.py)
+# ---------------------------------------------------------------------------
+
+def run_loconet_asd_per_track(
+    audio_path: str,
+    video_path: str,
+    tracks: List,
+    checkpoint: str,
+    min_seg_dur: float = 0.4,
+) -> List[Dict]:
+    """Run LocoNet-ASD independently on every face track.
+
+    Returns a list of dicts, one per track:
+      {"track_id": int, "mean_area": float,
+       "segments": [{"start": float, "end": float}]}
+
+    Unlike run_loconet_asd() which uses smallest-face heuristic, this
+    function scores every track so callers can pick the child track via
+    speaker identity (e.g. ECAPA cosine similarity).
+    """
+    loconet_dir = _THIS_DIR / "LoCoNet_ASD"
+    if not loconet_dir.is_dir():
+        raise FileNotFoundError(f"LoCoNet_ASD repo not found at {loconet_dir}.")
+
+    if not checkpoint or not os.path.exists(checkpoint):
+        default_bin = str(loconet_dir / "pytorch_model.bin")
+        if os.path.exists(default_bin):
+            checkpoint = default_bin
+        else:
+            raise FileNotFoundError(f"LocoNet checkpoint not found: {checkpoint}")
+
+    if str(loconet_dir) not in sys.path:
+        sys.path.insert(0, str(loconet_dir))
+
+    try:
+        from torchvggish import vggish_input as _vggish_input  # type: ignore
+        from config_loconet import LoCoNetConfig  # type: ignore
+        from modeling_loconet import loconet as LoconetModel  # type: ignore
+
+        cfg_loco = LoCoNetConfig.from_pretrained(str(loconet_dir))
+        model = LoconetModel(cfg_loco)
+        state = torch.load(checkpoint, map_location="cpu")
+        if not any(k.startswith("model.") for k in state):
+            state = {"model." + k: v for k, v in state.items()}
+        model.load_state_dict(state, strict=False)
+        model.eval()
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = model.to(device)
+
+        # Video params
+        cap = cv2.VideoCapture(video_path)
+        fps_vid = cap.get(cv2.CAP_PROP_FPS) or 25.0
+        n_vid_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        cap.release()
+        duration_sec = n_vid_frames / fps_vid if fps_vid > 0 else 0.0
+        if duration_sec <= 0:
+            return []
+
+        # Audio features: VGGish log-mel (shared across all tracks).
+        # waveform_to_examples → (n_vid_frames*4, 64), 4 audio frames per video frame.
+        audio_raw, sr = load_audio_16k(audio_path)
+        mel_all = _vggish_input.waveform_to_examples(
+            audio_raw, sr, n_vid_frames, fps_vid, return_tensor=False
+        )  # (n_vid_frames*4, 64)
+
+        window_sec = min(4.0, duration_sec)
+        hop_sec = 0.4
+        n_windows = max(1, int((duration_sec - window_sec) / hop_sec) + 1)
+
+        def _track_area(t):
+            areas = [abs((b[2]-b[0])*(b[3]-b[1])) for b in _track_to_bboxes(t) if b]
+            return float(np.mean(areas)) if areas else float("inf")
+
+        results = []
+        for ti, track in enumerate(tracks):
+            bboxes = _track_to_bboxes(track)
+            if not bboxes:
+                continue
+
+            # Extract face crops for this track
+            cap = cv2.VideoCapture(video_path)
+            face_frames: List[np.ndarray] = []
+            fi = 0
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                if fi < len(bboxes) and bboxes[fi]:
+                    x1, y1, x2, y2 = [int(v) for v in bboxes[fi]]
+                    x1, y1 = max(0, x1), max(0, y1)
+                    x2 = min(frame.shape[1], x2)
+                    y2 = min(frame.shape[0], y2)
+                    crop = frame[y1:y2, x1:x2]
+                    if crop.size > 0:
+                        gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+                        face_frames.append(cv2.resize(gray, (112, 112)))
+                    else:
+                        face_frames.append(np.zeros((112, 112), dtype=np.uint8))
+                else:
+                    face_frames.append(np.zeros((112, 112), dtype=np.uint8))
+                fi += 1
+            cap.release()
+
+            if not face_frames:
+                continue
+
+            # Sliding-window LocoNet inference for this track
+            all_frame_scores: dict = {}
+            for wi in range(n_windows):
+                t_start = wi * hop_sec
+                t_end = t_start + window_sec
+                v_s = int(t_start * fps_vid)
+                v_e = min(int(t_end * fps_vid), len(face_frames))
+                if v_e <= v_s:
+                    continue
+                a_s, a_e = v_s * 4, min(v_e * 4, len(mel_all))
+                if a_e <= a_s:
+                    continue
+
+                # (1, 1, T_audio, 64) — batch=1, channel=1 for VGGish Conv2d
+                audio_feat = torch.FloatTensor(mel_all[a_s:a_e]).unsqueeze(0).unsqueeze(0).to(device)
+                vis_chunk = np.stack(face_frames[v_s:v_e], axis=0)
+                visual_feat = torch.FloatTensor(vis_chunk).unsqueeze(0).to(device)
+
+                try:
+                    with torch.no_grad():
+                        enc = model.model
+                        a_emb = enc.forward_audio_frontend(audio_feat)
+                        v_emb = enc.forward_visual_frontend(visual_feat)
+                        T = min(a_emb.shape[1], v_emb.shape[1])
+                        a_emb, v_emb = a_emb[:, :T, :], v_emb[:, :T, :]
+                        # ConvLayer kernel height = cfg_loco.num_speakers (=3)
+                        n_spk = cfg_loco.num_speakers
+                        a_rep = a_emb.repeat(n_spk, 1, 1)
+                        v_rep = v_emb.repeat(n_spk, 1, 1)
+                        a_rep, v_rep = enc.forward_cross_attention(a_rep, v_rep)
+                        outsAV = enc.forward_audio_visual_backend(a_rep, v_rep, b=1, s=n_spk)
+                        scores_np = model.lossAV(outsAV)  # (n_spk*T,)
+                        if hasattr(scores_np, "cpu"):
+                            scores_np = scores_np.cpu().numpy()
+                        scores_np = scores_np[:T]  # first T = target speaker slot
+                    for frame_i, score in enumerate(scores_np):
+                        all_frame_scores.setdefault(v_s + frame_i, []).append(float(score))
+                except Exception as _e:
+                    print(f"  LocoNet per-track track={ti} win={wi} failed: {_e}",
+                          file=sys.stderr)
+
+            if not all_frame_scores:
+                continue
+
+            n_frames_total = len(face_frames)
+            frame_scores = np.zeros(n_frames_total, dtype=np.float32)
+            for frame_i, sc_list in all_frame_scores.items():
+                if frame_i < n_frames_total:
+                    frame_scores[frame_i] = float(np.mean(sc_list))
+
+            segs = _scores_to_segments(frame_scores, fps_vid, min_seg_dur, threshold=0.5)
+            results.append({
+                "track_id": ti,
+                "mean_area": _track_area(track),
+                "segments": [{"start": s["start"], "end": s["end"]} for s in segs],
+            })
+
+        return results
+
+    except Exception as e:
+        import traceback
+        print(f"  WARNING: LocoNet per-track failed: {e}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+        return []
+
+
+# ---------------------------------------------------------------------------
 # Shared track-scoring helper (used by LocoNet and Light-ASD)
 # ---------------------------------------------------------------------------
 
@@ -842,7 +1205,7 @@ def _score_tracks_with_model(
 
     # Find the track with the smallest mean face area (child candidate)
     def _track_area(track):
-        areas = [abs((b[2] - b[0]) * (b[3] - b[1])) for b in track.get("bboxes", []) if b]
+        areas = [abs((b[2] - b[0]) * (b[3] - b[1])) for b in _track_to_bboxes(track) if b]
         return float(np.mean(areas)) if areas else float("inf")
 
     sorted_tracks = sorted(tracks, key=_track_area)
@@ -850,7 +1213,7 @@ def _score_tracks_with_model(
         return []
 
     child_track = sorted_tracks[0]
-    bboxes = child_track.get("bboxes", [])
+    bboxes = _track_to_bboxes(child_track)
     if not bboxes:
         return []
 
@@ -941,6 +1304,8 @@ def main():
                         help="Directory containing model checkpoint files")
     parser.add_argument("--min_seg_dur", type=float, default=0.4,
                         help="Minimum segment duration in seconds")
+    parser.add_argument("--output_tracks_json", default="",
+                        help="(loconet only) Write per-track active segments to this JSON path")
     args = parser.parse_args()
 
     # Derive video path (raises FileNotFoundError for audio-only datasets)
@@ -980,10 +1345,28 @@ def main():
     elif args.model == "loconet":
         if not args.checkpoint:
             parser.error("--checkpoint is required for --model loconet")
-        segments = run_loconet_asd(
-            args.audio_path, video_path, tracks,
-            args.checkpoint, args.min_seg_dur,
-        )
+        if args.output_tracks_json:
+            track_data = run_loconet_asd_per_track(
+                args.audio_path, video_path, tracks,
+                args.checkpoint, args.min_seg_dur,
+            )
+            os.makedirs(os.path.dirname(os.path.abspath(args.output_tracks_json)), exist_ok=True)
+            with open(args.output_tracks_json, "w") as _tf:
+                json.dump(track_data, _tf)
+            print(f"Per-track JSON: {args.output_tracks_json} ({len(track_data)} tracks)",
+                  flush=True)
+            # Also write a smallest-face RTTM for the standard output
+            if track_data:
+                best = min(track_data, key=lambda t: t.get("mean_area", float("inf")))
+                segments = [{"start": s["start"], "end": s["end"],
+                             "score": 1.0} for s in best["segments"]]
+            else:
+                segments = []
+        else:
+            segments = run_loconet_asd(
+                args.audio_path, video_path, tracks,
+                args.checkpoint, args.min_seg_dur,
+            )
     elif args.model == "light_asd":
         if not args.checkpoint:
             parser.error("--checkpoint is required for --model light_asd")

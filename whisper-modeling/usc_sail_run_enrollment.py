@@ -77,6 +77,11 @@ def save_json(obj, path: str):
 
 
 def compute_metrics(y_true, y_prob, threshold=0.5):
+    """
+    Threshold-dependent metrics (F1, precision, recall) use the binarised
+    predictions.  AUROC and AUPRC always use the raw continuous y_prob so
+    that ranking information is preserved.
+    """
     y_pred = (y_prob >= threshold).astype(int)
     metrics = {
         "f1": float(f1_score(y_true, y_pred, zero_division=0)),
@@ -133,20 +138,12 @@ def cache_path_for_audio(audio_path: str, cache_dir: str) -> str:
 
 
 def rttm_cache_path_for_audio(audio_path: str, cache_dir: str) -> str:
-    """
-    Must match the patched infer_long_wav_files.py naming scheme.
-    """
     cache_id = audio_to_cache_id(audio_path)
     stem = Path(audio_path).stem
     return os.path.join(cache_dir, f"{stem}__{cache_id}.rttm")
 
 
 def parse_rttm_for_child_segments(rttm_path: str) -> List[Dict[str, float]]:
-    """
-    Parses RTTM lines like:
-    SPEAKER rec 1 start dur <NA> <NA> CHI <NA> <NA>
-    and returns only CHI segments.
-    """
     child_segments = []
 
     if not os.path.exists(rttm_path):
@@ -176,10 +173,6 @@ def parse_rttm_for_child_segments(rttm_path: str) -> List[Dict[str, float]]:
 
 
 def run_usc_sail_inference(audio_path: str, cfg: Config) -> str:
-    """
-    Runs USC-SAIL inference if RTTM is not already cached.
-    Returns path to cached RTTM.
-    """
     os.makedirs(cfg.rttm_cache_dir, exist_ok=True)
 
     target_rttm = rttm_cache_path_for_audio(audio_path, cfg.rttm_cache_dir)
@@ -302,20 +295,31 @@ def total_child_duration(audio_path: str, cfg: Config) -> float:
     return float(sum(seg["dur"] for seg in segs))
 
 
-def extract_segment_embeddings(audio_path: str, embedder: ECAPAEmbedder, cfg: Config) -> List[np.ndarray]:
-    wav = load_audio_mono(audio_path, cfg.sample_rate)
+def extract_segment_embeddings(
+    audio_path: str,
+    embedder: ECAPAEmbedder,
+    cfg: Config,
+    wav: Optional[torch.Tensor] = None,
+) -> List[Tuple[np.ndarray, float]]:
+    """
+    Returns list of (embedding, duration) pairs for valid child segments.
+    If *wav* is provided the audio is not reloaded from disk.
+    """
+    if wav is None:
+        wav = load_audio_mono(audio_path, cfg.sample_rate)
     segs = get_valid_child_segments(audio_path, cfg)
 
-    embs = []
+    emb_dur_pairs: List[Tuple[np.ndarray, float]] = []
     for seg in segs:
         clip = crop_segment(wav, cfg.sample_rate, seg["start"], seg["end"])
         if clip.numel() < int(cfg.min_seg_dur_sec * cfg.sample_rate):
             continue
         try:
-            embs.append(embedder.embed_waveform(clip))
+            emb = embedder.embed_waveform(clip)
+            emb_dur_pairs.append((emb, seg["dur"]))
         except Exception:
             continue
-    return embs
+    return emb_dur_pairs
 
 
 # =========================================================
@@ -329,18 +333,18 @@ def build_child_prototypes(train_df: pd.DataFrame, embedder: ECAPAEmbedder, cfg:
     pos_train = train_df[train_df["label"] == 1].copy()
 
     for child_id, sub in pos_train.groupby("child_id"):
-        all_embs = []
+        all_pairs: List[Tuple[np.ndarray, float]] = []
 
         for _, row in sub.iterrows():
             audio_path = row["audio_path"]
-            embs = extract_segment_embeddings(audio_path, embedder, cfg)
-            all_embs.extend(embs)
+            pairs = extract_segment_embeddings(audio_path, embedder, cfg)
+            all_pairs.extend(pairs)
 
-            if len(all_embs) >= cfg.max_enrollment_segments_per_child:
-                all_embs = all_embs[:cfg.max_enrollment_segments_per_child]
+            if len(all_pairs) >= cfg.max_enrollment_segments_per_child:
+                all_pairs = all_pairs[:cfg.max_enrollment_segments_per_child]
                 break
 
-        if len(all_embs) == 0:
+        if len(all_pairs) == 0:
             stats.append({
                 "child_id": child_id,
                 "n_segments": 0,
@@ -348,12 +352,15 @@ def build_child_prototypes(train_df: pd.DataFrame, embedder: ECAPAEmbedder, cfg:
             })
             continue
 
-        proto = np.mean(np.stack(all_embs, axis=0), axis=0)
+        # Duration-weighted prototype
+        embs = np.stack([e for e, _ in all_pairs], axis=0)
+        weights = np.array([d for _, d in all_pairs])
+        proto = np.average(embs, axis=0, weights=weights)
         prototypes[child_id] = l2_normalize(proto)
 
         stats.append({
             "child_id": child_id,
-            "n_segments": int(len(all_embs)),
+            "n_segments": int(len(all_pairs)),
             "status": "ok",
         })
 
@@ -379,28 +386,38 @@ def run_role_only(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
 
 
 def tune_role_only_threshold(val_role_df: pd.DataFrame, cfg: Config):
+    """
+    Tune the duration threshold that maximises F1 on the validation set.
+    AUROC/AUPRC are always computed on the raw continuous duration score.
+    """
     y_true = val_role_df["label"].to_numpy()
+    y_cont = val_role_df["score_duration_sec"].to_numpy().astype(float)
 
     best_t = cfg.duration_threshold_grid[0]
-    best_prob = (val_role_df["score_duration_sec"] >= best_t).astype(float).to_numpy()
-    best_metrics = compute_metrics(y_true, best_prob, threshold=0.5)
-    best_f1 = best_metrics["f1"]
+    best_f1 = -1.0
+    best_metrics = None
 
     for t in cfg.duration_threshold_grid:
-        prob = (val_role_df["score_duration_sec"] >= t).astype(float).to_numpy()
-        m = compute_metrics(y_true, prob, threshold=0.5)
-        if m["f1"] > best_f1:
-            best_f1 = m["f1"]
+        y_pred = (y_cont >= t).astype(int)
+        f1 = float(f1_score(y_true, y_pred, zero_division=0))
+        if f1 > best_f1:
+            best_f1 = f1
             best_t = t
-            best_metrics = m
 
+    # Compute full metrics at the chosen threshold, using the
+    # continuous score for AUROC/AUPRC
+    best_metrics = compute_metrics(y_true, y_cont, threshold=best_t)
     return float(best_t), best_metrics
 
 
 def role_df_to_pred_df(role_df: pd.DataFrame, threshold_sec: float):
+    """
+    Keep the continuous duration score as *prob* so that AUROC/AUPRC
+    are computed on the ranking, not on a binary variable.
+    """
     out = role_df.copy()
-    out["prob"] = (out["score_duration_sec"] >= threshold_sec).astype(float)
-    out["pred_label"] = out["prob"].astype(int)
+    out["prob"] = out["score_duration_sec"]
+    out["pred_label"] = (out["score_duration_sec"] >= threshold_sec).astype(int)
     return out
 
 
@@ -415,16 +432,27 @@ def score_clip_with_enrollment(
     embedder: ECAPAEmbedder,
     cfg: Config,
 ) -> float:
+    """
+    Score a clip using duration-weighted mean cosine similarity to the
+    enrolled prototype.  Returns 0.0 if the child has no prototype
+    (unseen split) or if no valid child segments are found.
+    """
     if target_child_id not in prototypes:
         return 0.0
 
-    seg_embs = extract_segment_embeddings(audio_path, embedder, cfg)
-    if len(seg_embs) == 0:
+    # Load audio once and pass to extract_segment_embeddings
+    wav = load_audio_mono(audio_path, cfg.sample_rate)
+    emb_dur_pairs = extract_segment_embeddings(audio_path, embedder, cfg, wav=wav)
+
+    if len(emb_dur_pairs) == 0:
         return 0.0
 
     proto = prototypes[target_child_id]
-    sims = [cosine_similarity(emb, proto) for emb in seg_embs]
-    return float(max(sims))
+    scored = [(cosine_similarity(emb, proto), dur) for emb, dur in emb_dur_pairs]
+
+    # Duration-weighted mean similarity
+    total_dur = sum(d for _, d in scored)
+    return float(sum(s * d for s, d in scored) / total_dur)
 
 
 def run_enrollment(df: pd.DataFrame, prototypes: Dict[str, np.ndarray], embedder: ECAPAEmbedder, cfg: Config):
@@ -511,21 +539,22 @@ def main():
         os.path.join(CFG.results_dir, "role_only_val_metrics.json"),
     )
 
+    # For test metrics, use the tuned duration threshold
     role_test_metrics = compute_metrics(
         test_role_pred["label"].to_numpy(),
-        test_role_pred["prob"].to_numpy(),
-        threshold=0.5,
+        test_role_pred["prob"].to_numpy(),   # continuous score
+        threshold=role_t,                     # duration threshold
     )
     save_json(
         {"threshold_sec": role_t, **role_test_metrics},
         os.path.join(CFG.results_dir, "role_only_test_metrics.json"),
     )
 
-    per_timepoint_metrics(val_role_pred, 0.5).to_csv(
+    per_timepoint_metrics(val_role_pred, role_t).to_csv(
         os.path.join(CFG.results_dir, "role_only_val_metrics_by_timepoint.csv"),
         index=False,
     )
-    per_timepoint_metrics(test_role_pred, 0.5).to_csv(
+    per_timepoint_metrics(test_role_pred, role_t).to_csv(
         os.path.join(CFG.results_dir, "role_only_test_metrics_by_timepoint.csv"),
         index=False,
     )
@@ -540,6 +569,13 @@ def main():
     prototypes, child_stats_df = build_child_prototypes(train_df, embedder, CFG)
     child_stats_df.to_csv(os.path.join(CFG.results_dir, "child_prototype_stats.csv"), index=False)
     print(f"Built prototypes for {len(prototypes)} children.")
+
+    # Verify no seen children are missing prototypes
+    seen_children = set(train_df["child_id"].unique())
+    missing = seen_children - set(prototypes.keys())
+    if missing:
+        print(f"WARNING: {len(missing)} seen children have no prototype "
+              f"(diarizer found no child segments): {missing}")
 
     print("Running enrollment on val/test...")
     val_enroll_df = run_enrollment(val_df, prototypes, embedder, CFG)

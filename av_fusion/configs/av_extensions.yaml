@@ -21,7 +21,7 @@ gpt4o:
 
 cascade:
   vad_feature: kchi_total_dur
-  child_id_feature: prob       # enrollment score column (from BabAR)
+  child_id_feature: existing_audio_score  # enrollment score column (renamed from prob in feature table)
   vad_threshold_grid: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0, 1.5, 2.0]
   child_id_threshold_grid: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 

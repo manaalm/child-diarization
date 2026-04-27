@@ -68,6 +68,18 @@
       source: vbx_ecapa_enrollment_runs/enroll_test_metrics.json
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
       meta: {diarizer: "VBx"}
+    - label: "TalkNet-ASD"
+      source: video_asd_ecapa_enrollment_runs/talknet_asd/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {diarizer: "TalkNet-ASD"}
+    - label: "EEND-EDA"
+      source: eend_eda_ecapa_enrollment_runs/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {diarizer: "EEND-EDA"}
+    - label: "Sortformer"
+      source: sortformer_ecapa_enrollment_runs/enroll_test_metrics.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {diarizer: "Sortformer"}
 
 # ---------------------------------------------------------------------------
 # Table 3: Age-Stratified Enrollment (BabAR)
@@ -76,14 +88,16 @@
   title: "BabAR enrollment — age-stratified test set"
   columns: [age_group, f1, precision, recall, auroc, auprc]
   rows:
-    - label: "12-16 months"
-      source: pyannote/babar_age_stratified/12_16m/test_metrics_tuned.json
+    - label: "14 months"
+      source: babar_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 14_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {age_group: "12_16m"}
-    - label: "34-38 months"
-      source: pyannote/babar_age_stratified/34_38m/test_metrics_tuned.json
+      meta: {age_group: "14_month"}
+    - label: "36 months"
+      source: babar_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 36_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {age_group: "34_38m"}
+      meta: {age_group: "36_month"}
 
 # ---------------------------------------------------------------------------
 # Table 4: Age-Stratified Enrollment (USC-SAIL)
@@ -92,14 +106,16 @@
   title: "USC-SAIL enrollment — age-stratified test set"
   columns: [age_group, f1, precision, recall, auroc, auprc]
   rows:
-    - label: "12-16 months"
-      source: pyannote/usc_sail_age_stratified/12_16m/test_metrics_tuned.json
+    - label: "14 months"
+      source: whisper-modeling/usc_sail_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 14_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {age_group: "12_16m"}
-    - label: "34-38 months"
-      source: pyannote/usc_sail_age_stratified/34_38m/test_metrics_tuned.json
+      meta: {age_group: "14_month"}
+    - label: "36 months"
+      source: whisper-modeling/usc_sail_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 36_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {age_group: "34_38m"}
+      meta: {age_group: "36_month"}
 
 # ---------------------------------------------------------------------------
 # Table 5: Age-Stratified Enrollment (Pyannote)
@@ -108,14 +124,16 @@
   title: "Pyannote enrollment — age-stratified test set"
   columns: [age_group, f1, precision, recall, auroc, auprc]
   rows:
-    - label: "12-16 months"
-      source: pyannote/pyannote_age_stratified/12_16m/test_metrics_tuned.json
+    - label: "14 months"
+      source: pyannote/pyannote_enrollment_runs/test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 14_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {age_group: "12_16m"}
-    - label: "34-38 months"
-      source: pyannote/pyannote_age_stratified/34_38m/test_metrics_tuned.json
+      meta: {age_group: "14_month"}
+    - label: "36 months"
+      source: pyannote/pyannote_enrollment_runs/test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 36_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {age_group: "34_38m"}
+      meta: {age_group: "36_month"}
 
 # ---------------------------------------------------------------------------
 # Table 6: Age-Stratified Enrollment (VTC / VBx)
@@ -124,22 +142,58 @@
   title: "VTC / VBx enrollment — age-stratified test set"
   columns: [diarizer, age_group, f1, precision, recall, auroc, auprc]
   rows:
-    - label: "VTC 12-16m"
-      source: pyannote/vtc_age_stratified/12_16m/test_metrics_tuned.json
+    - label: "VTC 14m"
+      source: vtc_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 14_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {diarizer: "VTC (KCHI+OCH)", age_group: "12_16m"}
-    - label: "VTC 34-38m"
-      source: pyannote/vtc_age_stratified/34_38m/test_metrics_tuned.json
+      meta: {diarizer: "VTC (KCHI+OCH)", age_group: "14_month"}
+    - label: "VTC 36m"
+      source: vtc_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 36_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {diarizer: "VTC (KCHI+OCH)", age_group: "34_38m"}
-    - label: "VBx 12-16m"
-      source: pyannote/vbx_age_stratified/12_16m/test_metrics_tuned.json
+      meta: {diarizer: "VTC (KCHI+OCH)", age_group: "36_month"}
+    - label: "VBx 14m"
+      source: vbx_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 14_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {diarizer: "VBx", age_group: "12_16m"}
-    - label: "VBx 34-38m"
-      source: pyannote/vbx_age_stratified/34_38m/test_metrics_tuned.json
+      meta: {diarizer: "VBx", age_group: "14_month"}
+    - label: "VBx 36m"
+      source: vbx_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      csv_filter: {timepoint: 36_month}
       key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
-      meta: {diarizer: "VBx", age_group: "34_38m"}
+      meta: {diarizer: "VBx", age_group: "36_month"}
+
+# ---------------------------------------------------------------------------
+# Table 6b: Age-Stratified Enrollment (EEND-EDA and Sortformer)
+# ---------------------------------------------------------------------------
+- name: table6b_age_stratified_neural
+  title: "EEND-EDA / Sortformer enrollment — age-stratified test set"
+  columns: [diarizer, age_group, f1, precision, recall, auroc, auprc]
+  rows:
+    - label: "EEND-EDA 14 months"
+      source: eend_eda_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      source_type: csv_row
+      filter: {timepoint_norm: "14_month"}
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {diarizer: "EEND-EDA", age_group: "14_month"}
+    - label: "EEND-EDA 36 months"
+      source: eend_eda_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      source_type: csv_row
+      filter: {timepoint_norm: "36_month"}
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {diarizer: "EEND-EDA", age_group: "36_month"}
+    - label: "Sortformer 14 months"
+      source: sortformer_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      source_type: csv_row
+      filter: {timepoint_norm: "14_month"}
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {diarizer: "Sortformer", age_group: "14_month"}
+    - label: "Sortformer 36 months"
+      source: sortformer_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+      source_type: csv_row
+      filter: {timepoint_norm: "36_month"}
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {diarizer: "Sortformer", age_group: "36_month"}
 
 # ---------------------------------------------------------------------------
 # Table 7: Synthesis Evaluation
@@ -194,6 +248,92 @@
       meta: {age_group: "34_38m", condition: "aug ratio=1.0"}
 
 # ---------------------------------------------------------------------------
+# Table 9b: Frame-Window MIL — WavLM-Base+ and Whisper (seen-child split)
+# ---------------------------------------------------------------------------
+- name: table_mil_frame_window
+  title: "Frame-window MIL — WavLM-Base+ and Whisper-small (seen-child held-out test set)"
+  columns: [model, backbone, f1, precision, recall, auroc, auprc, threshold]
+  rows:
+    - label: "WavLM-MIL"
+      source: mil/mil_results/wavlm_mil/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {model: "WavLM-MIL", backbone: "microsoft/wavlm-base-plus"}
+    - label: "Whisper-MIL"
+      source: mil/mil_results/whisper_mil/test_metrics_tuned.json
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc, threshold: threshold}
+      meta: {model: "Whisper-MIL", backbone: "openai/whisper-small"}
+
+# Age-stratified MIL (14-month and 36-month cohorts)
+- name: table_mil_frame_window_age
+  title: "Frame-window MIL — age-stratified (seen-child test set)"
+  columns: [model, age_group, f1, precision, recall, auroc, auprc]
+  rows:
+    - label: "WavLM-MIL 14m"
+      source: mil/mil_results/wavlm_mil/test_metrics_by_timepoint.csv
+      csv_filter: {timepoint_norm: 14_month}
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {model: "WavLM-MIL", age_group: "14_month"}
+    - label: "WavLM-MIL 36m"
+      source: mil/mil_results/wavlm_mil/test_metrics_by_timepoint.csv
+      csv_filter: {timepoint_norm: 36_month}
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {model: "WavLM-MIL", age_group: "36_month"}
+    - label: "Whisper-MIL 14m"
+      source: mil/mil_results/whisper_mil/test_metrics_by_timepoint.csv
+      csv_filter: {timepoint_norm: 14_month}
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {model: "Whisper-MIL", age_group: "14_month"}
+    - label: "Whisper-MIL 36m"
+      source: mil/mil_results/whisper_mil/test_metrics_by_timepoint.csv
+      csv_filter: {timepoint_norm: 36_month}
+      key_map: {f1: f1, precision: precision, recall: recall, auroc: auroc, auprc: auprc}
+      meta: {model: "Whisper-MIL", age_group: "36_month"}
+
+# ---------------------------------------------------------------------------
+# Table 10: Audio-Visual Fusion — 4 model classes (seen-child test set)
+# ---------------------------------------------------------------------------
+- name: table_av_fusion
+  title: "Audio-visual fusion — seen-child held-out test set (manual BIDS annotations)"
+  columns: [model, f1, precision, recall, auroc, auprc]
+  rows:
+    - label: "Audio-Only"
+      source: av_fusion/av_results/manual_only/metrics_overall.json
+      key_map:
+        f1: audio_only.f1
+        precision: audio_only.precision
+        recall: audio_only.recall
+        auroc: audio_only.auroc
+        auprc: audio_only.auprc
+      meta: {model: "audio_only"}
+    - label: "Video-Only"
+      source: av_fusion/av_results/manual_only/metrics_overall.json
+      key_map:
+        f1: video_only.f1
+        precision: video_only.precision
+        recall: video_only.recall
+        auroc: video_only.auroc
+        auprc: video_only.auprc
+      meta: {model: "video_only"}
+    - label: "Always-Fuse AV"
+      source: av_fusion/av_results/manual_only/metrics_overall.json
+      key_map:
+        f1: always_fuse.f1
+        precision: always_fuse.precision
+        recall: always_fuse.recall
+        auroc: always_fuse.auroc
+        auprc: always_fuse.auprc
+      meta: {model: "always_fuse"}
+    - label: "Gated AV"
+      source: av_fusion/av_results/manual_only/metrics_overall.json
+      key_map:
+        f1: gated_av.f1
+        precision: gated_av.precision
+        recall: gated_av.recall
+        auroc: gated_av.auroc
+        auprc: gated_av.auprc
+      meta: {model: "gated_av"}
+
+# ---------------------------------------------------------------------------
 # required_files: all files that must exist for a complete table assembly
 # Files listed here that are missing cause the script to exit 1
 # ---------------------------------------------------------------------------
@@ -210,20 +350,41 @@
     - vtc_ecapa_enrollment_runs/enroll_test_metrics.json
     - vtc_kchi_ecapa_enrollment_runs/enroll_test_metrics.json
     - vbx_ecapa_enrollment_runs/enroll_test_metrics.json
-    # Table 3-6 — age-stratified (produced by unified_age_stratified.py runs)
-    - pyannote/babar_age_stratified/12_16m/test_metrics_tuned.json
-    - pyannote/babar_age_stratified/34_38m/test_metrics_tuned.json
-    - pyannote/usc_sail_age_stratified/12_16m/test_metrics_tuned.json
-    - pyannote/usc_sail_age_stratified/34_38m/test_metrics_tuned.json
-    - pyannote/pyannote_age_stratified/12_16m/test_metrics_tuned.json
-    - pyannote/pyannote_age_stratified/34_38m/test_metrics_tuned.json
-    - pyannote/vtc_age_stratified/12_16m/test_metrics_tuned.json
-    - pyannote/vtc_age_stratified/34_38m/test_metrics_tuned.json
-    - pyannote/vbx_age_stratified/12_16m/test_metrics_tuned.json
-    - pyannote/vbx_age_stratified/34_38m/test_metrics_tuned.json
+    # Table 3-6 — age-stratified (by_timepoint CSVs produced by unified.py enrollment runs)
+    - babar_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+    - whisper-modeling/usc_sail_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+    - pyannote/pyannote_enrollment_runs/test_metrics_by_timepoint.csv
+    - vtc_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
+    - vbx_ecapa_enrollment_runs/enroll_test_metrics_by_timepoint.csv
     # Table 7 — synthesis eval (produced by synthesis/evaluate.py)
     - synthesis/eval_results/12_16m/eval_results.json
     - synthesis/eval_results/34_38m/eval_results.json
     # Table 8 — augmentation eval (produced by augmentation_eval.py)
     - pyannote/babar_augmented/12_16m_ratio1.0/test_metrics_tuned.json
     - pyannote/babar_augmented/34_38m_ratio1.0/test_metrics_tuned.json
+    # Table 9 — segment-instance MIL (produced by mil/seg_train.py sweep)
+    - mil/mil_results/seg_mil/all_configs.json
+    # Table 9b — frame-window MIL (produced by mil/mil_evaluate.py)
+    - mil/mil_results/wavlm_mil/test_metrics_tuned.json
+    - mil/mil_results/whisper_mil/test_metrics_tuned.json
+    - mil/mil_results/wavlm_mil/test_metrics_by_timepoint.csv
+    - mil/mil_results/whisper_mil/test_metrics_by_timepoint.csv
+    # Table 10 — AV fusion (produced by av_fusion/scripts/evaluate_av_fusion.py)
+    - av_fusion/av_results/manual_only/metrics_overall.json
+
+# ---------------------------------------------------------------------------
+# Table 9: Segment-Instance MIL — 16-cell frontend × aggregator matrix
+# ---------------------------------------------------------------------------
+- name: table_segment_mil
+  title: "Segment-instance MIL — 4 frontends × 4 aggregators (seen-child test set)"
+  columns: [diarizer, aggregator, f1, precision, recall, auroc, auprc]
+  source: mil/mil_results/seg_mil/all_configs.json
+  source_type: json_array
+  key_map:
+    diarizer: frontend
+    aggregator: aggregator
+    f1: test_f1
+    precision: test_precision
+    recall: test_recall
+    auroc: test_auroc
+    auprc: test_auprc

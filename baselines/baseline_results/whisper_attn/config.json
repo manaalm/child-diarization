@@ -11,11 +11,12 @@
   "lr_head": 0.001,
   "lr_backbone": 1e-05,
   "weight_decay": 0.0001,
-  "epochs": 10,
+  "epochs": 20,
   "device": "cuda",
   "freeze_backbone": true,
   "unfreeze_last_n_layers": 0,
   "pooling": "attn",
+  "use_layer_weights": false,
   "use_timepoint_feature": true,
   "dropout": 0.3,
   "hidden_dim": 256,
@@ -26,6 +27,9 @@
   "train_frac": 0.7,
   "val_frac": 0.15,
   "test_frac": 0.15,
+  "speed_perturb": false,
+  "random_crop": false,
+  "per_timepoint_threshold": false,
   "experiment_name": "whisper_attn",
   "save_path": "./baseline_results/whisper_attn/best_model.pt"
 }

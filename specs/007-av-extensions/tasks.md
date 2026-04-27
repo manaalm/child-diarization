@@ -123,6 +123,20 @@
 
 ---
 
+## Phase 10: LocoNet + ECAPA Speaker Identity Frontend (Branch 005-mil-extensions)
+
+**Goal**: Replace the smallest-face heuristic with per-track LocoNet ASD + ECAPA speaker similarity for target-child identification; alternative to TS-TalkNet when its checkpoint is unavailable.
+
+- [X] T022 Implement `run_loconet_asd_per_track()` in `video/run_asd.py` with `--output_tracks_json` flag — runs LocoNet independently on every face track, returns per-track JSON with `{track_id, mean_area, segments:[{start,end}]}`; wired into `--model loconet` branch alongside existing smallest-face RTTM output
+- [X] T023 Implement `LocoNetECAPAFrontend` in `pyannote/video_asd.py` — loads ECAPA via speechbrain on init; checks/fills per-track JSON cache via `run_asd.py --output_tracks_json`; embeds reference audio and each track's active speech segments; picks best-cosine-similarity track as target child; falls back to smallest-face when no reference available; registered as `loconet_ecapa` in `pyannote/unified.py` with `video_loconet_checkpoint` config field
+- [ ] T024 Run LocoNet ECAPA enrollment: `sbatch pyannote/run_loconet_ecapa_enrollment.sh` (SLURM job 12615544, 24h); results to `video_asd_ecapa_enrollment_runs/loconet_ecapa/` with `enroll_test_metrics.json`
+- [ ] T025 [P] Log LocoNet ECAPA enrollment results in CLAUDE.md results table (F1/AUROC/AUPRC) once T024 completes
+- [ ] T026 [P] TS-TalkNet checkpoint acquisition: contact `jiang_yidi@outlook.com` for `video/pretrain/ts_talknet.model` and `video/TS-TalkNet/exps/pretrain.model`; once received, run `sbatch pyannote/run_ts_talknet_enrollment.sh`; results to `video_asd_ecapa_enrollment_runs/ts_talknet/`
+
+**Checkpoint**: LocoNet ECAPA enrollment results committed; TS-TalkNet checkpoint acquired or acquisition documented.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

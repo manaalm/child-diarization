@@ -3,7 +3,7 @@ import json
 import hashlib
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import List, Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -229,7 +229,7 @@ def get_pyannote_segments(audio_path: str, pipeline, cfg: Config) -> List[Dict]:
 
 
 # =========================================================
-# Prototype building
+# Segment embedding extraction
 # =========================================================
 
 def extract_segment_embeddings_from_segments(
@@ -237,19 +237,31 @@ def extract_segment_embeddings_from_segments(
     segments: List[Dict],
     embedder: ECAPAEmbedder,
     cfg: Config,
-) -> List[np.ndarray]:
-    wav = load_audio_mono(audio_path, cfg.sample_rate)
-    embs = []
+    wav: Optional[torch.Tensor] = None,
+) -> List[Tuple[np.ndarray, float]]:
+    """
+    Returns list of (embedding, duration) pairs for valid segments.
+    If *wav* is provided the audio is not reloaded from disk.
+    """
+    if wav is None:
+        wav = load_audio_mono(audio_path, cfg.sample_rate)
+
+    emb_dur_pairs: List[Tuple[np.ndarray, float]] = []
     for seg in segments:
         clip = crop_segment(wav, cfg.sample_rate, seg["start"], seg["end"])
         if clip.numel() < int(cfg.min_seg_dur_sec * cfg.sample_rate):
             continue
         try:
-            embs.append(embedder.embed_waveform(clip))
+            emb = embedder.embed_waveform(clip)
+            emb_dur_pairs.append((emb, seg["dur"]))
         except Exception:
             continue
-    return embs
+    return emb_dur_pairs
 
+
+# =========================================================
+# Prototype building
+# =========================================================
 
 def build_child_prototypes_from_pyannote(
     train_df: pd.DataFrame,
@@ -263,19 +275,21 @@ def build_child_prototypes_from_pyannote(
     pos_train = train_df[train_df["label"] == 1].copy()
 
     for child_id, sub in pos_train.groupby("child_id"):
-        all_embs = []
+        all_pairs: List[Tuple[np.ndarray, float]] = []
 
         for _, row in sub.iterrows():
             audio_path = row["audio_path"]
             segs = get_pyannote_segments(audio_path, pyannote_pipeline, cfg)
-            embs = extract_segment_embeddings_from_segments(audio_path, segs, embedder, cfg)
-            all_embs.extend(embs)
+            pairs = extract_segment_embeddings_from_segments(
+                audio_path, segs, embedder, cfg
+            )
+            all_pairs.extend(pairs)
 
-            if len(all_embs) >= cfg.max_enrollment_segments_per_child:
-                all_embs = all_embs[:cfg.max_enrollment_segments_per_child]
+            if len(all_pairs) >= cfg.max_enrollment_segments_per_child:
+                all_pairs = all_pairs[:cfg.max_enrollment_segments_per_child]
                 break
 
-        if len(all_embs) == 0:
+        if len(all_pairs) == 0:
             stats.append({
                 "child_id": child_id,
                 "n_segments": 0,
@@ -283,12 +297,15 @@ def build_child_prototypes_from_pyannote(
             })
             continue
 
-        proto = np.mean(np.stack(all_embs, axis=0), axis=0)
+        # Duration-weighted prototype
+        embs = np.stack([e for e, _ in all_pairs], axis=0)
+        weights = np.array([d for _, d in all_pairs])
+        proto = np.average(embs, axis=0, weights=weights)
         prototypes[child_id] = l2_normalize(proto)
 
         stats.append({
             "child_id": child_id,
-            "n_segments": int(len(all_embs)),
+            "n_segments": int(len(all_pairs)),
             "status": "ok",
         })
 
@@ -307,6 +324,11 @@ def score_clip_with_pyannote_enrollment(
     embedder: ECAPAEmbedder,
     cfg: Config,
 ) -> float:
+    """
+    Score a clip using duration-weighted mean cosine similarity to the
+    enrolled prototype.  Returns 0.0 if the child has no prototype
+    (unseen split) or if no valid segments are found.
+    """
     if target_child_id not in prototypes:
         return 0.0
 
@@ -314,24 +336,28 @@ def score_clip_with_pyannote_enrollment(
     if len(segments) == 0:
         return 0.0
 
+    # Load audio once and pass through
     wav = load_audio_mono(audio_path, cfg.sample_rate)
     proto = prototypes[target_child_id]
 
-    sims = []
+    scored: List[Tuple[float, float]] = []
     for seg in segments:
         clip = crop_segment(wav, cfg.sample_rate, seg["start"], seg["end"])
         if clip.numel() < int(cfg.min_seg_dur_sec * cfg.sample_rate):
             continue
         try:
             emb = embedder.embed_waveform(clip)
-            sims.append(cosine_similarity(emb, proto))
+            sim = cosine_similarity(emb, proto)
+            scored.append((sim, seg["dur"]))
         except Exception:
             continue
 
-    if len(sims) == 0:
+    if len(scored) == 0:
         return 0.0
 
-    return float(max(sims))
+    # Duration-weighted mean similarity
+    total_dur = sum(d for _, d in scored)
+    return float(sum(s * d for s, d in scored) / total_dur)
 
 
 def run_enrollment(df: pd.DataFrame, prototypes, pyannote_pipeline, embedder, cfg: Config):
@@ -407,6 +433,13 @@ def main():
     )
     child_stats_df.to_csv(os.path.join(CFG.results_dir, "child_prototype_stats.csv"), index=False)
     print(f"Built prototypes for {len(prototypes)} children.")
+
+    # Verify no seen children are missing prototypes
+    seen_children = set(train_df["child_id"].unique())
+    missing = seen_children - set(prototypes.keys())
+    if missing:
+        print(f"WARNING: {len(missing)} seen children have no prototype "
+              f"(diarizer found no segments): {missing}")
 
     print("Running PyAnnote + enrollment on val/test...")
     val_df_pred = run_enrollment(val_df, prototypes, pyannote_pipeline, embedder, CFG)

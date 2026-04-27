@@ -1,5 +1,6 @@
-import argparse
 import os
+import hashlib
+import argparse
 from pathlib import Path
 
 import torch
@@ -10,28 +11,23 @@ from scripts.convert_output import get_timestamps, majority_filter
 
 SAMPLE_RATE = 16000
 
+
 def merge_segments(segments, min_duration=0.05, merge_gap=0.2):
     """
     segments: list of (start, end)
     - removes zero / tiny segments
     - merges overlapping or near-touching segments
     """
-
-    # Remove tiny segments
     segments = [(s, e) for s, e in segments if (e - s) >= min_duration]
 
     if not segments:
         return []
 
-    # Sort by start time
     segments = sorted(segments, key=lambda x: x[0])
-
     merged = [segments[0]]
 
     for s, e in segments[1:]:
         last_s, last_e = merged[-1]
-
-        # If overlapping or close enough → merge
         if s <= last_e + merge_gap:
             merged[-1] = (last_s, max(last_e, e))
         else:
@@ -39,8 +35,8 @@ def merge_segments(segments, min_duration=0.05, merge_gap=0.2):
 
     return merged
 
+
 def combine_results(intervals, gap=0.01, ndigits=2):
-    """Merge adjacent intervals with small gaps."""
     new_intervals = []
     for start, end in intervals:
         if not new_intervals or start - new_intervals[-1][1] > gap:
@@ -82,17 +78,16 @@ def process_wav_file(
 
         x_window = x[:, start_n:end_n]
 
-        # Pad final chunk to exactly 10s (model was trained on 10s windows)
         if x_window.size(1) < win_n:
             pad = win_n - x_window.size(1)
             x_window = torch.nn.functional.pad(x_window, (0, pad))
 
         with torch.no_grad():
             pred = model.forward_eval(x_window)
+
         pred = majority_filter(pred)
         child, adult, overlap = get_timestamps(pred)
 
-        # Shift window-local timestamps to global time
         child_pred += [(start_s + s, start_s + e) for s, e in child]
         adult_pred += [(start_s + s, start_s + e) for s, e in adult]
         overlap_pred += [(start_s + s, start_s + e) for s, e in overlap]
@@ -107,7 +102,6 @@ def process_wav_file(
 
 
 def write_segments_txt(out_path: str, segments, label: str):
-    # simple tab-separated: start  end  label
     with open(out_path, "w") as f:
         for s, e in segments:
             f.write(f"{s:.2f}\t{e:.2f}\t{label}\n")
@@ -123,11 +117,20 @@ def write_rttm(out_path: str, recording_id: str, segments, label: str, min_dur=0
                 f"SPEAKER {recording_id} 1 {s:.3f} {dur:.3f} <NA> <NA> {label} <NA> <NA>\n"
             )
 
+
+def make_recording_id_and_rttm_name(audio_path: str):
+    stem = Path(audio_path).stem
+    cache_id = hashlib.md5(audio_path.encode("utf-8")).hexdigest()
+    recording_id = f"{stem}__{cache_id}"
+    rttm_name = f"{recording_id}.rttm"
+    return recording_id, rttm_name
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--wav_file", type=str, default="")
     ap.add_argument("--wav_dir", type=str, default="")
-    ap.add_argument("--filelist", type=str, default="")  # text file: one wav path per line
+    ap.add_argument("--filelist", type=str, default="")
     ap.add_argument("--out_dir", type=str, required=True)
 
     ap.add_argument("--model_path", type=str, default="whisper-base_rank8_pretrained_50k.pt")
@@ -140,7 +143,6 @@ def main():
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Collect inputs
     wavs = []
     if args.wav_file:
         wavs = [args.wav_file]
@@ -152,10 +154,8 @@ def main():
     else:
         raise ValueError("Provide one of --wav_file, --wav_dir, or --filelist")
 
-    # Load model
     device = args.device
     model = WhisperWrapper()
-    # replace positional embedding for 10s input audio (as repo README shows)
     model.backbone_model.encoder.embed_positions = (
         model.backbone_model.encoder.embed_positions.from_pretrained(model.embed_positions[:500])
     )
@@ -164,9 +164,9 @@ def main():
     model.to(device)
     model.eval()
 
-    # Run batch
     for wav in wavs:
-        stem = Path(wav).stem
+        recording_id, rttm_name = make_recording_id_and_rttm_name(wav)
+
         child, adult, overlap = process_wav_file(
             wav,
             model,
@@ -175,16 +175,19 @@ def main():
             device=device,
         )
 
-        # Write three files per recording (easy + robust)
-        rttm_path = out_dir / f"{stem}.rttm"
+        rttm_path = out_dir / rttm_name
         if rttm_path.exists():
-            rttm_path.unlink()  # start clean
+            rttm_path.unlink()
 
-        write_rttm(str(rttm_path), stem, child, "CHI")
-        write_rttm(str(rttm_path), stem, adult, "ADULT")
-        write_rttm(str(rttm_path), stem, overlap, "OVL")
+        write_rttm(str(rttm_path), recording_id, child, "CHI")
+        write_rttm(str(rttm_path), recording_id, adult, "ADULT")
+        write_rttm(str(rttm_path), recording_id, overlap, "OVL")
 
-        print(f"[OK] {wav} -> {stem} ({len(child)} child, {len(adult)} adult, {len(overlap)} overlap)")
+        print(
+            f"[OK] {wav} -> {rttm_name} "
+            f"({len(child)} child, {len(adult)} adult, {len(overlap)} overlap)"
+        )
+
 
 if __name__ == "__main__":
     main()
