@@ -92,7 +92,7 @@ best-ratio AUPRC + 0.005 (SC-003); `metrics_by_age_band.csv` has 14-month and
 
 ### Scene Re-generation
 
-- [x] T020 [US2] Re-generate 5000 acoustic scenes via SLURM: job 12647967 submitted with --rir-dir data/rir/simulated_rirs_16k --noise-dir data/noise/musan/noise; monitoring via logs/synth/scene_gen_12647967.out (~24h)
+- [ ] T020 [US2] Re-generate 5000 acoustic scenes: job 12647967 skipped all 5000 (old clean-mix scenes still existed); deleted old scenes, resubmitted as job 12648742; 67/5000 generated at 35min mark — confirm complete and synthetic_manifest.csv updated (~24h total)
 - [ ] T021 [US2] Spot-check 20 output JSONs from T020 to confirm ≥12 have `rir_id ≠ null` and ≥14 have `noise_id ≠ null` (US1 spec independent test applied at full-scale)
 
 ### Ratio Sweep & Evaluation

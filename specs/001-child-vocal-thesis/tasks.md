@@ -234,12 +234,13 @@ SC-003 thresholds met.
   contract: load config, instantiate model (VITS or VAE by model.type), train with
   seed=42, save best checkpoint to synthesis/checkpoints/{age_group}_{model}_{ts}/,
   write training_log.csv and config.json copy per Constitution Principle VI
-- [X] T037 [US3] Submit synthesis training for 34_38m VITS via SLURM:
-  SLURM job 12647588 submitted (PENDING → Resources); manifests created:
-  synthesis/data/34_38m/{train_manifest.csv (5106), val_manifest.csv (1277)}
-- [X] T038 [P] [US3] Submit synthesis training for 12_16m VAE via SLURM:
-  SLURM job 12647590 submitted (PENDING → Priority); manifests created:
-  synthesis/data/12_16m/{train_manifest.csv (4988), val_manifest.csv (1248)}
+- [ ] T037 [US3] Submit synthesis training for 34_38m VAE via SLURM:
+  job 12652016 PENDING (Resources); bugs fixed: REPO_ROOT hardcoded, TTS removed
+  (numpy conflict), model switched vits→vae, torchaudio pinned <2.9 (torchcodec
+  error in 2.11); manifests: synthesis/data/34_38m/{train,val}_manifest.csv
+- [ ] T038 [P] [US3] Submit synthesis training for 12_16m VAE via SLURM:
+  job 12652017 PENDING (Priority); same fixes as T037; manifests:
+  synthesis/data/12_16m/{train,val}_manifest.csv
 - [X] T039 [US3] Implement synthesis/generate.py per contracts/script-interfaces.md
   CLI contract: load checkpoint, generate n-samples with fixed seed, write WAVs to
   synthesis/generated/{model_name}/{age_group}/, populate registry.jsonl with
