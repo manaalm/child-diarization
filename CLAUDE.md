@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Child-adult speaker diarization system that classifies speakers (silence, child, adult, overlap) in audio recordings at 20ms frame-level resolution. Based on ICASSP 2025 / Interspeech 2024 papers by Xu et al.
 
-The goal is per-clip child presence detection: given a short audio clip, predict whether a target child is vocalizing. Nine diarization frontends are compared:
+The goal is per-clip child presence detection: given a short audio clip, predict whether a target child is vocalizing. A synthetic scene generator (`synth/`) produces augmented training data by mixing Providence child speech and LibriSpeech adult speech under configurable SNR, RIR, overlap, and scene-type distributions. Nine diarization frontends are compared:
 1. **USC-SAIL** — Fine-tuned Whisper + LoRA frame classifier (`whisper-modeling/`)
 2. **Pyannote** — `pyannote/speaker-diarization-community-1` model
 3. **BabAR** — VTC 2.0 child speech diarizer (full pipeline with phoneme step)
@@ -16,6 +16,7 @@ The goal is per-clip child presence detection: given a short audio clip, predict
 7. **TS-TalkNet** — Speaker-conditioned video-audio ASD; uses a reference clip from the training split for target-child enrollment
 8. **EEND-EDA** — End-to-End Neural Diarization with Encoder-Decoder Attractors (ESPnet2); handles overlapping speech natively; anonymous speaker labels resolved via ECAPA cosine similarity
 9. **Sortformer** — Sort-based transformer diarization (NeMo/NVIDIA); anonymous speaker labels resolved via ECAPA cosine similarity
+10. **Audio LLM Baseline** — Qwen2-Audio-7B-Instruct zero-shot child vocalization detection (`baselines/audio_llm_baseline.py`); prompted "Is there a child vocalizing?" → yes/no logit ratio → threshold-tuned on val
 
 All are evaluated using a shared ECAPA-based speaker enrollment pipeline. The primary evaluation and combined-feature scripts live in the **`pyannote/` folder** (despite the name, it is the multi-diarizer testing suite for the project).
 
@@ -243,6 +244,109 @@ python av_fusion/scripts/1kd_integration.py \
   --output av_fusion/av_results/manual_only/1kd_integration_report.json
 ```
 
+### Audio LLM Zero-Shot Baseline (`baselines/audio_llm_baseline.py`)
+
+```bash
+# Dry run — print 3 example prompts and exit 0
+python baselines/audio_llm_baseline.py --split val --max-clips 5 --dry-run
+
+# Step 1: val-set inference + threshold tuning (submit via SLURM — requires GPU, ~4h)
+sbatch baselines/slurm/run_audio_llm_baseline.sh val
+# Output: baselines/audio_llm_baseline_runs/qwen2_audio_7b/val_predictions.csv
+#         baselines/audio_llm_baseline_runs/qwen2_audio_7b/val_metrics_tuned.json
+
+# Step 2: test-set inference (run after Step 1 completes; loads threshold from val JSON)
+sbatch baselines/slurm/run_audio_llm_baseline.sh test
+# Output: test_predictions.csv, test_metrics_tuned.json, test_metrics_by_timepoint.csv, config.json
+
+# Optional: 2-shot few-shot variant (same-child training clips as in-context examples)
+sbatch baselines/slurm/run_audio_llm_baseline.sh val qwen2_audio_7b_2shot 2
+sbatch baselines/slurm/run_audio_llm_baseline.sh test qwen2_audio_7b_2shot 2
+
+# Smoke test (10 clips, no model required flag)
+python baselines/audio_llm_baseline.py --split val --max-clips 10 \
+  --output-dir /tmp/audio_llm_smoke --cache-dir /tmp/audio_llm_cache_smoke --seed 42
+```
+
+### Synthetic Data Generator (`synth/`)
+
+7-step pipeline: build segment manifest → extract segments → generate scenes → make training manifests → train at each ratio → evaluate → error analysis. No GPU required for steps 1–3.
+
+```bash
+# Step 1: build Providence + TinyVox + LibriSpeech segment manifest
+python synth/scripts/build_segment_manifest.py \
+  --providence-dir        providence/ \
+  --providence-rttm-dir   providence/rttm/ \
+  --tinyvox-dir           data/tinyvox/ \
+  --librispeech-dir       /path/to/LibriSpeech/train-clean-100/ \
+  --exclude-speakers-csv  whisper-modeling/seen_child_splits/test.csv \
+  --output                synth_results/manifests/segment_manifest.csv
+# TinyVox adds ~24k Eng-NA child segments (~10 h) with age_band from session YYMMDD
+
+# Step 2: extract segment WAVs
+python synth/scripts/extract_segments.py \
+  --manifest   synth_results/manifests/segment_manifest.csv \
+  --output-dir data/segments/
+
+# Step 3: generate 5000 synthetic scenes (via SLURM — no GPU)
+sbatch synth/slurm/run_scene_generation.sh synth/configs/default_14_18mo.yaml
+# Output: synth_results/synthetic_scenes/{wav,rttm,json}/
+#         synth_results/manifests/synthetic_manifest.csv
+
+# Step 4: build train manifests at 6 ratios (0×, 0.5×, 1×, 2×, 5×, 10×)
+python synth/scripts/generate_training_sets.py \
+  --real-train-csv     whisper-modeling/seen_child_splits/train.csv \
+  --synthetic-manifest synth_results/manifests/synthetic_manifest.csv \
+  --output-dir         synth_results/manifests/
+
+# Steps 5–6: train + evaluate (GPU sweep, 48 h SLURM)
+sbatch synth/slurm/run_ratio_sweep.sh synth/configs/default_14_18mo.yaml
+# Output: synth_results/augmentation_experiments/default_14_18mo/
+#         metrics_by_ratio.csv, metrics_by_age_band.csv, figures/
+
+# Step 7: error analysis (real-only vs. best ratio)
+python synth/scripts/error_analysis_synthetic.py \
+  --experiment-dir synth_results/augmentation_experiments/default_14_18mo/ \
+  --test-csv       whisper-modeling/seen_child_splits/test.csv \
+  --output-dir     synth_results/augmentation_experiments/default_14_18mo/
+
+# Optional: distribution quality figures
+python synth/scripts/analyze_synthetic_quality.py \
+  --synthetic-manifest synth_results/manifests/synthetic_manifest.csv \
+  --real-train-csv     whisper-modeling/seen_child_splits/train.csv \
+  --output-dir         synth_results/augmentation_experiments/default_14_18mo/figures/
+```
+
+### Frame-window MIL (WavLM-Base+ / Whisper-small)
+
+```bash
+# Train one variant (wavlm_mil or whisper_mil):
+sbatch mil/slurm/train_mil.sh mil/configs/wavlm_mil.yaml
+sbatch mil/slurm/train_mil.sh mil/configs/whisper_mil.yaml
+# Output: mil/mil_results/{variant}/best_checkpoint.pt + val_metrics_tuned.json
+# Logs: logs/mil/train_{jobid}.out
+
+# Evaluate both checkpoints on the test split:
+sbatch mil/slurm/eval_mil.sh
+# Output per variant: test_metrics_tuned.json, test_predictions.csv,
+#                     test_metrics_by_timepoint.csv, val_metrics_by_timepoint.csv
+# Logs: logs/mil/eval_{jobid}.out
+
+# Age-stratified evaluation (after eval_mil.sh completes):
+python mil/mil_age_stratified.py \
+  --checkpoint mil/mil_results/wavlm_mil/best_checkpoint.pt \
+  --config     mil/mil_results/wavlm_mil/config.json \
+  --age-group  14_month \
+  --manifest   playlogue/manifest.csv
+python mil/mil_age_stratified.py \
+  --checkpoint mil/mil_results/wavlm_mil/best_checkpoint.pt \
+  --config     mil/mil_results/wavlm_mil/config.json \
+  --age-group  36_month \
+  --manifest   playlogue/manifest.csv
+# (Repeat replacing wavlm_mil with whisper_mil)
+# Output: mil/mil_results/{variant}/age_stratified/{age_group}/test_metrics_tuned.json
+```
+
 ### Segment-instance MIL sweep
 
 ```bash
@@ -292,6 +396,16 @@ Shared enrollment pipeline: builds ECAPA duration-weighted child prototypes from
 
 Trains 8 feature-set combinations × LR + GBM = 16 models, plus per-timepoint variants. Requires BabAR RTTM + phoneme CSVs and ECAPA prototypes from a prior enrollment run.
 
+**`unified_age_stratified.py`** — Wraps the `unified.py` enrollment pipeline with per-age-group filtering; reads the `timepoint_norm` column from the seen-child split to filter to `14_month` or `36_month` cohorts; writes per-cohort `test_metrics_tuned.json` and `test_predictions.csv` to `pyannote/{diarizer}_age_stratified/{age_group}/`. CLI: `python pyannote/unified_age_stratified.py --diarizer babar --age-group 14_month`.
+
+**`augmentation_eval.py`** — Retrain enrollment prototypes on a training split augmented with synthetic child speech (reads `registry.jsonl` from `--synthetic-dir`); evaluates on the same val/test splits as the baseline; produces F1/AUROC/AUPRC delta table vs. the unaugmented baseline. CLI: `python pyannote/augmentation_eval.py --diarizer babar --synthetic-dir synth_results/synthetic_scenes/ --output-dir pyannote/babar_augmented/`.
+
+**`proxy_analysis.py`** — Quality proxy metrics on unlabeled core dataset recordings; runs BabAR and USC-SAIL diarizers to estimate child speech duration, segment rate, and SNR proxy; writes per-session CSV for exploratory analysis. CLI: `python pyannote/proxy_analysis.py --core-dir core/audio/ --output-dir pyannote/proxy_results/`.
+
+**`scripts/prepare_age_manifests.py`** — Loads per-dataset annotation sources (Playlogue: `anotated_processed.csv`, Providence: CHAT metadata, Seedlings: Databrary export); assigns `age_group` labels (12_16m / 34_38m / other); outputs `manifest.csv` per dataset matching the `AudioRecording` schema. CLI: `python scripts/prepare_age_manifests.py --dataset {playlogue|providence|seedlings}`.
+
+**`scripts/verify_reproducibility.py`** — Compares committed `config.json` against result files across all result folders; reports hash mismatches. CLI: `python scripts/verify_reproducibility.py`; outputs to `evaluation/reproducibility_report.txt`.
+
 **Note**: `unified.py` is partially redundant with `whisper-modeling/usc_sail_run_enrollment.py` — USC-SAIL enrollment logic exists in both places.
 
 ### `mil/` — Multiple Instance Learning module
@@ -299,6 +413,10 @@ Trains 8 feature-set combinations × LR + GBM = 16 models, plus per-timepoint va
 **`mil_model.py`** — `BackboneExtractor` (frozen WavLM-base+ or Whisper-small) + `GatedABMILHead` (gated attention MIL, Ilse et al. 2018) + `MILModel` composer. Used by the frame-window MIL workflow.
 
 **`mil_train.py`** / **`mil_dataset.py`** — Frame-window MIL: splits audio into 2s windows, embeds each window, trains GatedABMIL head over the bag of windows.
+
+**`mil_evaluate.py`** — Loads a trained checkpoint + val-tuned threshold; runs forward pass over the test split; writes `test_metrics_tuned.json`, `test_predictions.csv`, `test_metrics_by_timepoint.csv`. CLI: `python mil/mil_evaluate.py --checkpoint <pt> --config <json>`.
+
+**`mil_age_stratified.py`** — Age-cohort evaluation: inner-joins test split with a dataset manifest on `audio_path`, filters to a single `age_group` (14_month or 36_month), runs the checkpoint and writes cohort-specific metrics to `mil/mil_results/{variant}/age_stratified/{age_group}/`. CLI: `python mil/mil_age_stratified.py --checkpoint <pt> --config <json> --age-group <group> --manifest <csv>`.
 
 **`mil_utils.py`** — Shared metric helpers: `compute_metrics()`, `tune_threshold()`, `per_timepoint_metrics()`, `save_json()`, `save_csv()`.
 
@@ -386,7 +504,12 @@ The `seen_child_splits/` approach tests enrollment-based personalization (the mo
 - `vbx_ecapa_enrollment_runs/` — VBx speaker diarization enrollment
 - `video_asd_ecapa_enrollment_runs/talknet_asd/` — TalkNet-ASD video ASD enrollment
 - `video_asd_ecapa_enrollment_runs/ts_talknet/` — TS-TalkNet video ASD enrollment
-- `mil/mil_results/seg_mil/` — Segment-instance MIL sweep results (16 configs); `all_configs.json` summary + per-config subdirs
+- `mil/mil_results/wavlm_mil/` — Frame-window MIL with WavLM-Base+ backbone; `best_checkpoint.pt`, `config.json`, `val/test_metrics_tuned.json`, `val/test_predictions.csv`, `val/test_metrics_by_timepoint.csv`; `age_stratified/{14_month,36_month}/` after age-stratified eval
+- `mil/mil_results/whisper_mil/` — Frame-window MIL with Whisper-small backbone; same layout as `wavlm_mil/`
+- `mil/mil_results/seg_mil/` — Segment-instance MIL sweep results (28 configs); `all_configs.json` summary + per-config subdirs
+- `synth_results/manifests/` — `segment_manifest.csv`, `synthetic_manifest.csv`, `train_{ratio}x_manifest.csv` files (committed)
+- `synth_results/augmentation_experiments/{config_name}/` — per-ratio enrollment results, `metrics_by_ratio.csv`, `metrics_by_age_band.csv`, `error_analysis.csv`, `figures/` (committed); scene WAVs in `synth_results/synthetic_scenes/` are gitignore'd
+- `baselines/audio_llm_baseline_runs/{model_slug}/` — Audio LLM baseline results; `val_predictions.csv`, `val_metrics_tuned.json`, `test_predictions.csv`, `test_metrics_tuned.json`, `test_metrics_by_timepoint.csv`, `config.json`; cache files in `baselines/audio_llm_cache/` are gitignore'd
 
 Each folder contains:
 - `config.json` — full config
@@ -404,6 +527,10 @@ Each folder contains:
 | VTC (KCHI+OCH) | 0.888 | 0.866 | 0.910 | 0.787 | 0.895 |
 | VTC-KCHI | 0.874 | 0.912 | 0.839 | 0.820 | 0.918 |
 | VBx | 0.858 | 0.797 | 0.928 | 0.686 | 0.851 |
+| TalkNet-ASD | 0.336 | 0.908 | 0.206 | 0.569 | 0.791 |
+| WavLM-MIL | 0.882 | 0.807 | 0.973 | 0.771 | 0.893 |
+| Whisper-MIL | 0.886 | 0.868 | 0.904 | 0.853 | 0.946 |
+| Audio LLM (Qwen2-Audio-7B, zero-shot) | 0.871 | 0.807 | 0.946 | 0.725 | 0.853 |
 
 **BabAR per-timepoint combined features** (`babar_combined_runs/all_model_results.json`):
 - 14_month: F1=0.907, AUROC=0.892, AUPRC=0.949
@@ -444,13 +571,19 @@ If audio files change, delete the relevant cache directory before re-running.
 - `extract_gpt4o_features.py` requires `OPENAI_API_KEY` env var; uses `gpt-4o-mini` by default (~$0.66 for 2183 clips at 2 frames each); supports `--dry-run` for cost estimation before API calls
 - `train_cascaded_pipeline.py` requires `av_val.csv` from the 006 pipeline to exist; test thresholds come from `cascade_thresholds.json` (val-tuned only)
 - `smooth_predictions.py` requires `--val-predictions` when `--param None`; smoothing is scoped within (child_id, timepoint_norm) groups — no cross-child information leakage
+- `synth/scripts/build_segment_manifest.py` **must** receive `--exclude-speakers-csv` pointing to the real test split — omitting it leaks test-child speech into training segments
+- Synthetic scene WAVs (`synth_results/synthetic_scenes/wav/`) and extracted segments (`data/segments/`) are gitignore'd; only manifests, configs, metrics, and scripts are committed
+- `synth/scripts/generate_scenes.py` is CPU-only; do not request a GPU node for scene generation
+- Deleting and regenerating only part of a scene set breaks reproducibility — always regenerate the full N scenes for a given config + seed pair
+- **Audio LLM prompt cache invalidation** — if the prompt template in `baselines/audio_llm_baseline.py` changes, delete `baselines/audio_llm_cache/{model_slug}/` before rerunning; cached logits were generated with the old prompt and will silently produce wrong results
+- **Audio LLM test-before-val guard** — `python baselines/audio_llm_baseline.py --split test` exits with code 2 if `val_metrics_tuned.json` is missing; run val first
 
 ## Recent Changes
-- 007-av-extensions: Added `train_cascaded_pipeline.py` (3-stage cascade with val-tuned thresholds), `smooth_predictions.py` (Gaussian/majority-vote/moving-average temporal smoothing), `extract_gpt4o_features.py` (GPT-4o-mini vision API frame analysis with caching), `ego4d_experiment.py` (zero-shot ASD evaluation), `1kd_integration.py` (schema compatibility check); extended `extract_asd_features.py` with `--model {loconet,light_asd}` and `evaluate_av_fusion.py` with `--cascade-breakdown` and `--smoothed-predictions`; added `av_extensions.yaml` config
-- 005-mil-extensions: Added Python 3.11 (conda `child-vocalizations` env — same as existing AV pipeline) + scikit-learn (threshold tuning, logistic regression), pandas, numpy, scipy (Gaussian smoothing), OpenCV (frame sampling), openai (GPT-4o API), tqdm; LocoNet and Light-ASD require the `video/` Python 3.10 uv env as subprocess targets
-- 005-mil-extensions: Added Python 3.11 (conda `child-vocalizations` env — same as MIL sweep) + `opencv-python` (YuNet face detector), `xgboost`, `scikit-learn`, `pandas`, `numpy`, `matplotlib`, `seaborn`, `scipy`; optional: `mediapipe` (fallback detector); existing `video/` env for ASD stretch
-- 005-mil-extensions: Added Python 3.11 (conda `child-vocalizations`) + PyTorch 2.x, transformers (WavLM-base+), torchaudio, scikit-learn, pandas, PyYAML, numpy, soundfile, scipy (for Pearson/Spearman correlation in eval script)
+- **Synthetic augmentation null result** (spec-008, 2026-04-27): All 6 augmentation ratios (0×–10×) produce identical enrollment metrics (F1=0.874, AUROC=0.820, AUPRC=0.918). Root cause: ECAPA encoder is frozen; synthetic BabAR RTTM cache reused from baseline run; synthetic ECAPA embeddings are similar to real ones, so prototype averaging is unaffected. Error analysis: 360/441 test clips unchanged; 81 unchanged errors (44 short-vocalization, 23 overlap, 7 adult-background FP). Full results: `synth_results/augmentation_experiments/default_14_18mo/`
+- **Audio LLM results** (spec-010, 2026-04-27): Qwen2-Audio-7B-Instruct zero-shot — test F1=0.871, AUROC=0.725, AUPRC=0.853, val F1=0.859, AUROC=0.781, AUPRC=0.898. AUROC/AUPRC below BabAR (delta_auroc=-0.095, delta_auprc=-0.065) but F1 near-identical (delta=-0.003). 14_month F1=0.838, 36_month F1=0.904. Fixed 3 inference bugs: wrong model class, wrong processor kwarg (`audios=`→`audio=`), constrained decoding (`model.generate()`→`model(**inputs)` forward pass + logsumexp). Results: `baselines/audio_llm_baseline_runs/qwen2_audio_7b/`
+- 009-synth-rir-noise: Added Python 3.11, `child-vocalizations` conda env + `transformers>=4.45`, `accelerate`, `torchaudio`, `soundfile`, `pandas`, `scikit-learn`, `numpy`; optional: `bitsandbytes` for 4-bit quantization
+- evaluation analyses (cross-diarizer): Added `evaluation/build_master_table.py` (bootstrap CIs for 11 diarizers), `evaluation/stat_significance.py` (pairwise AUROC bootstrap tests, 55 pairs), `evaluation/weak_diarization_correlation.py` (attention-weight vs. classification AUROC Spearman), `evaluation/per_diarizer_error_analysis.py` (FP/FN breakdown by interaction/timepoint/n_children for all diarizers), `evaluation/comprehensive_stratified_analysis.py` (12 SAILS annotation factors × 11 diarizers → stratified_analysis/), `evaluation/cross_diarizer_persistent_errors.py` (persistent FP/FN across diarizers, pairwise agreement matrix, unique contributions, per-child error rates, confidence calibration), `evaluation/double_stratification.py` (2-way interaction effects: gestures×interaction, face_vis×diarizer_type, n_children×n_adults, timepoint×face_vis); outputs under `evaluation/cross_diarizer_errors/`, `evaluation/stratified_analysis/`, `evaluation/double_stratification/`
 
 ## Active Technologies
-- Python 3.11 (conda `child-vocalizations` env — same as existing AV pipeline) + scikit-learn (threshold tuning, logistic regression), pandas, numpy, scipy (Gaussian smoothing), OpenCV (frame sampling), openai (GPT-4o API), tqdm; LocoNet and Light-ASD require the `video/` Python 3.10 uv env as subprocess targets (005-mil-extensions, 007-av-extensions)
-- CSV files for features and predictions; JSON for metrics/configs/cache; `.pkl` for trained models; `av_fusion/gpt4o_cache/` for raw API responses; `av_fusion/face_track_cache/` shared with 006 (005-mil-extensions, 007-av-extensions)
+- Python 3.11, `child-vocalizations` conda env + `transformers>=4.45`, `accelerate`, `torchaudio`, `soundfile`, `pandas`, `scikit-learn`, `numpy`; optional: `bitsandbytes` for 4-bit quantization (009-synth-rir-noise)
+- Per-clip JSON cache at `baselines/audio_llm_cache/{model_slug}/`; result CSVs and JSONs at `baselines/audio_llm_baseline_runs/{model_slug}/`; no database (009-synth-rir-noise)

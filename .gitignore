@@ -43,6 +43,9 @@ av_fusion/gpt4o_cache/*
 !av_fusion/gpt4o_cache/.gitkeep
 av_fusion/face_track_cache/
 
+# Audio LLM per-clip inference cache (gitignored; only result CSVs/JSONs committed)
+baselines/audio_llm_cache/
+
 # LocoNet and Light-ASD repos (download separately — see specs/007-av-extensions/quickstart.md)
 video/LoCoNet_ASD/
 video/Light-ASD/
@@ -52,3 +55,9 @@ video/Light-ASD/
 
 # uv lock (synthesis env)
 synthesis/uv.lock
+
+# Synthetic data generator - raw data (user-populated)
+data/
+synth_results/synthetic_scenes/wav/
+synth_results/synthetic_scenes/rttm/
+synth_results/synthetic_scenes/json/
