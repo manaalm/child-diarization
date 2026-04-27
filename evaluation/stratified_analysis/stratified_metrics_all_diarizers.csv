@@ -1,0 +1,452 @@
+diarizer,stratify_by,group,n,n_pos,f1,precision,recall,auroc,auprc,fp,fn
+BabAR,task_type,bookshare,9,7,0.8571,0.8571,0.8571,0.8929,0.9683,1,1
+BabAR,task_type,dailyroutine,29,27,0.9811,1.0000,0.9630,1.0000,1.0000,0,1
+BabAR,task_type,generalsocialcommunicationinteraction,135,112,0.9116,0.9515,0.8750,0.8323,0.9459,5,14
+BabAR,task_type,motorplay,96,63,0.8000,0.8421,0.7619,0.7557,0.8247,9,15
+BabAR,task_type,other,43,29,0.8929,0.9259,0.8621,0.8473,0.8757,2,4
+BabAR,task_type,socialroutine,23,22,0.9524,1.0000,0.9091,0.9545,0.9960,0,2
+BabAR,task_type,specialoccasion,17,9,0.7368,0.7000,0.7778,0.7917,0.8249,3,2
+BabAR,task_type,toyplay,77,57,0.8870,0.8793,0.8947,0.8404,0.9291,7,6
+BabAR,task_type,unknown,11,9,0.0000,0.0000,0.0000,0.5000,0.8182,0,9
+BabAR,timepoint_norm,14_month,234,163,0.8688,0.8854,0.8528,0.8261,0.8941,18,24
+BabAR,timepoint_norm,36_month,207,172,0.8793,0.9404,0.8256,0.8106,0.9420,9,30
+BabAR,n_adults_cat,0,337,259,0.8862,0.9174,0.8571,0.8310,0.9276,20,37
+BabAR,n_adults_cat,1,89,69,0.8550,0.9032,0.8116,0.7652,0.8927,6,13
+BabAR,n_adults_cat,2+,14,7,0.5455,0.7500,0.4286,0.6735,0.7143,1,4
+BabAR,n_children_cat,1,345,271,0.8872,0.9383,0.8413,0.8395,0.9339,15,43
+BabAR,n_children_cat,2+,94,62,0.8254,0.8125,0.8387,0.7747,0.8520,12,10
+BabAR,has_interaction,False,94,54,0.8727,0.8571,0.8889,0.8787,0.8956,8,6
+BabAR,has_interaction,True,347,281,0.8743,0.9246,0.8292,0.8000,0.9286,19,48
+BabAR,has_gestures,False,247,183,0.8646,0.9146,0.8197,0.8161,0.9102,14,33
+BabAR,has_gestures,True,194,152,0.8851,0.9097,0.8618,0.8234,0.9258,13,21
+BabAR,context,book share,9,7,0.8571,0.8571,0.8571,0.8929,0.9683,1,1
+BabAR,context,daily routine,30,28,0.9630,1.0000,0.9286,0.9821,0.9976,0,2
+BabAR,context,general social communication interaction,140,116,0.8950,0.9515,0.8448,0.8215,0.9418,5,18
+BabAR,context,motor play,96,63,0.8000,0.8421,0.7619,0.7557,0.8247,9,15
+BabAR,context,other,44,30,0.8772,0.9259,0.8333,0.8333,0.8702,2,5
+BabAR,context,social routine,24,23,0.9302,1.0000,0.8696,0.9348,0.9946,0,3
+BabAR,context,special occasion,17,9,0.7368,0.7000,0.7778,0.7917,0.8249,3,2
+BabAR,context,toy play,80,59,0.8718,0.8793,0.8644,0.8281,0.9223,7,8
+BabAR,location,inside private,306,248,0.9110,0.9362,0.8871,0.8493,0.9474,15,28
+BabAR,location,inside public,43,27,0.8163,0.9091,0.7407,0.8241,0.8692,2,7
+BabAR,location,outside private,43,28,0.7170,0.7600,0.6786,0.6357,0.7342,6,9
+BabAR,location,outside public,47,30,0.7636,0.8400,0.7000,0.7598,0.8376,4,9
+BabAR,child_constrained,False,364,277,0.8719,0.9268,0.8231,0.8300,0.9212,18,49
+BabAR,child_constrained,True,77,58,0.8833,0.8548,0.9138,0.7650,0.8940,9,5
+BabAR,face_visibility,high(8-10),188,146,0.8826,0.9185,0.8493,0.8497,0.9386,11,22
+BabAR,face_visibility,low(1-4),135,95,0.8729,0.9186,0.8316,0.8526,0.9156,7,16
+BabAR,face_visibility,mid(5-7),118,94,0.8619,0.8966,0.8298,0.7125,0.8915,9,16
+BabAR,lighting,high(6-10),431,328,0.8766,0.9112,0.8445,0.8203,0.9185,27,51
+BabAR,lighting,low(1-5),10,7,0.7273,1.0000,0.5714,0.7857,0.8714,0,3
+BabAR,body_parts,both,321,237,0.8659,0.9037,0.8312,0.8058,0.8996,21,40
+BabAR,body_parts,upper,117,95,0.8962,0.9318,0.8632,0.8646,0.9562,6,13
+Pyannote,task_type,bookshare,9,7,0.8000,0.7500,0.8571,0.4286,0.7968,2,1
+Pyannote,task_type,dailyroutine,29,27,0.9259,0.9259,0.9259,0.2593,0.8975,2,2
+Pyannote,task_type,generalsocialcommunicationinteraction,135,112,0.9145,0.8770,0.9554,0.6312,0.8682,15,5
+Pyannote,task_type,motorplay,96,63,0.7857,0.7143,0.8730,0.5854,0.6940,22,8
+Pyannote,task_type,other,43,29,0.7857,0.8148,0.7586,0.8054,0.8781,5,7
+Pyannote,task_type,socialroutine,23,22,0.9545,0.9545,0.9545,0.1818,0.9340,1,1
+Pyannote,task_type,specialoccasion,17,9,0.7826,0.6429,1.0000,0.7361,0.7315,5,0
+Pyannote,task_type,toyplay,77,57,0.8276,0.8136,0.8421,0.7228,0.8702,11,9
+Pyannote,task_type,unknown,11,9,0.8421,0.8000,0.8889,0.7778,0.9576,2,1
+Pyannote,timepoint_norm,14_month,234,163,0.8357,0.7880,0.8896,0.7184,0.8131,39,18
+Pyannote,timepoint_norm,36_month,207,172,0.8789,0.8525,0.9070,0.5379,0.8401,27,16
+Pyannote,n_adults_cat,0,337,259,0.8625,0.8315,0.8958,0.6677,0.8323,47,27
+Pyannote,n_adults_cat,1,89,69,0.8571,0.8077,0.9130,0.5826,0.8122,15,6
+Pyannote,n_adults_cat,2+,14,7,0.7500,0.6667,0.8571,0.7143,0.7499,3,1
+Pyannote,n_children_cat,1,345,271,0.8618,0.8495,0.8745,0.6505,0.8427,42,34
+Pyannote,n_children_cat,2+,94,62,0.8378,0.7209,1.0000,0.7450,0.7789,24,0
+Pyannote,has_interaction,False,94,54,0.7290,0.7358,0.7222,0.7458,0.7927,14,15
+Pyannote,has_interaction,True,347,281,0.8807,0.8344,0.9324,0.5768,0.8254,52,19
+Pyannote,has_gestures,False,247,183,0.8549,0.8128,0.9016,0.6694,0.8165,38,18
+Pyannote,has_gestures,True,194,152,0.8608,0.8293,0.8947,0.6494,0.8448,28,16
+Pyannote,context,book share,9,7,0.8000,0.7500,0.8571,0.4286,0.7968,2,1
+Pyannote,context,daily routine,30,28,0.9286,0.9286,0.9286,0.2500,0.8988,2,2
+Pyannote,context,general social communication interaction,140,116,0.9091,0.8730,0.9483,0.6372,0.8694,16,6
+Pyannote,context,motor play,96,63,0.7857,0.7143,0.8730,0.5854,0.6940,22,8
+Pyannote,context,other,44,30,0.7931,0.8214,0.7667,0.8024,0.8787,5,7
+Pyannote,context,social routine,24,23,0.9565,0.9565,0.9565,0.1739,0.9351,1,1
+Pyannote,context,special occasion,17,9,0.7826,0.6429,1.0000,0.7361,0.7315,5,0
+Pyannote,context,toy play,80,59,0.8264,0.8065,0.8475,0.7280,0.8713,12,9
+Pyannote,location,inside private,306,248,0.8924,0.8669,0.9194,0.6837,0.8686,35,20
+Pyannote,location,inside public,43,27,0.7407,0.7407,0.7407,0.6412,0.7370,7,7
+Pyannote,location,outside private,43,28,0.8125,0.7222,0.9286,0.7214,0.8467,10,2
+Pyannote,location,outside public,47,30,0.7429,0.6500,0.8667,0.4422,0.6221,14,4
+Pyannote,child_constrained,False,364,277,0.8547,0.8206,0.8917,0.6596,0.8193,54,30
+Pyannote,child_constrained,True,77,58,0.8710,0.8182,0.9310,0.6688,0.8545,12,4
+Pyannote,face_visibility,high(8-10),188,146,0.8664,0.8261,0.9110,0.7010,0.8690,28,13
+Pyannote,face_visibility,low(1-4),135,95,0.8000,0.7619,0.8421,0.6024,0.7473,25,15
+Pyannote,face_visibility,mid(5-7),118,94,0.9026,0.8713,0.9362,0.6742,0.8472,13,6
+Pyannote,lighting,high(6-10),431,328,0.8571,0.8212,0.8963,0.6569,0.8234,64,34
+Pyannote,lighting,low(1-5),10,7,0.8750,0.7778,1.0000,0.8571,0.9478,2,0
+Pyannote,body_parts,both,321,237,0.8410,0.8038,0.8819,0.6512,0.8006,51,28
+Pyannote,body_parts,upper,117,95,0.8945,0.8558,0.9368,0.6837,0.8748,15,6
+USC-SAIL,task_type,bookshare,9,7,0.8571,0.8571,0.8571,0.4643,0.7407,1,1
+USC-SAIL,task_type,dailyroutine,29,27,0.9630,0.9630,0.9630,0.7778,0.9798,1,1
+USC-SAIL,task_type,generalsocialcommunicationinteraction,135,112,0.9212,0.8605,0.9911,0.6157,0.8576,18,1
+USC-SAIL,task_type,motorplay,96,63,0.8344,0.7159,1.0000,0.6041,0.6905,25,0
+USC-SAIL,task_type,other,43,29,0.8485,0.7568,0.9655,0.6318,0.7354,9,1
+USC-SAIL,task_type,socialroutine,23,22,0.9545,0.9545,0.9545,0.5455,0.9748,1,1
+USC-SAIL,task_type,specialoccasion,17,9,0.7500,0.6000,1.0000,0.8472,0.8709,6,0
+USC-SAIL,task_type,toyplay,77,57,0.8750,0.7887,0.9825,0.6754,0.8088,15,1
+USC-SAIL,task_type,unknown,11,9,0.0000,0.0000,0.0000,0.5000,0.8182,0,9
+USC-SAIL,timepoint_norm,14_month,234,163,0.8370,0.7512,0.9448,0.6268,0.7490,51,9
+USC-SAIL,timepoint_norm,36_month,207,172,0.9121,0.8646,0.9651,0.6140,0.8416,26,6
+USC-SAIL,n_adults_cat,0,337,259,0.8845,0.8191,0.9614,0.6395,0.8090,55,10
+USC-SAIL,n_adults_cat,1,89,69,0.8800,0.8148,0.9565,0.6420,0.8234,15,3
+USC-SAIL,n_adults_cat,2+,14,7,0.5556,0.4545,0.7143,0.4082,0.4942,6,2
+USC-SAIL,n_children_cat,1,345,271,0.8897,0.8350,0.9520,0.6279,0.8199,51,13
+USC-SAIL,n_children_cat,2+,94,62,0.8108,0.6977,0.9677,0.6598,0.7272,26,2
+USC-SAIL,has_interaction,False,94,54,0.7778,0.6806,0.9074,0.6877,0.7034,23,5
+USC-SAIL,has_interaction,True,347,281,0.8944,0.8338,0.9644,0.5883,0.8203,54,10
+USC-SAIL,has_gestures,False,247,183,0.8663,0.7919,0.9563,0.6305,0.7885,46,8
+USC-SAIL,has_gestures,True,194,152,0.8841,0.8239,0.9539,0.6187,0.8021,31,7
+USC-SAIL,context,book share,9,7,0.8571,0.8571,0.8571,0.4643,0.7407,1,1
+USC-SAIL,context,daily routine,30,28,0.9455,0.9630,0.9286,0.7589,0.9781,1,2
+USC-SAIL,context,general social communication interaction,140,116,0.9061,0.8605,0.9569,0.6121,0.8566,18,5
+USC-SAIL,context,motor play,96,63,0.8344,0.7159,1.0000,0.6041,0.6905,25,0
+USC-SAIL,context,other,44,30,0.8358,0.7568,0.9333,0.6167,0.7338,9,2
+USC-SAIL,context,social routine,24,23,0.9333,0.9545,0.9130,0.5217,0.9741,1,2
+USC-SAIL,context,special occasion,17,9,0.7500,0.6000,1.0000,0.8472,0.8709,6,0
+USC-SAIL,context,toy play,80,59,0.8615,0.7887,0.9492,0.6711,0.8063,15,3
+USC-SAIL,location,inside private,306,248,0.9008,0.8551,0.9516,0.6442,0.8599,40,12
+USC-SAIL,location,inside public,43,27,0.7812,0.6757,0.9259,0.5185,0.6003,12,2
+USC-SAIL,location,outside private,43,28,0.8358,0.7179,1.0000,0.7548,0.8301,11,0
+USC-SAIL,location,outside public,47,30,0.7945,0.6744,0.9667,0.5539,0.6606,14,1
+USC-SAIL,child_constrained,False,364,277,0.8756,0.8098,0.9531,0.6477,0.8088,62,13
+USC-SAIL,child_constrained,True,77,58,0.8682,0.7887,0.9655,0.5218,0.7337,15,2
+USC-SAIL,face_visibility,high(8-10),188,146,0.8790,0.8214,0.9452,0.6156,0.8062,30,8
+USC-SAIL,face_visibility,low(1-4),135,95,0.8624,0.7642,0.9895,0.6626,0.7782,29,1
+USC-SAIL,face_visibility,mid(5-7),118,94,0.8800,0.8302,0.9362,0.5731,0.8051,18,6
+USC-SAIL,lighting,high(6-10),431,328,0.8771,0.8093,0.9573,0.6192,0.7884,74,14
+USC-SAIL,lighting,low(1-5),10,7,0.7500,0.6667,0.8571,0.7619,0.9129,3,1
+USC-SAIL,body_parts,both,321,237,0.8648,0.7882,0.9578,0.6239,0.7687,61,10
+USC-SAIL,body_parts,upper,117,95,0.8955,0.8491,0.9474,0.6258,0.8531,16,5
+VTC,task_type,bookshare,9,7,0.8571,0.8571,0.8571,0.8929,0.9683,1,1
+VTC,task_type,dailyroutine,29,27,1.0000,1.0000,1.0000,1.0000,1.0000,0,0
+VTC,task_type,generalsocialcommunicationinteraction,135,112,0.9386,0.9224,0.9554,0.7811,0.9292,9,5
+VTC,task_type,motorplay,96,63,0.8175,0.7568,0.8889,0.7487,0.8082,18,7
+VTC,task_type,other,43,29,0.9333,0.9032,0.9655,0.8288,0.8157,3,1
+VTC,task_type,socialroutine,23,22,0.9524,1.0000,0.9091,0.9545,0.9960,0,2
+VTC,task_type,specialoccasion,17,9,0.7273,0.6154,0.8889,0.8194,0.8550,5,1
+VTC,task_type,toyplay,77,57,0.8760,0.8281,0.9298,0.8000,0.9127,11,4
+VTC,task_type,unknown,11,9,0.0000,0.0000,0.0000,0.5000,0.8182,0,9
+VTC,timepoint_norm,14_month,234,163,0.8580,0.8286,0.8896,0.7923,0.8771,30,18
+VTC,timepoint_norm,36_month,207,172,0.9169,0.9040,0.9302,0.7495,0.9076,17,12
+VTC,n_adults_cat,0,337,259,0.9074,0.8889,0.9266,0.8114,0.9094,30,19
+VTC,n_adults_cat,1,89,69,0.8592,0.8356,0.8841,0.6986,0.8547,12,8
+VTC,n_adults_cat,2+,14,7,0.5333,0.5000,0.5714,0.5510,0.6548,4,3
+VTC,n_children_cat,1,345,271,0.9050,0.9135,0.8967,0.8243,0.9275,23,28
+VTC,n_children_cat,2+,94,62,0.8219,0.7143,0.9677,0.7500,0.8020,24,2
+VTC,has_interaction,False,94,54,0.8673,0.8305,0.9074,0.8579,0.8609,10,5
+VTC,has_interaction,True,347,281,0.8920,0.8737,0.9110,0.7461,0.9044,37,25
+VTC,has_gestures,False,247,183,0.8794,0.8632,0.8962,0.7959,0.8967,26,19
+VTC,has_gestures,True,194,152,0.8981,0.8704,0.9276,0.7729,0.8904,21,11
+VTC,context,book share,9,7,0.8571,0.8571,0.8571,0.8929,0.9683,1,1
+VTC,context,daily routine,30,28,0.9818,1.0000,0.9643,0.9821,0.9976,0,1
+VTC,context,general social communication interaction,140,116,0.9224,0.9224,0.9224,0.7728,0.9257,9,9
+VTC,context,motor play,96,63,0.8175,0.7568,0.8889,0.7487,0.8082,18,7
+VTC,context,other,44,30,0.9180,0.9032,0.9333,0.8143,0.8115,3,2
+VTC,context,social routine,24,23,0.9302,1.0000,0.8696,0.9348,0.9946,0,3
+VTC,context,special occasion,17,9,0.7273,0.6154,0.8889,0.8194,0.8550,5,1
+VTC,context,toy play,80,59,0.8618,0.8281,0.8983,0.7885,0.9066,11,6
+VTC,location,inside private,306,248,0.9073,0.9073,0.9073,0.8101,0.9286,23,23
+VTC,location,inside public,43,27,0.8136,0.7500,0.8889,0.7442,0.8198,8,3
+VTC,location,outside private,43,28,0.8667,0.8125,0.9286,0.7786,0.8605,6,2
+VTC,location,outside public,47,30,0.8235,0.7368,0.9333,0.7647,0.7971,10,2
+VTC,child_constrained,False,364,277,0.8917,0.8776,0.9061,0.7968,0.8975,35,26
+VTC,child_constrained,True,77,58,0.8710,0.8182,0.9310,0.7323,0.8789,12,4
+VTC,face_visibility,high(8-10),188,146,0.8919,0.8800,0.9041,0.8213,0.9224,18,14
+VTC,face_visibility,low(1-4),135,95,0.8788,0.8447,0.9158,0.7916,0.8586,16,8
+VTC,face_visibility,mid(5-7),118,94,0.8912,0.8687,0.9149,0.7190,0.8966,13,8
+VTC,lighting,high(6-10),431,328,0.8902,0.8671,0.9146,0.7848,0.8943,46,28
+VTC,lighting,low(1-5),10,7,0.7692,0.8333,0.7143,0.8095,0.9143,1,2
+VTC,body_parts,both,321,237,0.8871,0.8640,0.9114,0.7925,0.8852,34,21
+VTC,body_parts,upper,117,95,0.8923,0.8700,0.9158,0.7679,0.9184,13,8
+VTC-KCHI,task_type,bookshare,9,7,0.8571,0.8571,0.8571,0.8929,0.9683,1,1
+VTC-KCHI,task_type,dailyroutine,29,27,0.9811,1.0000,0.9630,1.0000,1.0000,0,1
+VTC-KCHI,task_type,generalsocialcommunicationinteraction,135,112,0.9116,0.9515,0.8750,0.8323,0.9459,5,14
+VTC-KCHI,task_type,motorplay,96,63,0.8000,0.8421,0.7619,0.7557,0.8247,9,15
+VTC-KCHI,task_type,other,43,29,0.8929,0.9259,0.8621,0.8473,0.8757,2,4
+VTC-KCHI,task_type,socialroutine,23,22,0.9524,1.0000,0.9091,0.9545,0.9960,0,2
+VTC-KCHI,task_type,specialoccasion,17,9,0.7368,0.7000,0.7778,0.7917,0.8249,3,2
+VTC-KCHI,task_type,toyplay,77,57,0.8870,0.8793,0.8947,0.8404,0.9291,7,6
+VTC-KCHI,task_type,unknown,11,9,0.0000,0.0000,0.0000,0.5000,0.8182,0,9
+VTC-KCHI,timepoint_norm,14_month,234,163,0.8688,0.8854,0.8528,0.8261,0.8941,18,24
+VTC-KCHI,timepoint_norm,36_month,207,172,0.8793,0.9404,0.8256,0.8106,0.9420,9,30
+VTC-KCHI,n_adults_cat,0,337,259,0.8862,0.9174,0.8571,0.8310,0.9276,20,37
+VTC-KCHI,n_adults_cat,1,89,69,0.8550,0.9032,0.8116,0.7652,0.8927,6,13
+VTC-KCHI,n_adults_cat,2+,14,7,0.5455,0.7500,0.4286,0.6735,0.7143,1,4
+VTC-KCHI,n_children_cat,1,345,271,0.8872,0.9383,0.8413,0.8395,0.9339,15,43
+VTC-KCHI,n_children_cat,2+,94,62,0.8254,0.8125,0.8387,0.7747,0.8520,12,10
+VTC-KCHI,has_interaction,False,94,54,0.8727,0.8571,0.8889,0.8787,0.8956,8,6
+VTC-KCHI,has_interaction,True,347,281,0.8743,0.9246,0.8292,0.8000,0.9286,19,48
+VTC-KCHI,has_gestures,False,247,183,0.8646,0.9146,0.8197,0.8161,0.9102,14,33
+VTC-KCHI,has_gestures,True,194,152,0.8851,0.9097,0.8618,0.8234,0.9258,13,21
+VTC-KCHI,context,book share,9,7,0.8571,0.8571,0.8571,0.8929,0.9683,1,1
+VTC-KCHI,context,daily routine,30,28,0.9630,1.0000,0.9286,0.9821,0.9976,0,2
+VTC-KCHI,context,general social communication interaction,140,116,0.8950,0.9515,0.8448,0.8215,0.9418,5,18
+VTC-KCHI,context,motor play,96,63,0.8000,0.8421,0.7619,0.7557,0.8247,9,15
+VTC-KCHI,context,other,44,30,0.8772,0.9259,0.8333,0.8333,0.8702,2,5
+VTC-KCHI,context,social routine,24,23,0.9302,1.0000,0.8696,0.9348,0.9946,0,3
+VTC-KCHI,context,special occasion,17,9,0.7368,0.7000,0.7778,0.7917,0.8249,3,2
+VTC-KCHI,context,toy play,80,59,0.8718,0.8793,0.8644,0.8281,0.9223,7,8
+VTC-KCHI,location,inside private,306,248,0.9110,0.9362,0.8871,0.8493,0.9474,15,28
+VTC-KCHI,location,inside public,43,27,0.8163,0.9091,0.7407,0.8241,0.8692,2,7
+VTC-KCHI,location,outside private,43,28,0.7170,0.7600,0.6786,0.6357,0.7342,6,9
+VTC-KCHI,location,outside public,47,30,0.7636,0.8400,0.7000,0.7598,0.8376,4,9
+VTC-KCHI,child_constrained,False,364,277,0.8719,0.9268,0.8231,0.8300,0.9212,18,49
+VTC-KCHI,child_constrained,True,77,58,0.8833,0.8548,0.9138,0.7650,0.8940,9,5
+VTC-KCHI,face_visibility,high(8-10),188,146,0.8826,0.9185,0.8493,0.8497,0.9386,11,22
+VTC-KCHI,face_visibility,low(1-4),135,95,0.8729,0.9186,0.8316,0.8526,0.9156,7,16
+VTC-KCHI,face_visibility,mid(5-7),118,94,0.8619,0.8966,0.8298,0.7125,0.8915,9,16
+VTC-KCHI,lighting,high(6-10),431,328,0.8766,0.9112,0.8445,0.8203,0.9185,27,51
+VTC-KCHI,lighting,low(1-5),10,7,0.7273,1.0000,0.5714,0.7857,0.8714,0,3
+VTC-KCHI,body_parts,both,321,237,0.8659,0.9037,0.8312,0.8058,0.8996,21,40
+VTC-KCHI,body_parts,upper,117,95,0.8962,0.9318,0.8632,0.8646,0.9562,6,13
+VBx,task_type,bookshare,9,7,0.8750,0.7778,1.0000,0.2857,0.7870,2,0
+VBx,task_type,dailyroutine,29,27,0.9455,0.9286,0.9630,0.2222,0.8667,2,1
+VBx,task_type,generalsocialcommunicationinteraction,135,112,0.9038,0.8504,0.9643,0.7030,0.9242,19,4
+VBx,task_type,motorplay,96,63,0.8082,0.7108,0.9365,0.6159,0.7253,24,4
+VBx,task_type,other,43,29,0.8125,0.7429,0.8966,0.8190,0.8843,9,3
+VBx,task_type,socialroutine,23,22,0.9778,0.9565,1.0000,0.1364,0.9250,1,0
+VBx,task_type,specialoccasion,17,9,0.7500,0.6000,1.0000,0.7361,0.6824,6,0
+VBx,task_type,toyplay,77,57,0.8361,0.7846,0.8947,0.7640,0.8782,14,6
+VBx,task_type,unknown,11,9,0.4615,0.7500,0.3333,0.5556,0.8785,1,6
+VBx,timepoint_norm,14_month,234,163,0.8361,0.7537,0.9387,0.7220,0.8279,50,10
+VBx,timepoint_norm,36_month,207,172,0.8802,0.8449,0.9186,0.6058,0.8715,29,14
+VBx,n_adults_cat,0,337,259,0.8705,0.8148,0.9344,0.6967,0.8584,55,17
+VBx,n_adults_cat,1,89,69,0.8344,0.7683,0.9130,0.6123,0.8386,19,6
+VBx,n_adults_cat,2+,14,7,0.7059,0.6000,0.8571,0.6735,0.7304,4,1
+VBx,n_children_cat,1,345,271,0.8687,0.8267,0.9151,0.6844,0.8633,52,23
+VBx,n_children_cat,2+,94,62,0.8133,0.6932,0.9839,0.7404,0.8318,27,1
+VBx,has_interaction,False,94,54,0.7603,0.6866,0.8519,0.7687,0.7950,21,8
+VBx,has_interaction,True,347,281,0.8775,0.8204,0.9431,0.6121,0.8593,58,16
+VBx,has_gestures,False,247,183,0.8442,0.7814,0.9180,0.6902,0.8390,47,15
+VBx,has_gestures,True,194,152,0.8746,0.8171,0.9408,0.6805,0.8701,32,9
+VBx,context,book share,9,7,0.8750,0.7778,1.0000,0.2857,0.7870,2,0
+VBx,context,daily routine,30,28,0.9286,0.9286,0.9286,0.2143,0.8690,2,2
+VBx,context,general social communication interaction,140,116,0.8934,0.8516,0.9397,0.7028,0.9235,19,7
+VBx,context,motor play,96,63,0.8082,0.7108,0.9365,0.6159,0.7253,24,4
+VBx,context,other,44,30,0.8182,0.7500,0.9000,0.8131,0.8837,9,3
+VBx,context,social routine,24,23,0.9565,0.9565,0.9565,0.1304,0.9264,1,1
+VBx,context,special occasion,17,9,0.7500,0.6000,1.0000,0.7361,0.6824,6,0
+VBx,context,toy play,80,59,0.8254,0.7761,0.8814,0.7603,0.8763,15,7
+VBx,location,inside private,306,248,0.8812,0.8394,0.9274,0.7066,0.8929,44,18
+VBx,location,inside public,43,27,0.8065,0.7143,0.9259,0.6481,0.7396,10,2
+VBx,location,outside private,43,28,0.8182,0.7105,0.9643,0.7786,0.8834,11,1
+VBx,location,outside public,47,30,0.7778,0.6667,0.9333,0.5461,0.6739,14,2
+VBx,child_constrained,False,364,277,0.8576,0.8000,0.9242,0.7021,0.8665,64,21
+VBx,child_constrained,True,77,58,0.8594,0.7857,0.9483,0.6175,0.7763,15,3
+VBx,face_visibility,high(8-10),188,146,0.8571,0.8148,0.9041,0.6881,0.8807,30,14
+VBx,face_visibility,low(1-4),135,95,0.8131,0.7311,0.9158,0.6787,0.8086,32,8
+VBx,face_visibility,mid(5-7),118,94,0.9064,0.8440,0.9787,0.6826,0.8584,17,2
+VBx,lighting,high(6-10),431,328,0.8588,0.8000,0.9268,0.6802,0.8482,76,24
+VBx,lighting,low(1-5),10,7,0.8235,0.7000,1.0000,0.9048,0.9617,3,0
+VBx,body_parts,both,321,237,0.8444,0.7834,0.9156,0.6883,0.8406,60,20
+VBx,body_parts,upper,117,95,0.8878,0.8273,0.9579,0.6679,0.8737,19,4
+TalkNet-ASD,task_type,bookshare,9,7,0.4444,1.0000,0.2857,0.6429,0.8413,0,5
+TalkNet-ASD,task_type,dailyroutine,29,27,0.5789,1.0000,0.4074,0.7407,0.9642,0,16
+TalkNet-ASD,task_type,generalsocialcommunicationinteraction,135,112,0.3741,0.9630,0.2321,0.5912,0.8672,1,86
+TalkNet-ASD,task_type,motorplay,96,63,0.2857,0.7857,0.1746,0.5346,0.6817,3,52
+TalkNet-ASD,task_type,other,43,29,0.2941,1.0000,0.1724,0.5862,0.7306,0,24
+TalkNet-ASD,task_type,socialroutine,23,22,0.1600,0.6667,0.0909,0.0000,0.9226,1,20
+TalkNet-ASD,task_type,specialoccasion,17,9,0.5714,0.8000,0.4444,0.6528,0.7386,1,5
+TalkNet-ASD,task_type,toyplay,77,57,0.2424,0.8889,0.1404,0.5509,0.7564,1,49
+TalkNet-ASD,task_type,unknown,11,9,0.0000,0.0000,0.0000,0.5000,0.8182,0,9
+TalkNet-ASD,timepoint_norm,14_month,234,163,0.3100,0.8378,0.1902,0.5403,0.7166,6,132
+TalkNet-ASD,timepoint_norm,36_month,207,172,0.3602,0.9744,0.2209,0.6068,0.8768,1,134
+TalkNet-ASD,n_adults_cat,0,337,259,0.3551,0.9194,0.2201,0.5726,0.8036,5,202
+TalkNet-ASD,n_adults_cat,1,89,69,0.2716,0.9167,0.1594,0.5659,0.7920,1,58
+TalkNet-ASD,n_adults_cat,2+,14,7,0.2222,0.5000,0.1429,0.4898,0.5000,1,6
+TalkNet-ASD,n_children_cat,1,345,271,0.3571,0.9231,0.2214,0.5720,0.8090,5,211
+TalkNet-ASD,n_children_cat,2+,94,62,0.2466,0.8182,0.1452,0.5471,0.7114,2,53
+TalkNet-ASD,has_interaction,False,94,54,0.1967,0.8571,0.1111,0.5512,0.6071,1,48
+TalkNet-ASD,has_interaction,True,347,281,0.3600,0.9130,0.2242,0.5573,0.8320,6,218
+TalkNet-ASD,has_gestures,False,247,183,0.3318,0.9250,0.2022,0.5771,0.7813,3,146
+TalkNet-ASD,has_gestures,True,194,152,0.3404,0.8889,0.2105,0.5547,0.8043,4,120
+TalkNet-ASD,context,book share,9,7,0.4444,1.0000,0.2857,0.6429,0.8413,0,5
+TalkNet-ASD,context,daily routine,30,28,0.5641,1.0000,0.3929,0.7321,0.9643,0,17
+TalkNet-ASD,context,general social communication interaction,140,116,0.3636,0.9630,0.2241,0.5882,0.8652,1,90
+TalkNet-ASD,context,motor play,96,63,0.2857,0.7857,0.1746,0.5346,0.6817,3,52
+TalkNet-ASD,context,other,44,30,0.2857,1.0000,0.1667,0.5833,0.7348,0,25
+TalkNet-ASD,context,social routine,24,23,0.1538,0.6667,0.0870,0.0000,0.9257,1,21
+TalkNet-ASD,context,special occasion,17,9,0.5714,0.8000,0.4444,0.6528,0.7386,1,5
+TalkNet-ASD,context,toy play,80,59,0.2353,0.8889,0.1356,0.5496,0.7535,1,51
+TalkNet-ASD,location,inside private,306,248,0.3389,0.9623,0.2056,0.5878,0.8490,2,197
+TalkNet-ASD,location,inside public,43,27,0.2353,0.5714,0.1481,0.4757,0.6301,3,23
+TalkNet-ASD,location,outside private,43,28,0.2941,0.8333,0.1786,0.5357,0.6730,1,23
+TalkNet-ASD,location,outside public,47,30,0.4500,0.9000,0.3000,0.6118,0.7193,1,21
+TalkNet-ASD,child_constrained,False,364,277,0.3214,0.9153,0.1949,0.5717,0.7925,5,223
+TalkNet-ASD,child_constrained,True,77,58,0.4000,0.8824,0.2586,0.5554,0.7749,2,43
+TalkNet-ASD,face_visibility,high(8-10),188,146,0.4536,0.9167,0.3014,0.5925,0.8161,4,102
+TalkNet-ASD,face_visibility,low(1-4),135,95,0.1698,0.8182,0.0947,0.5413,0.7263,2,86
+TalkNet-ASD,face_visibility,mid(5-7),118,94,0.2883,0.9412,0.1702,0.5550,0.8195,1,78
+TalkNet-ASD,lighting,high(6-10),431,328,0.3416,0.9079,0.2104,0.5697,0.7922,7,259
+TalkNet-ASD,lighting,low(1-5),10,7,0.0000,0.0000,0.0000,0.5000,0.7000,0,7
+TalkNet-ASD,body_parts,both,321,237,0.2898,0.8913,0.1730,0.5459,0.7612,5,196
+TalkNet-ASD,body_parts,upper,117,95,0.4355,0.9310,0.2842,0.6220,0.8611,2,68
+EEND-EDA,task_type,bookshare,9,7,0.8000,0.7500,0.8571,0.1429,0.6679,2,1
+EEND-EDA,task_type,dailyroutine,29,27,0.9259,0.9259,0.9259,0.5741,0.9564,2,2
+EEND-EDA,task_type,generalsocialcommunicationinteraction,135,112,0.8880,0.8295,0.9554,0.4979,0.8420,22,5
+EEND-EDA,task_type,motorplay,96,63,0.8079,0.6932,0.9683,0.5753,0.7479,27,2
+EEND-EDA,task_type,other,43,29,0.7826,0.6750,0.9310,0.5936,0.6938,13,2
+EEND-EDA,task_type,socialroutine,23,22,0.9545,0.9545,0.9545,0.2727,0.9481,1,1
+EEND-EDA,task_type,specialoccasion,17,9,0.7500,0.6000,1.0000,0.7083,0.7593,6,0
+EEND-EDA,task_type,toyplay,77,57,0.8226,0.7612,0.8947,0.5053,0.7479,16,6
+EEND-EDA,task_type,unknown,11,9,0.6250,0.7143,0.5556,0.2222,0.7780,2,4
+EEND-EDA,timepoint_norm,14_month,234,163,0.8138,0.7183,0.9387,0.5830,0.7654,60,10
+EEND-EDA,timepoint_norm,36_month,207,172,0.8760,0.8325,0.9244,0.4285,0.7972,32,13
+EEND-EDA,n_adults_cat,0,337,259,0.8486,0.7799,0.9305,0.5332,0.7904,68,18
+EEND-EDA,n_adults_cat,1,89,69,0.8421,0.7711,0.9275,0.5435,0.8195,19,5
+EEND-EDA,n_adults_cat,2+,14,7,0.7778,0.6364,1.0000,0.5714,0.6267,4,0
+EEND-EDA,n_children_cat,1,345,271,0.8586,0.7975,0.9299,0.5089,0.8035,64,19
+EEND-EDA,n_children_cat,2+,94,62,0.7838,0.6744,0.9355,0.5862,0.7038,28,4
+EEND-EDA,has_interaction,False,94,54,0.7101,0.5833,0.9074,0.6067,0.6991,35,5
+EEND-EDA,has_interaction,True,347,281,0.8752,0.8219,0.9359,0.5019,0.8127,57,18
+EEND-EDA,has_gestures,False,247,183,0.8321,0.7500,0.9344,0.5068,0.7483,57,12
+EEND-EDA,has_gestures,True,194,152,0.8598,0.8011,0.9276,0.5617,0.8254,35,11
+EEND-EDA,context,book share,9,7,0.8000,0.7500,0.8571,0.1429,0.6679,2,1
+EEND-EDA,context,daily routine,30,28,0.9091,0.9259,0.8929,0.5536,0.9557,2,3
+EEND-EDA,context,general social communication interaction,140,116,0.8790,0.8258,0.9397,0.4935,0.8415,23,7
+EEND-EDA,context,motor play,96,63,0.8079,0.6932,0.9683,0.5753,0.7479,27,2
+EEND-EDA,context,other,44,30,0.7887,0.6829,0.9333,0.5976,0.7013,13,2
+EEND-EDA,context,social routine,24,23,0.9565,0.9565,0.9565,0.2609,0.9486,1,1
+EEND-EDA,context,special occasion,17,9,0.7500,0.6000,1.0000,0.7083,0.7593,6,0
+EEND-EDA,context,toy play,80,59,0.8125,0.7536,0.8814,0.4915,0.7408,17,7
+EEND-EDA,location,inside private,306,248,0.8631,0.8165,0.9153,0.5614,0.8409,51,21
+EEND-EDA,location,inside public,43,27,0.7463,0.6250,0.9259,0.5278,0.6777,15,2
+EEND-EDA,location,outside private,43,28,0.8235,0.7000,1.0000,0.5619,0.7310,12,0
+EEND-EDA,location,outside public,47,30,0.8108,0.6818,1.0000,0.4941,0.6597,14,0
+EEND-EDA,child_constrained,False,364,277,0.8426,0.7718,0.9278,0.5442,0.7989,76,20
+EEND-EDA,child_constrained,True,77,58,0.8527,0.7746,0.9483,0.4551,0.7084,16,3
+EEND-EDA,face_visibility,high(8-10),188,146,0.8553,0.8061,0.9110,0.5060,0.7692,32,13
+EEND-EDA,face_visibility,low(1-4),135,95,0.8072,0.7031,0.9474,0.5568,0.7804,38,5
+EEND-EDA,face_visibility,mid(5-7),118,94,0.8683,0.8018,0.9468,0.5470,0.8114,22,5
+EEND-EDA,lighting,high(6-10),431,328,0.8449,0.7741,0.9299,0.5229,0.7774,89,23
+EEND-EDA,lighting,low(1-5),10,7,0.8235,0.7000,1.0000,0.7143,0.8917,3,0
+EEND-EDA,body_parts,both,321,237,0.8295,0.7526,0.9241,0.5335,0.7679,72,18
+EEND-EDA,body_parts,upper,117,95,0.8780,0.8182,0.9474,0.5033,0.8113,20,5
+Sortformer,task_type,bookshare,9,7,0.8000,0.7500,0.8571,0.8571,0.9683,2,1
+Sortformer,task_type,dailyroutine,29,27,0.9630,0.9630,0.9630,0.5093,0.9089,1,1
+Sortformer,task_type,generalsocialcommunicationinteraction,135,112,0.8908,0.8413,0.9464,0.6537,0.8850,20,6
+Sortformer,task_type,motorplay,96,63,0.7571,0.6883,0.8413,0.5938,0.7428,24,10
+Sortformer,task_type,other,43,29,0.8254,0.7647,0.8966,0.8005,0.8965,8,3
+Sortformer,task_type,socialroutine,23,22,0.8500,0.9444,0.7727,0.2273,0.9422,1,5
+Sortformer,task_type,specialoccasion,17,9,0.7200,0.5625,1.0000,0.6389,0.6766,7,0
+Sortformer,task_type,toyplay,77,57,0.8305,0.8033,0.8596,0.7136,0.8367,12,8
+Sortformer,task_type,unknown,11,9,0.9474,0.9000,1.0000,0.6667,0.9060,1,0
+Sortformer,timepoint_norm,14_month,234,163,0.7966,0.7382,0.8650,0.6813,0.8068,50,22
+Sortformer,timepoint_norm,36_month,207,172,0.8914,0.8556,0.9302,0.6036,0.8736,27,12
+Sortformer,n_adults_cat,0,337,259,0.8571,0.8061,0.9151,0.6611,0.8450,57,22
+Sortformer,n_adults_cat,1,89,69,0.8112,0.7838,0.8406,0.5891,0.8302,16,11
+Sortformer,n_adults_cat,2+,14,7,0.7500,0.6667,0.8571,0.8776,0.9038,3,1
+Sortformer,n_children_cat,1,345,271,0.8491,0.8094,0.8930,0.6180,0.8413,57,29
+Sortformer,n_children_cat,2+,94,62,0.8201,0.7403,0.9194,0.7898,0.8502,20,5
+Sortformer,has_interaction,False,94,54,0.7458,0.6875,0.8148,0.7329,0.7765,20,10
+Sortformer,has_interaction,True,347,281,0.8639,0.8185,0.9146,0.6063,0.8549,57,24
+Sortformer,has_gestures,False,247,183,0.8256,0.7778,0.8798,0.6798,0.8375,46,22
+Sortformer,has_gestures,True,194,152,0.8669,0.8187,0.9211,0.6378,0.8508,31,12
+Sortformer,context,book share,9,7,0.8000,0.7500,0.8571,0.8571,0.9683,2,1
+Sortformer,context,daily routine,30,28,0.9643,0.9643,0.9643,0.5089,0.9109,1,1
+Sortformer,context,general social communication interaction,140,116,0.8907,0.8397,0.9483,0.6394,0.8821,21,6
+Sortformer,context,motor play,96,63,0.7571,0.6883,0.8413,0.5938,0.7428,24,10
+Sortformer,context,other,44,30,0.8308,0.7714,0.9000,0.8000,0.8976,8,3
+Sortformer,context,social routine,24,23,0.8571,0.9474,0.7826,0.2609,0.9491,1,5
+Sortformer,context,special occasion,17,9,0.7200,0.5625,1.0000,0.6389,0.6766,7,0
+Sortformer,context,toy play,80,59,0.8361,0.8095,0.8644,0.7256,0.8413,12,8
+Sortformer,location,inside private,306,248,0.8672,0.8409,0.8952,0.6443,0.8663,42,26
+Sortformer,location,inside public,43,27,0.8000,0.7273,0.8889,0.7072,0.7856,9,3
+Sortformer,location,outside private,43,28,0.7761,0.6667,0.9286,0.6667,0.7847,13,2
+Sortformer,location,outside public,47,30,0.7714,0.6750,0.9000,0.6314,0.7363,13,3
+Sortformer,child_constrained,False,364,277,0.8464,0.8026,0.8953,0.6615,0.8394,61,29
+Sortformer,child_constrained,True,77,58,0.8346,0.7681,0.9138,0.6733,0.8532,16,5
+Sortformer,face_visibility,high(8-10),188,146,0.8617,0.8121,0.9178,0.7122,0.8880,31,12
+Sortformer,face_visibility,low(1-4),135,95,0.7902,0.7364,0.8526,0.6350,0.7883,29,14
+Sortformer,face_visibility,mid(5-7),118,94,0.8731,0.8350,0.9149,0.6139,0.8203,17,8
+Sortformer,lighting,high(6-10),431,328,0.8469,0.7978,0.9024,0.6611,0.8390,75,32
+Sortformer,lighting,low(1-5),10,7,0.7143,0.7143,0.7143,0.6667,0.8619,2,2
+Sortformer,body_parts,both,321,237,0.8284,0.7778,0.8861,0.6484,0.8153,60,27
+Sortformer,body_parts,upper,117,95,0.8856,0.8396,0.9368,0.7098,0.9014,17,6
+WavLM-MIL,task_type,bookshare,9,7,0.8750,0.7778,1.0000,0.9286,0.9821,2,0
+WavLM-MIL,task_type,dailyroutine,29,27,0.9818,0.9643,1.0000,0.7963,0.9819,1,0
+WavLM-MIL,task_type,generalsocialcommunicationinteraction,135,112,0.9295,0.8682,1.0000,0.8024,0.9343,17,0
+WavLM-MIL,task_type,motorplay,96,63,0.8267,0.7126,0.9841,0.7912,0.8449,25,1
+WavLM-MIL,task_type,other,43,29,0.8750,0.8000,0.9655,0.7931,0.8387,7,1
+WavLM-MIL,task_type,socialroutine,23,22,0.9302,0.9524,0.9091,0.9091,0.9960,1,2
+WavLM-MIL,task_type,specialoccasion,17,9,0.7200,0.5625,1.0000,0.5694,0.6005,7,0
+WavLM-MIL,task_type,toyplay,77,57,0.8480,0.7794,0.9298,0.7386,0.8900,15,4
+WavLM-MIL,task_type,unknown,11,9,0.8421,0.8000,0.8889,0.2222,0.7308,2,1
+WavLM-MIL,timepoint_norm,14_month,234,163,0.8525,0.7571,0.9755,0.7762,0.8500,51,4
+WavLM-MIL,timepoint_norm,36_month,207,172,0.9126,0.8608,0.9709,0.7583,0.9329,27,5
+WavLM-MIL,n_adults_cat,0,337,259,0.8869,0.8176,0.9691,0.7704,0.8914,56,8
+WavLM-MIL,n_adults_cat,1,89,69,0.8774,0.7907,0.9855,0.7246,0.9083,18,1
+WavLM-MIL,n_adults_cat,2+,14,7,0.7778,0.6364,1.0000,0.8776,0.8802,4,0
+WavLM-MIL,n_children_cat,1,345,271,0.8976,0.8349,0.9705,0.7985,0.9167,52,8
+WavLM-MIL,n_children_cat,2+,94,62,0.8188,0.7011,0.9839,0.7198,0.8101,26,1
+WavLM-MIL,has_interaction,False,94,54,0.7778,0.6806,0.9074,0.7565,0.7704,23,5
+WavLM-MIL,has_interaction,True,347,281,0.9038,0.8343,0.9858,0.7508,0.9121,55,4
+WavLM-MIL,has_gestures,False,247,183,0.8775,0.7956,0.9781,0.7899,0.8877,46,4
+WavLM-MIL,has_gestures,True,194,152,0.8882,0.8212,0.9671,0.7469,0.9005,32,5
+WavLM-MIL,context,book share,9,7,0.8750,0.7778,1.0000,0.9286,0.9821,2,0
+WavLM-MIL,context,daily routine,30,28,0.9825,0.9655,1.0000,0.7857,0.9814,1,0
+WavLM-MIL,context,general social communication interaction,140,116,0.9237,0.8647,0.9914,0.7874,0.9309,18,1
+WavLM-MIL,context,motor play,96,63,0.8267,0.7126,0.9841,0.7912,0.8449,25,1
+WavLM-MIL,context,other,44,30,0.8788,0.8056,0.9667,0.7881,0.8394,7,1
+WavLM-MIL,context,social routine,24,23,0.9333,0.9545,0.9130,0.9130,0.9963,1,2
+WavLM-MIL,context,special occasion,17,9,0.7200,0.5625,1.0000,0.5694,0.6005,7,0
+WavLM-MIL,context,toy play,80,59,0.8462,0.7746,0.9322,0.7086,0.8630,16,4
+WavLM-MIL,location,inside private,306,248,0.9071,0.8414,0.9839,0.7405,0.9035,46,4
+WavLM-MIL,location,inside public,43,27,0.8197,0.7353,0.9259,0.7847,0.8396,9,2
+WavLM-MIL,location,outside private,43,28,0.8308,0.7297,0.9643,0.8048,0.8904,10,1
+WavLM-MIL,location,outside public,47,30,0.7887,0.6829,0.9333,0.7569,0.8104,13,2
+WavLM-MIL,child_constrained,False,364,277,0.8849,0.8127,0.9711,0.7589,0.8858,62,8
+WavLM-MIL,child_constrained,True,77,58,0.8702,0.7808,0.9828,0.8348,0.9399,16,1
+WavLM-MIL,face_visibility,high(8-10),188,146,0.8840,0.8150,0.9658,0.7622,0.8949,32,5
+WavLM-MIL,face_visibility,low(1-4),135,95,0.8651,0.7750,0.9789,0.7516,0.8622,27,2
+WavLM-MIL,face_visibility,mid(5-7),118,94,0.8976,0.8288,0.9787,0.8147,0.9246,19,2
+WavLM-MIL,lighting,high(6-10),431,328,0.8824,0.8076,0.9726,0.7685,0.8917,76,9
+WavLM-MIL,lighting,low(1-5),10,7,0.8750,0.7778,1.0000,0.8571,0.9478,2,0
+WavLM-MIL,body_parts,both,321,237,0.8707,0.7924,0.9662,0.7665,0.8799,60,8
+WavLM-MIL,body_parts,upper,117,95,0.9082,0.8393,0.9895,0.7766,0.9202,18,1
+Whisper-MIL,task_type,bookshare,9,7,0.9231,1.0000,0.8571,0.9286,0.9821,0,1
+Whisper-MIL,task_type,dailyroutine,29,27,0.9615,1.0000,0.9259,0.9815,0.9987,0,2
+Whisper-MIL,task_type,generalsocialcommunicationinteraction,135,112,0.9244,0.9204,0.9286,0.8676,0.9698,9,8
+Whisper-MIL,task_type,motorplay,96,63,0.8369,0.7564,0.9365,0.8215,0.8854,19,4
+Whisper-MIL,task_type,other,43,29,0.8571,0.8889,0.8276,0.8498,0.9244,3,5
+Whisper-MIL,task_type,socialroutine,23,22,0.9302,0.9524,0.9091,0.8636,0.9938,1,2
+Whisper-MIL,task_type,specialoccasion,17,9,0.7200,0.5625,1.0000,0.8056,0.8123,7,0
+Whisper-MIL,task_type,toyplay,77,57,0.8750,0.8909,0.8596,0.8860,0.9571,6,8
+Whisper-MIL,task_type,unknown,11,9,0.8235,0.8750,0.7778,0.8333,0.9627,1,2
+Whisper-MIL,timepoint_norm,14_month,234,163,0.8529,0.8353,0.8712,0.8293,0.9146,28,21
+Whisper-MIL,timepoint_norm,36_month,207,172,0.9174,0.8994,0.9360,0.8754,0.9703,18,11
+Whisper-MIL,n_adults_cat,0,337,259,0.8952,0.8835,0.9073,0.8765,0.9586,31,24
+Whisper-MIL,n_adults_cat,1,89,69,0.8732,0.8493,0.8986,0.7638,0.9137,11,7
+Whisper-MIL,n_adults_cat,2+,14,7,0.7500,0.6667,0.8571,0.7551,0.7065,3,1
+Whisper-MIL,n_children_cat,1,345,271,0.8955,0.9057,0.8856,0.8727,0.9585,25,31
+Whisper-MIL,n_children_cat,2+,94,62,0.8472,0.7439,0.9839,0.8493,0.9153,21,1
+Whisper-MIL,has_interaction,False,94,54,0.8333,0.8333,0.8333,0.8843,0.9156,9,9
+Whisper-MIL,has_interaction,True,347,281,0.8958,0.8746,0.9181,0.8266,0.9509,37,23
+Whisper-MIL,has_gestures,False,247,183,0.8859,0.8608,0.9126,0.8782,0.9518,27,16
+Whisper-MIL,has_gestures,True,194,152,0.8860,0.8774,0.8947,0.8174,0.9392,19,16
+Whisper-MIL,context,book share,9,7,0.9231,1.0000,0.8571,0.9286,0.9821,0,1
+Whisper-MIL,context,daily routine,30,28,0.9630,1.0000,0.9286,0.9821,0.9988,0,2
+Whisper-MIL,context,general social communication interaction,140,116,0.9185,0.9145,0.9224,0.8660,0.9695,10,9
+Whisper-MIL,context,motor play,96,63,0.8369,0.7564,0.9365,0.8215,0.8854,19,4
+Whisper-MIL,context,other,44,30,0.8621,0.8929,0.8333,0.8524,0.9273,3,5
+Whisper-MIL,context,social routine,24,23,0.9333,0.9545,0.9130,0.8696,0.9943,1,2
+Whisper-MIL,context,special occasion,17,9,0.7200,0.5625,1.0000,0.8056,0.8123,7,0
+Whisper-MIL,context,toy play,80,59,0.8696,0.8929,0.8475,0.8862,0.9560,6,9
+Whisper-MIL,location,inside private,306,248,0.9098,0.9044,0.9153,0.8685,0.9629,24,21
+Whisper-MIL,location,inside public,43,27,0.7857,0.7586,0.8148,0.8032,0.8671,7,5
+Whisper-MIL,location,outside private,43,28,0.8814,0.8387,0.9286,0.8500,0.9181,5,2
+Whisper-MIL,location,outside public,47,30,0.7879,0.7222,0.8667,0.7647,0.8520,10,4
+Whisper-MIL,child_constrained,False,364,277,0.8948,0.8838,0.9061,0.8759,0.9574,33,26
+Whisper-MIL,child_constrained,True,77,58,0.8455,0.8000,0.8966,0.7341,0.8855,13,6
+Whisper-MIL,face_visibility,high(8-10),188,146,0.8926,0.8750,0.9110,0.8550,0.9506,19,13
+Whisper-MIL,face_visibility,low(1-4),135,95,0.8705,0.8571,0.8842,0.8642,0.9375,14,11
+Whisper-MIL,face_visibility,mid(5-7),118,94,0.8912,0.8687,0.9149,0.8258,0.9480,13,8
+Whisper-MIL,lighting,high(6-10),431,328,0.8866,0.8684,0.9055,0.8527,0.9458,45,31
+Whisper-MIL,lighting,low(1-5),10,7,0.8571,0.8571,0.8571,0.8571,0.9379,1,1
+Whisper-MIL,body_parts,both,321,237,0.8807,0.8594,0.9030,0.8563,0.9425,35,23
+Whisper-MIL,body_parts,upper,117,95,0.8958,0.8866,0.9053,0.8354,0.9547,11,9

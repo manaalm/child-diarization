@@ -1,0 +1,7 @@
+{
+  "status": "not_found",
+  "n_clips": 0,
+  "missing_columns": [],
+  "age_range_overlap": [],
+  "notes": "Data directory not found: /tmp/nonexistent_1kd/. The '1kd' dataset likely refers to the 1000 Days (1kd) longitudinal project from Brown University / NICHD, which contains naturalistic home recordings of infants and toddlers from birth to 36 months. Access requires an institutional data use agreement (DUA) with the PI's lab at Brown University. See: Bergelson & Swingley (2012) PNAS; Casillas et al. (2019) LREC. Alternative interpretation: 1000 Days from Home (UK Biobank linked cohort, age 0-3). To integrate if accessible: map clip_id, child_id, audio_path, label, timepoint columns to the existing seen-child split schema; assign 1kd children to a separate child_id namespace (e.g., prefix 'kd_') to avoid conflicts with existing SAILS BIDS child IDs; re-run make_seen_child_split.py with the merged annotation CSV."
+}

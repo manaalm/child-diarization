@@ -1,0 +1,1232 @@
+{
+  "lr_role_only": {
+    "features": [
+      "kchi_total_dur"
+    ],
+    "threshold": 0.27,
+    "val_metrics": {
+      "f1": 0.8914473684210527,
+      "precision": 0.928082191780822,
+      "recall": 0.8575949367088608,
+      "auroc": 0.8805998899284535,
+      "auprc": 0.9392038654016557
+    },
+    "test_metrics": {
+      "f1": 0.8775193798449612,
+      "precision": 0.9129032258064517,
+      "recall": 0.844776119402985,
+      "auroc": 0.8555336524922557,
+      "auprc": 0.9415012801546278
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8644258187159768,
+        "auprc": 0.9299900066969102,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8861538461538462,
+        "precision": 0.9411764705882353,
+        "recall": 0.8372093023255814,
+        "auroc": 0.8371262458471762,
+        "auprc": 0.954343242432252,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 5.141640363522898
+    }
+  },
+  "lr_enrollment_only": {
+    "features": [
+      "sim_weighted_mean"
+    ],
+    "threshold": 0.29000000000000004,
+    "val_metrics": {
+      "f1": 0.8910891089108911,
+      "precision": 0.9310344827586207,
+      "recall": 0.8544303797468354,
+      "auroc": 0.8634837644468905,
+      "auprc": 0.9259185474535276
+    },
+    "test_metrics": {
+      "f1": 0.8740279937791602,
+      "precision": 0.9123376623376623,
+      "recall": 0.8388059701492537,
+      "auroc": 0.8203604618417346,
+      "auprc": 0.9177605297462264
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8261470664477664,
+        "auprc": 0.8940536789497637,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8792569659442725,
+        "precision": 0.9403973509933775,
+        "recall": 0.8255813953488372,
+        "auroc": 0.8106312292358805,
+        "auprc": 0.9420022366061511,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "sim_weighted_mean": 1.665966210152736
+    }
+  },
+  "lr_diarizer_all": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion"
+    ],
+    "threshold": 0.2,
+    "val_metrics": {
+      "f1": 0.8914473684210527,
+      "precision": 0.928082191780822,
+      "recall": 0.8575949367088608,
+      "auroc": 0.8799394606494222,
+      "auprc": 0.9384612669877739
+    },
+    "test_metrics": {
+      "f1": 0.8775193798449612,
+      "precision": 0.9129032258064517,
+      "recall": 0.844776119402985,
+      "auroc": 0.8560968741199662,
+      "auprc": 0.9419673852456975
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8653763069212823,
+        "auprc": 0.930648052998837,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8861538461538462,
+        "precision": 0.9411764705882353,
+        "recall": 0.8372093023255814,
+        "auroc": 0.8385382059800666,
+        "auprc": 0.9549779255607316,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": -1.619138039401689,
+      "kchi_n_segments": 3.399132895190002,
+      "kchi_mean_seg_dur": 0.34277599916742346,
+      "kchi_max_seg_dur": 0.5060686148663044,
+      "kchi_proportion": 0.6228471457545999
+    }
+  },
+  "lr_embedding_all": {
+    "features": [
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "threshold": 0.15000000000000002,
+    "val_metrics": {
+      "f1": 0.8896210873146623,
+      "precision": 0.9278350515463918,
+      "recall": 0.8544303797468354,
+      "auroc": 0.8752889378095763,
+      "auprc": 0.9399750533932815
+    },
+    "test_metrics": {
+      "f1": 0.8775193798449612,
+      "precision": 0.9129032258064517,
+      "recall": 0.844776119402985,
+      "auroc": 0.8509152351450295,
+      "auprc": 0.9381906878181602
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8595005616521213,
+        "auprc": 0.923284351078838,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8861538461538462,
+        "precision": 0.9411764705882353,
+        "recall": 0.8372093023255814,
+        "auroc": 0.8388704318936877,
+        "auprc": 0.955005849036554,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "sim_weighted_mean": -1.2954357500301297,
+      "sim_max": 1.5220209678198526,
+      "sim_top3_mean": 1.5177809690169561
+    }
+  },
+  "lr_phoneme_all": {
+    "features": [
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "threshold": 0.25,
+    "val_metrics": {
+      "f1": 0.8976897689768977,
+      "precision": 0.9379310344827586,
+      "recall": 0.8607594936708861,
+      "auroc": 0.892019812878371,
+      "auprc": 0.9470263568484094
+    },
+    "test_metrics": {
+      "f1": 0.8652931854199684,
+      "precision": 0.9222972972972973,
+      "recall": 0.8149253731343283,
+      "auroc": 0.8493382145874402,
+      "auprc": 0.9384134771637901
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8478964401294499,
+        "precision": 0.8972602739726028,
+        "recall": 0.803680981595092,
+        "auroc": 0.8456752786658601,
+        "auprc": 0.9166540389431286,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8819875776397516,
+        "precision": 0.9466666666666667,
+        "recall": 0.8255813953488372,
+        "auroc": 0.8508305647840532,
+        "auprc": 0.9593287824692678,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "phon_n_utterances": 3.5756062566909863,
+      "phon_n_total": -0.02919264322795642,
+      "phon_n_unique": -1.1724074820504613,
+      "phon_n_consonants": -0.977742043708316,
+      "phon_n_vowels": 1.085721256842305,
+      "phon_cv_ratio": 0.18407416210818145,
+      "phon_mean_per_utt": 0.7123841181558668,
+      "phon_max_per_utt": 0.5052127792318463,
+      "phon_unique_ratio": 0.3362519287456715
+    }
+  },
+  "lr_diarizer_plus_embedding": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "threshold": 0.15000000000000002,
+    "val_metrics": {
+      "f1": 0.8877887788778878,
+      "precision": 0.9275862068965517,
+      "recall": 0.8512658227848101,
+      "auroc": 0.8803659878921298,
+      "auprc": 0.9427345721036263
+    },
+    "test_metrics": {
+      "f1": 0.8775193798449612,
+      "precision": 0.9129032258064517,
+      "recall": 0.844776119402985,
+      "auroc": 0.8542945649112926,
+      "auprc": 0.9403794831843985
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8653763069212823,
+        "auprc": 0.9301265906950307,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8861538461538462,
+        "precision": 0.9411764705882353,
+        "recall": 0.8372093023255814,
+        "auroc": 0.839202657807309,
+        "auprc": 0.9538591857379448,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 0.08310893203695406,
+      "kchi_n_segments": 0.7336292630238338,
+      "kchi_mean_seg_dur": -1.1705788778677237,
+      "kchi_max_seg_dur": 1.0409097340948819,
+      "kchi_proportion": 0.525772614398073,
+      "sim_weighted_mean": 0.46947237415317156,
+      "sim_max": 0.1660021086311207,
+      "sim_top3_mean": 0.9894919731500387
+    }
+  },
+  "lr_diarizer_plus_phoneme": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "threshold": 0.21000000000000002,
+    "val_metrics": {
+      "f1": 0.8993506493506493,
+      "precision": 0.9233333333333333,
+      "recall": 0.8765822784810127,
+      "auroc": 0.8914556962025316,
+      "auprc": 0.9484405681079084
+    },
+    "test_metrics": {
+      "f1": 0.8809891808346213,
+      "precision": 0.9134615384615384,
+      "recall": 0.8507462686567164,
+      "auroc": 0.8577865390030978,
+      "auprc": 0.9435920235265791
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8652898989026181,
+        "auprc": 0.9311101151094104,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8929663608562691,
+        "precision": 0.9419354838709677,
+        "recall": 0.8488372093023255,
+        "auroc": 0.8456810631229236,
+        "auprc": 0.9582274702323539,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": -0.6526440099861898,
+      "kchi_n_segments": 1.324712871567191,
+      "kchi_mean_seg_dur": -0.16732121304832062,
+      "kchi_max_seg_dur": 0.6336213212573754,
+      "kchi_proportion": 0.6029144697435479,
+      "phon_n_utterances": 2.1479795801741504,
+      "phon_n_total": -0.05369673172253215,
+      "phon_n_unique": -1.066956494444459,
+      "phon_n_consonants": -0.7666145538129064,
+      "phon_n_vowels": 0.8356311790751274,
+      "phon_cv_ratio": 0.16077709759196765,
+      "phon_mean_per_utt": 0.5989707309955558,
+      "phon_max_per_utt": 0.10321369840576006,
+      "phon_unique_ratio": 0.32398099919399803
+    }
+  },
+  "lr_all_features": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean",
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "threshold": 0.17,
+    "val_metrics": {
+      "f1": 0.8957654723127035,
+      "precision": 0.9228187919463087,
+      "recall": 0.870253164556962,
+      "auroc": 0.8953769950467805,
+      "auprc": 0.9512140259517701
+    },
+    "test_metrics": {
+      "f1": 0.8809891808346213,
+      "precision": 0.9134615384615384,
+      "recall": 0.8507462686567164,
+      "auroc": 0.856519290340749,
+      "auprc": 0.9420370898052619
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8615743541000604,
+        "auprc": 0.9275091142621696,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8929663608562691,
+        "precision": 0.9419354838709677,
+        "recall": 0.8488372093023255,
+        "auroc": 0.849501661129568,
+        "auprc": 0.9582695357582405,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 0.1839580017591715,
+      "kchi_n_segments": 0.08932092423766677,
+      "kchi_mean_seg_dur": -1.260954268582531,
+      "kchi_max_seg_dur": 1.0411221956507026,
+      "kchi_proportion": 0.48754516942042164,
+      "sim_weighted_mean": 0.44781801059983695,
+      "sim_max": 0.049447489761353595,
+      "sim_top3_mean": 0.9132319087949549,
+      "phon_n_utterances": 1.3987910792394178,
+      "phon_n_total": -0.08636842014280224,
+      "phon_n_unique": -0.8066806613275445,
+      "phon_n_consonants": -0.6894194956136147,
+      "phon_n_vowels": 0.8002945403476406,
+      "phon_cv_ratio": 0.10611248749182833,
+      "phon_mean_per_utt": 0.5218713049966327,
+      "phon_max_per_utt": 0.10757489634072669,
+      "phon_unique_ratio": 0.08235238728236652
+    }
+  },
+  "gbm_role_only": {
+    "features": [
+      "kchi_total_dur"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8877887788778878,
+      "precision": 0.9275862068965517,
+      "recall": 0.8512658227848101,
+      "auroc": 0.8620665932856356,
+      "auprc": 0.9309758193013855
+    },
+    "test_metrics": {
+      "f1": 0.8740279937791602,
+      "precision": 0.9123376623376623,
+      "recall": 0.8388059701492537,
+      "auroc": 0.8367924528301887,
+      "auprc": 0.932536298660293
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8506005357297157,
+        "auprc": 0.9209303763500696,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8792569659442725,
+        "precision": 0.9403973509933775,
+        "recall": 0.8255813953488372,
+        "auroc": 0.8168604651162792,
+        "auprc": 0.9475023890694309,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 1.0
+    }
+  },
+  "gbm_enrollment_only": {
+    "features": [
+      "sim_weighted_mean"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8855721393034826,
+      "precision": 0.9303135888501742,
+      "recall": 0.8449367088607594,
+      "auroc": 0.8541001651073198,
+      "auprc": 0.9209789400963183
+    },
+    "test_metrics": {
+      "f1": 0.8665620094191523,
+      "precision": 0.9139072847682119,
+      "recall": 0.8238805970149253,
+      "auroc": 0.790509715573078,
+      "auprc": 0.899863501360341
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8535031847133758,
+        "precision": 0.8874172185430463,
+        "recall": 0.8220858895705522,
+        "auroc": 0.7965523200553011,
+        "auprc": 0.8741933819760205,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8792569659442725,
+        "precision": 0.9403973509933775,
+        "recall": 0.8255813953488372,
+        "auroc": 0.7780730897009968,
+        "auprc": 0.9278979020619493,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "sim_weighted_mean": 1.0
+    }
+  },
+  "gbm_diarizer_all": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8851913477537438,
+      "precision": 0.9333333333333333,
+      "recall": 0.8417721518987342,
+      "auroc": 0.8586268574573472,
+      "auprc": 0.9295227236013885
+    },
+    "test_metrics": {
+      "f1": 0.8665620094191523,
+      "precision": 0.9139072847682119,
+      "recall": 0.8238805970149253,
+      "auroc": 0.8213883413123063,
+      "auprc": 0.9238010187327494
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8571428571428571,
+        "precision": 0.8881578947368421,
+        "recall": 0.8282208588957055,
+        "auroc": 0.8358247645381491,
+        "auprc": 0.9182509994775285,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8757763975155279,
+        "precision": 0.94,
+        "recall": 0.8197674418604651,
+        "auroc": 0.7916943521594686,
+        "auprc": 0.9332565780584026,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 0.245647857098293,
+      "kchi_n_segments": 0.02487718968138986,
+      "kchi_mean_seg_dur": 0.09318010430363291,
+      "kchi_max_seg_dur": 0.10600582717597469,
+      "kchi_proportion": 0.5302890217407095
+    }
+  },
+  "gbm_embedding_all": {
+    "features": [
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8822553897180763,
+      "precision": 0.926829268292683,
+      "recall": 0.8417721518987342,
+      "auroc": 0.8560264171711612,
+      "auprc": 0.925869222277252
+    },
+    "test_metrics": {
+      "f1": 0.8701095461658842,
+      "precision": 0.9144736842105263,
+      "recall": 0.8298507462686567,
+      "auroc": 0.8220501267248662,
+      "auprc": 0.9246136705879712
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8643533123028391,
+        "precision": 0.8896103896103896,
+        "recall": 0.8404907975460123,
+        "auroc": 0.8334485440248856,
+        "auprc": 0.909607504866782,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8757763975155279,
+        "precision": 0.94,
+        "recall": 0.8197674418604651,
+        "auroc": 0.8022425249169436,
+        "auprc": 0.9417106105857158,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "sim_weighted_mean": 0.2619239972123899,
+      "sim_max": 0.4022100525471039,
+      "sim_top3_mean": 0.3358659502405062
+    }
+  },
+  "gbm_phoneme_all": {
+    "features": [
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "threshold": 0.31,
+    "val_metrics": {
+      "f1": 0.8956661316211878,
+      "precision": 0.9087947882736156,
+      "recall": 0.8829113924050633,
+      "auroc": 0.88673637864612,
+      "auprc": 0.9441504120328046
+    },
+    "test_metrics": {
+      "f1": 0.8807339449541285,
+      "precision": 0.9028213166144201,
+      "recall": 0.8597014925373134,
+      "auroc": 0.8391157420444944,
+      "auprc": 0.9297749603849267
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8676923076923077,
+        "precision": 0.8703703703703703,
+        "recall": 0.8650306748466258,
+        "auroc": 0.8361703966128056,
+        "auprc": 0.9032565247143791,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8936170212765957,
+        "precision": 0.9363057324840764,
+        "recall": 0.8546511627906976,
+        "auroc": 0.8433554817275747,
+        "auprc": 0.9567229337210557,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "phon_n_utterances": 0.33597174124145085,
+      "phon_n_total": 0.12002063578940103,
+      "phon_n_unique": 0.11302380384884991,
+      "phon_n_consonants": 0.015227196784331896,
+      "phon_n_vowels": 0.034181161039803926,
+      "phon_cv_ratio": 0.026246313288203534,
+      "phon_mean_per_utt": 0.1261495587532815,
+      "phon_max_per_utt": 0.03051871104663521,
+      "phon_unique_ratio": 0.1986608782080423
+    }
+  },
+  "gbm_diarizer_plus_embedding": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8781302170283807,
+      "precision": 0.9293286219081273,
+      "recall": 0.8322784810126582,
+      "auroc": 0.8385525591634562,
+      "auprc": 0.9212315002077249
+    },
+    "test_metrics": {
+      "f1": 0.8621236133122029,
+      "precision": 0.918918918918919,
+      "recall": 0.8119402985074626,
+      "auroc": 0.8096029287524642,
+      "auprc": 0.9166840275481207
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8553054662379421,
+        "precision": 0.8986486486486487,
+        "recall": 0.8159509202453987,
+        "auroc": 0.8205305452345976,
+        "auprc": 0.9076790573935876,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.86875,
+        "precision": 0.9391891891891891,
+        "recall": 0.8081395348837209,
+        "auroc": 0.7862126245847175,
+        "auprc": 0.9307627856373639,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 0.056996642770402936,
+      "kchi_n_segments": 0.021830129383908357,
+      "kchi_mean_seg_dur": 0.05337871961496527,
+      "kchi_max_seg_dur": 0.032051770752242324,
+      "kchi_proportion": 0.15890956678635343,
+      "sim_weighted_mean": 0.17456110005326847,
+      "sim_max": 0.2648247454820863,
+      "sim_top3_mean": 0.23744732515677294
+    }
+  },
+  "gbm_diarizer_plus_phoneme": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "threshold": 0.31,
+    "val_metrics": {
+      "f1": 0.8841761827079935,
+      "precision": 0.9124579124579124,
+      "recall": 0.8575949367088608,
+      "auroc": 0.8606219042377544,
+      "auprc": 0.9373334513550019
+    },
+    "test_metrics": {
+      "f1": 0.8713178294573644,
+      "precision": 0.9064516129032258,
+      "recall": 0.8388059701492537,
+      "auroc": 0.8233032948465221,
+      "auprc": 0.9239566632184892
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8625,
+        "precision": 0.8789808917197452,
+        "recall": 0.8466257668711656,
+        "auroc": 0.8359543765661455,
+        "auprc": 0.9109104015110605,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.88,
+        "precision": 0.934640522875817,
+        "recall": 0.8313953488372093,
+        "auroc": 0.7995016611295681,
+        "auprc": 0.9384519487168046,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 0.21969734853684897,
+      "kchi_n_segments": 0.006241739628651215,
+      "kchi_mean_seg_dur": 0.044387888782701,
+      "kchi_max_seg_dur": 0.06102834680878488,
+      "kchi_proportion": 0.455213681714471,
+      "phon_n_utterances": 0.043414407475609075,
+      "phon_n_total": 0.01978010935054939,
+      "phon_n_unique": 0.014820821037234781,
+      "phon_n_consonants": 0.004579350547033391,
+      "phon_n_vowels": 0.015474953829641815,
+      "phon_cv_ratio": 0.009472692471783997,
+      "phon_mean_per_utt": 0.062288849540132654,
+      "phon_max_per_utt": 0.016649986409580132,
+      "phon_unique_ratio": 0.026949823866977685
+    }
+  },
+  "gbm_all_features": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean",
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "threshold": 0.31,
+    "val_metrics": {
+      "f1": 0.8881685575364667,
+      "precision": 0.9102990033222591,
+      "recall": 0.8670886075949367,
+      "auroc": 0.8632361034672538,
+      "auprc": 0.938672655281902
+    },
+    "test_metrics": {
+      "f1": 0.8722741433021807,
+      "precision": 0.9120521172638436,
+      "recall": 0.835820895522388,
+      "auroc": 0.8205857504928188,
+      "auprc": 0.9275107090536339
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8757763975155279,
+        "precision": 0.8867924528301887,
+        "recall": 0.8650306748466258,
+        "auroc": 0.8408364296206687,
+        "auprc": 0.9100095685862694,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.86875,
+        "precision": 0.9391891891891891,
+        "recall": 0.8081395348837209,
+        "auroc": 0.7978405315614617,
+        "auprc": 0.946677538976914,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 0.04988386967153056,
+      "kchi_n_segments": 0.0098355424213256,
+      "kchi_mean_seg_dur": 0.03685733730246113,
+      "kchi_max_seg_dur": 0.02493136644278946,
+      "kchi_proportion": 0.14598907988053839,
+      "sim_weighted_mean": 0.19839354262825096,
+      "sim_max": 0.19769084560507935,
+      "sim_top3_mean": 0.16812954882870634,
+      "phon_n_utterances": 0.03842369303028663,
+      "phon_n_total": 0.01480470495785497,
+      "phon_n_unique": 0.006570556986819393,
+      "phon_n_consonants": 0.0037553532209576293,
+      "phon_n_vowels": 0.006964155625734338,
+      "phon_cv_ratio": 0.00796463951971916,
+      "phon_mean_per_utt": 0.059129527660863684,
+      "phon_max_per_utt": 0.011769142992281234,
+      "phon_unique_ratio": 0.018907093224801174
+    }
+  },
+  "pertp_logistic_diarizer_plus_phoneme": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "test_metrics": {
+      "f1": 0.8824427480916031,
+      "precision": 0.903125,
+      "recall": 0.8626865671641791,
+      "auroc": 0.8702196564348071,
+      "auprc": 0.9492950685862119
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8634920634920635,
+        "precision": 0.8947368421052632,
+        "recall": 0.8343558282208589,
+        "auroc": 0.8717705003024279,
+        "auprc": 0.9331733377537683,
+        "timepoint": "14_month",
+        "n": 234,
+        "threshold": 0.30000000000000004
+      },
+      {
+        "f1": 0.896969696969697,
+        "precision": 0.9367088607594937,
+        "recall": 0.8604651162790697,
+        "auroc": 0.844767441860465,
+        "auprc": 0.9565276528600024,
+        "timepoint": "36_month",
+        "n": 207,
+        "threshold": 0.16
+      }
+    ],
+    "importances_by_timepoint": {
+      "14_month": {
+        "kchi_total_dur": 0.6105629389982226,
+        "kchi_n_segments": 1.412339752581672,
+        "kchi_mean_seg_dur": 0.005967267416738732,
+        "kchi_max_seg_dur": 0.11522236077823783,
+        "kchi_proportion": 0.3190590394602598,
+        "phon_n_utterances": 2.302950066354142,
+        "phon_n_total": 0.6814775899218799,
+        "phon_n_unique": -2.3805393272910567,
+        "phon_n_consonants": 0.32672934269219206,
+        "phon_n_vowels": 1.1398230407173233,
+        "phon_cv_ratio": 0.19727981889032414,
+        "phon_mean_per_utt": 0.39635306987917024,
+        "phon_max_per_utt": -0.10518135938029284,
+        "phon_unique_ratio": 0.4578318951692072
+      },
+      "36_month": {
+        "kchi_total_dur": -0.6193760446188863,
+        "kchi_n_segments": 0.6589747667005985,
+        "kchi_mean_seg_dur": -0.31186059141230954,
+        "kchi_max_seg_dur": 0.6836077405971449,
+        "kchi_proportion": 0.9503232891359555,
+        "phon_n_utterances": 0.5977422328625204,
+        "phon_n_total": -0.24382945180209384,
+        "phon_n_unique": 0.530438791106757,
+        "phon_n_consonants": -0.7991982938382655,
+        "phon_n_vowels": 0.4047747763862998,
+        "phon_cv_ratio": 0.09001390949755324,
+        "phon_mean_per_utt": 0.7726571497249425,
+        "phon_max_per_utt": -0.2814913004987881,
+        "phon_unique_ratio": 0.38044139176498293
+      }
+    }
+  },
+  "pertp_gbm_diarizer_plus_phoneme": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "test_metrics": {
+      "f1": 0.8661417322834646,
+      "precision": 0.9166666666666666,
+      "recall": 0.8208955223880597,
+      "auroc": 0.8383413123063926,
+      "auprc": 0.9331086671238433
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8571428571428571,
+        "precision": 0.8881578947368421,
+        "recall": 0.8282208588957055,
+        "auroc": 0.8349174803421757,
+        "auprc": 0.9094626379940529,
+        "timepoint": "14_month",
+        "n": 234,
+        "threshold": 0.24000000000000002
+      },
+      {
+        "f1": 0.8757763975155279,
+        "precision": 0.94,
+        "recall": 0.8197674418604651,
+        "auroc": 0.799169435215947,
+        "auprc": 0.9404720311088998,
+        "timepoint": "36_month",
+        "n": 207,
+        "threshold": 0.4
+      }
+    ],
+    "importances_by_timepoint": {
+      "14_month": {
+        "kchi_total_dur": 0.24868988611320603,
+        "kchi_n_segments": 0.008110827756000047,
+        "kchi_mean_seg_dur": 0.12126475423631798,
+        "kchi_max_seg_dur": 0.026228555381789163,
+        "kchi_proportion": 0.15250140592237868,
+        "phon_n_utterances": 0.17643155769716892,
+        "phon_n_total": 0.031216106485501598,
+        "phon_n_unique": 0.03727808664886217,
+        "phon_n_consonants": 0.003351879763696987,
+        "phon_n_vowels": 0.017026555354951716,
+        "phon_cv_ratio": 0.01599386549510675,
+        "phon_mean_per_utt": 0.10650071348326787,
+        "phon_max_per_utt": 0.0171931034028884,
+        "phon_unique_ratio": 0.038212702258863376
+      },
+      "36_month": {
+        "kchi_total_dur": 0.07102447181015717,
+        "kchi_n_segments": 0.003128832279689307,
+        "kchi_mean_seg_dur": 0.08235551059068866,
+        "kchi_max_seg_dur": 0.048100559790424456,
+        "kchi_proportion": 0.39958234629698947,
+        "phon_n_utterances": 0.05141296394371225,
+        "phon_n_total": 0.06365132605145586,
+        "phon_n_unique": 0.053885079115422174,
+        "phon_n_consonants": 0.01554430246022417,
+        "phon_n_vowels": 0.023955861783624827,
+        "phon_cv_ratio": 0.022138453448856385,
+        "phon_mean_per_utt": 0.13156936586647888,
+        "phon_max_per_utt": 0.023103009350000057,
+        "phon_unique_ratio": 0.010547917212276468
+      }
+    }
+  },
+  "pertp_logistic_all_features": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean",
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "test_metrics": {
+      "f1": 0.88,
+      "precision": 0.9079365079365079,
+      "recall": 0.8537313432835821,
+      "auroc": 0.8503379329766262,
+      "auprc": 0.9443750605214727
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8714733542319749,
+        "precision": 0.8910256410256411,
+        "recall": 0.852760736196319,
+        "auroc": 0.8709928281344508,
+        "auprc": 0.9316227255951444,
+        "timepoint": "14_month",
+        "n": 234,
+        "threshold": 0.18
+      },
+      {
+        "f1": 0.8895705521472392,
+        "precision": 0.9415584415584416,
+        "recall": 0.8430232558139535,
+        "auroc": 0.8441029900332226,
+        "auprc": 0.9575154126362412,
+        "timepoint": "36_month",
+        "n": 207,
+        "threshold": 0.17
+      }
+    ],
+    "importances_by_timepoint": {
+      "14_month": {
+        "kchi_total_dur": 1.0159635926489896,
+        "kchi_n_segments": 0.6858824532272838,
+        "kchi_mean_seg_dur": -0.7577729365343175,
+        "kchi_max_seg_dur": 0.3555265025575034,
+        "kchi_proportion": 0.22214540436734348,
+        "sim_weighted_mean": 0.2451037810976393,
+        "sim_max": -0.09582949496524566,
+        "sim_top3_mean": 0.9630066501820292,
+        "phon_n_utterances": 1.6309000703737015,
+        "phon_n_total": 0.6670163710033647,
+        "phon_n_unique": -2.1694535708994165,
+        "phon_n_consonants": 0.36491256492322677,
+        "phon_n_vowels": 1.2051335797896638,
+        "phon_cv_ratio": 0.11966938489398485,
+        "phon_mean_per_utt": 0.25688329840915897,
+        "phon_max_per_utt": -0.028792006637184203,
+        "phon_unique_ratio": 0.2837816082723691
+      },
+      "36_month": {
+        "kchi_total_dur": 0.10561021696595033,
+        "kchi_n_segments": -0.1524221413036926,
+        "kchi_mean_seg_dur": -1.4028934123258556,
+        "kchi_max_seg_dur": 0.6819183937301122,
+        "kchi_proportion": 0.6240171416232592,
+        "sim_weighted_mean": 1.211880190790774,
+        "sim_max": 0.09787189628585032,
+        "sim_top3_mean": 0.24669900205283124,
+        "phon_n_utterances": 0.202170269627645,
+        "phon_n_total": -0.15442553983948745,
+        "phon_n_unique": 0.460187199217327,
+        "phon_n_consonants": -0.6081922494608161,
+        "phon_n_vowels": 0.40120788602164165,
+        "phon_cv_ratio": 0.08481294178030013,
+        "phon_mean_per_utt": 0.8636520836071786,
+        "phon_max_per_utt": -0.2805673056106083,
+        "phon_unique_ratio": 0.03766022881350602
+      }
+    }
+  },
+  "pertp_gbm_all_features": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean",
+      "phon_n_utterances",
+      "phon_n_total",
+      "phon_n_unique",
+      "phon_n_consonants",
+      "phon_n_vowels",
+      "phon_cv_ratio",
+      "phon_mean_per_utt",
+      "phon_max_per_utt",
+      "phon_unique_ratio"
+    ],
+    "test_metrics": {
+      "f1": 0.8675078864353313,
+      "precision": 0.919732441471572,
+      "recall": 0.8208955223880597,
+      "auroc": 0.8345254857786539,
+      "auprc": 0.9318250774688068
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8662420382165605,
+        "precision": 0.9006622516556292,
+        "recall": 0.8343558282208589,
+        "auroc": 0.8425645899939516,
+        "auprc": 0.9151892938635557,
+        "timepoint": "14_month",
+        "n": 234,
+        "threshold": 0.31
+      },
+      {
+        "f1": 0.8757763975155279,
+        "precision": 0.94,
+        "recall": 0.8197674418604651,
+        "auroc": 0.7832225913621262,
+        "auprc": 0.9351384834876779,
+        "timepoint": "36_month",
+        "n": 207,
+        "threshold": 0.4
+      }
+    ],
+    "importances_by_timepoint": {
+      "14_month": {
+        "kchi_total_dur": 0.06451222478985662,
+        "kchi_n_segments": 0.007165257023986766,
+        "kchi_mean_seg_dur": 0.038108211434067944,
+        "kchi_max_seg_dur": 0.018916213815720267,
+        "kchi_proportion": 0.07365543242500122,
+        "sim_weighted_mean": 0.049426234376312536,
+        "sim_max": 0.1391344778588891,
+        "sim_top3_mean": 0.3967418863132649,
+        "phon_n_utterances": 0.053451920317654646,
+        "phon_n_total": 0.008920474582331181,
+        "phon_n_unique": 0.030515651365204968,
+        "phon_n_consonants": 0.0073769927015177065,
+        "phon_n_vowels": 0.013443042621986446,
+        "phon_cv_ratio": 0.009552238684765029,
+        "phon_mean_per_utt": 0.055737692456114214,
+        "phon_max_per_utt": 0.009936385918358753,
+        "phon_unique_ratio": 0.0234056633149677
+      },
+      "36_month": {
+        "kchi_total_dur": 0.027982441450714372,
+        "kchi_n_segments": 0.006871646186703484,
+        "kchi_mean_seg_dur": 0.0507308722542545,
+        "kchi_max_seg_dur": 0.035231299522212475,
+        "kchi_proportion": 0.1460955610331984,
+        "sim_weighted_mean": 0.18658733358435825,
+        "sim_max": 0.13519659365470657,
+        "sim_top3_mean": 0.07099940940528124,
+        "phon_n_utterances": 0.04579375063695567,
+        "phon_n_total": 0.056963033728991946,
+        "phon_n_unique": 0.026704005641414782,
+        "phon_n_consonants": 0.010041807779104519,
+        "phon_n_vowels": 0.00644608577795686,
+        "phon_cv_ratio": 0.02663401663391285,
+        "phon_mean_per_utt": 0.09202153803534606,
+        "phon_max_per_utt": 0.009520284090815435,
+        "phon_unique_ratio": 0.06618032058407261
+      }
+    }
+  }
+}
