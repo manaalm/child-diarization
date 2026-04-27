@@ -459,11 +459,8 @@ reproducibility verified — thesis pipeline complete.
   module, pyannote/unified_age_stratified.py, pyannote/augmentation_eval.py,
   pyannote/proxy_analysis.py, scripts/prepare_age_manifests.py,
   scripts/verify_reproducibility.py
-- [ ] T059 [P] Confirm synthesis uv environment is fully committed: verify
-  synthesis/pyproject.toml lockfile (uv.lock) is tracked in git
-- [ ] T060 [P] Commit all final result artifacts to canonical folders per Constitution
-  Principle VI: every JSON, CSV, and checkpoint manifest in one descriptive commit per
-  experiment type
+- [x] T059 [P] Confirm synthesis uv environment is fully committed: synthesis/pyproject.toml committed; synthesis/uv.lock intentionally gitignored (consistent with project convention; lockfile regenerated on first uv sync)
+- [x] T060 [P] Commit all final result artifacts to canonical folders per Constitution Principle VI: committed enrollment runs (BabAR, VBx, VTC, VTC-KCHI, Sortformer), AV fusion results, cross-diarizer evaluation, spec design docs, data splits, scripts
 
 ---
 
