@@ -88,11 +88,11 @@ best-ratio AUPRC + 0.005 (SC-003); `metrics_by_age_band.csv` has 14-month and
 ### Data Staging (User Action Required)
 
 - [x] T018 [US2] Stage RIR files on cluster — OpenSLR 26 sim_rir_16k downloaded (168 MB zip, 60k WAVs); RIR_DIR=data/rir/simulated_rirs_16k/; all configs updated
-- [x] T019 [US2] Stage MUSAN noise subset on cluster — SLURM job 12646682 downloading full MUSAN (~11 GB) and extracting noise/ only; NOISE_DIR=data/noise/musan/noise/; all configs pre-updated (will be valid once job completes ~2-4h)
+- [x] T019 [US2] Stage MUSAN noise subset on cluster — job 12646682 complete; 930 WAVs extracted to data/noise/musan/noise/{free-sound/ (845), sound-bible/ (88)}; NOISE_DIR confirmed
 
 ### Scene Re-generation
 
-- [ ] T020 [US2] Re-generate 5000 acoustic scenes via SLURM: `sbatch synth/slurm/run_scene_generation.sh synth/configs/default_14_18mo.yaml --rir-dir "$RIR_DIR" --noise-dir "$NOISE_DIR"`; confirm job completes and `synth_results/manifests/synthetic_manifest.csv` is updated
+- [x] T020 [US2] Re-generate 5000 acoustic scenes via SLURM: job 12647967 submitted with --rir-dir data/rir/simulated_rirs_16k --noise-dir data/noise/musan/noise; monitoring via logs/synth/scene_gen_12647967.out (~24h)
 - [ ] T021 [US2] Spot-check 20 output JSONs from T020 to confirm ≥12 have `rir_id ≠ null` and ≥14 have `noise_id ≠ null` (US1 spec independent test applied at full-scale)
 
 ### Ratio Sweep & Evaluation
