@@ -448,6 +448,38 @@ reproducibility verified — thesis pipeline complete.
 
 ---
 
+## Phase N+1: Parakeet TDT ASR Exploration
+
+**Goal**: Evaluate nvidia/parakeet-tdt-0.6b-v2 (600M FastConformer + TDT decoder,
+word-level timestamps, up to 24-min single-pass) as a new child-detection frontend.
+Strategy: run ASR on each clip, check whether any word-level timestamps fall within
+labeled child-speech intervals → derive a child-presence score; compare against
+existing frontends on seen-child split.
+
+- [ ] T098 [P] Smoke-test Parakeet TDT: `pip install nemo_toolkit[asr]` in
+  child-vocalizations env (NeMo already installed for Sortformer); run
+  `nemo_asr.models.ASRModel.from_pretrained("nvidia/parakeet-tdt-0.6b-v2")` on
+  3 val clips; confirm word timestamps output; check if child speech intervals
+  are recoverable from timestamp density — `python -c "import nemo.collections.asr
+  as nemo_asr; m = nemo_asr.models.ASRModel.from_pretrained('nvidia/parakeet-tdt-0.6b-v2');
+  print(m.transcribe(['<clip.wav>'], timestamps=True))"`
+
+- [ ] T099 [P] Implement `baselines/parakeet_baseline.py`: load
+  nvidia/parakeet-tdt-0.6b-v2 via NeMo, transcribe each clip with word timestamps,
+  derive child-presence score as fraction of clip duration covered by words in
+  child-speech timeframes (use BabAR RTTM as oracle for child-word alignment, OR
+  use timestamp density as a proxy); tune threshold on val → test; write
+  val/test_predictions.csv + val/test_metrics_tuned.json to
+  baselines/parakeet_baseline_runs/; match schema of audio_llm_baseline_runs/
+
+- [ ] T100 [P] Submit Parakeet evaluation SLURM job:
+  `sbatch baselines/slurm/run_parakeet_baseline.sh val` then test; GPU required
+  (~1h for 2183 clips at RTFx 3380); compare test F1/AUROC/AUPRC against
+  audio_llm_baseline (F1=0.871, AUROC=0.725, AUPRC=0.853) and BabAR enrollment
+  (F1=0.874, AUROC=0.820, AUPRC=0.918)
+
+---
+
 ## Phase N: Polish & Cross-Cutting Concerns
 
 - [X] T058 Update CLAUDE.md to document all new scripts: synthesis/ module, evaluation/
