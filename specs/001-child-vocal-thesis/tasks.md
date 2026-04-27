@@ -220,14 +220,9 @@ SC-003 thresholds met.
 - [X] T030 [P] [US3] Implement synthesis/scripts/count_segments.py — report per
   age-group counts (n segments, total hours, mean/std duration) from
   synthesis/data/{age_group}/; exit 1 if < 500 segments for any age group
-- [ ] T031 [US3] Run extract_segments.py for 12_16m:
-  `python synthesis/scripts/extract_segments.py --age-group 12_16m` →
-  synthesis/data/12_16m/
-- [ ] T032 [P] [US3] Run extract_segments.py for 34_38m:
-  `python synthesis/scripts/extract_segments.py --age-group 34_38m` →
-  synthesis/data/34_38m/
-- [ ] T033 [US3] Run count_segments.py to validate both age groups; abort if < 500
-  segments per group; commit extraction_log.csv
+- [ ] T031 [US3] Run extract_segments.py for 12_16m (SLURM job 12646873 submitted; Providence-only, 19 recordings with RTTMs; Playlogue clips lack ground-truth RTTMs)
+- [ ] T032 [P] [US3] Run extract_segments.py for 34_38m (same SLURM job 12646873; Providence-only, 10 recordings with RTTMs)
+- [ ] T033 [US3] Run count_segments.py to validate both age groups; abort if < 500 segments per group; commit extraction_log.csv (pending SLURM job 12646873)
 - [X] T034 [US3] Implement synthesis/models/vits_model.py — wrap Coqui TTS VITS
   architecture for age-conditioned 16kHz child speech synthesis; accept
   network_param from synthesis/configs/vits_34m.yaml

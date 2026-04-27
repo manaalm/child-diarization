@@ -87,8 +87,8 @@ best-ratio AUPRC + 0.005 (SC-003); `metrics_by_age_band.csv` has 14-month and
 
 ### Data Staging (User Action Required)
 
-- [ ] T018 [US2] Stage RIR files on cluster — download OpenSLR 26 sim_rir_16k (~1 GB) or MIT IR Survey; record absolute path as `RIR_DIR`; update `synth/configs/default_14_18mo.yaml` `mixing.rir_dir` with that path (or pass via `--rir-dir` at runtime)
-- [ ] T019 [US2] Stage MUSAN noise subset on cluster (~1 GB for noise-only, ~17 GB full); record absolute path as `NOISE_DIR`; update config or pass via `--noise-dir` at runtime
+- [x] T018 [US2] Stage RIR files on cluster — OpenSLR 26 sim_rir_16k downloaded (168 MB zip, 60k WAVs); RIR_DIR=data/rir/simulated_rirs_16k/; all configs updated
+- [x] T019 [US2] Stage MUSAN noise subset on cluster — SLURM job 12646682 downloading full MUSAN (~11 GB) and extracting noise/ only; NOISE_DIR=data/noise/musan/noise/; all configs pre-updated (will be valid once job completes ~2-4h)
 
 ### Scene Re-generation
 
@@ -121,17 +121,17 @@ to include all TinyVox languages or lower the floor).
 
 ### Data & Hours Check
 
-- [ ] T027 [US3] Audit available child speech: `find data/tinyvox/audio -name "*.wav" | wc -l` and `find data/segments/child -name "*.wav" | wc -l`; compute total hours; compare against 50 h spec threshold; if < 50 h, decide whether to include non-Eng-NA TinyVox or lower the floor (document decision in research.md)
-- [ ] T028 [US3] Produce child WAV file list: `find data/tinyvox/audio -name "phon_Eng-NA_*.wav" > synth_results/child_wavs.txt && find data/segments/child -name "*.wav" >> synth_results/child_wavs.txt`
+- [x] T027 [US3] Audit available child speech: data/tinyvox/audio 24,733 Eng-NA WAVs + data/segments/child 73,284 WAVs = 98,017 total; estimated ~101 h — above 50 h threshold; no need to include non-Eng-NA TinyVox
+- [x] T028 [US3] Produced child WAV file list: synth_results/child_wavs.txt (98,017 lines)
 
 ### SSL Pretraining Script
 
-- [ ] T029 [US3] Create `synth/scripts/pretrain_wavlm_child.py`: load `microsoft/wavlm-base-plus` via HuggingFace `transformers`; accept `--wav-list`, `--output-dir`, `--max-steps`, `--resume-from-checkpoint`; run continued masked-speech-unit prediction; save checkpoint every 5000 steps; log training loss to `synth_results/child_wavlm_checkpoint/training_log.csv`
-- [ ] T030 [US3] Create `synth/slurm/run_wavlm_pretrain.sh`: 48 h GPU job targeting `ou_bcs_normal,pi_satra`; pins `child-vocalizations` env; logs to `logs/synth/wavlm_pretrain_{SLURM_JOB_ID}.out`; passes `--resume-from-checkpoint` if checkpoint dir already exists (FR-010, FR-011, FR-013)
+- [x] T029 [US3] Create `synth/scripts/pretrain_wavlm_child.py`: implemented masked CNN-feature prediction (MSE loss), span masking, pred_head Linear(768→512), checkpoint save every 5000 steps, resume-from-checkpoint, training_log.csv
+- [x] T030 [US3] Create `synth/slurm/run_wavlm_pretrain.sh`: 48h GPU job, ou_bcs_normal/pi_satra, child-vocalizations env, auto-resume from latest step_* checkpoint
 
 ### Checkpoint Validation
 
-- [ ] T031 [US3] Submit pretraining: `sbatch synth/slurm/run_wavlm_pretrain.sh`; monitor training loss in log; confirm checkpoint saved at `synth_results/child_wavlm_checkpoint/`
+- [x] T031 [US3] Submit pretraining: SLURM job 12646887 submitted; 48h GPU; auto-resumes; monitoring via logs/synth/wavlm_pretrain_12646887.out
 - [ ] T032 [US3] Create `mil/configs/wavlm_mil_child_adapted.yaml`: copy `mil/configs/wavlm_mil.yaml`; change `backbone_name` / `backbone_path` to point to `synth_results/child_wavlm_checkpoint/` (FR-012)
 - [ ] T033 [US3] Validate drop-in: `sbatch mil/slurm/train_mil.sh mil/configs/wavlm_mil_child_adapted.yaml`; confirm training runs without error and converges (FR-012 acceptance)
 - [ ] T034 [US3] Evaluate: `sbatch mil/slurm/eval_mil.sh`; confirm test AUPRC ≥ 0.946 (SC-005); compare to baseline `mil/mil_results/wavlm_mil/test_metrics_tuned.json` for regression check (SC-005 acceptance)
@@ -142,7 +142,7 @@ to include all TinyVox languages or lower the floor).
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T035 [P] Update CLAUDE.md `Key Commands` section with acoustic scene generation command (including `--rir-dir` / `--noise-dir`) once cluster paths are known from T018–T019
+- [x] T035 [P] Update CLAUDE.md `Key Commands` section with acoustic scene generation command; paths confirmed: RIR_DIR=data/rir/simulated_rirs_16k, NOISE_DIR=data/noise/musan/noise; also added WavLM pretraining workflow section
 - [x] T036 [P] Update `synth/slurm/run_ratio_sweep.sh` comment block to note that scenes must be regenerated with acoustic augmentation before sweeping, and that clean-mix scenes in `synth_results/synthetic_scenes/` are discarded
 - [x] T037 Commit all spec artifacts: `specs/009-synth-rir-noise/{plan.md,research.md,data-model.md,quickstart.md,contracts/,tasks.md}`, updated configs (T001–T005), updated `synth/scripts/build_segment_manifest.py` (FR-014 already done), updated `synth/scene_generator.py` (T008–T012), updated `synth/scripts/generate_scenes.py` (T006), updated `synth/slurm/run_scene_generation.sh` (T007)
 

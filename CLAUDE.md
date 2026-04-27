@@ -288,8 +288,16 @@ python synth/scripts/extract_segments.py \
   --manifest   synth_results/manifests/segment_manifest.csv \
   --output-dir data/segments/
 
-# Step 3: generate 5000 synthetic scenes (via SLURM — no GPU)
+# Step 3: generate 5000 acoustic scenes with RIR + noise (via SLURM — no GPU)
+# RIR and MUSAN paths are baked into synth/configs/default_14_18mo.yaml (spec-009):
+#   RIR_DIR  = data/rir/simulated_rirs_16k/   (OpenSLR 26, 60k WAVs)
+#   NOISE_DIR = data/noise/musan/noise/        (MUSAN noise subset, SLURM job 12646682)
+# Can also override at runtime:
 sbatch synth/slurm/run_scene_generation.sh synth/configs/default_14_18mo.yaml
+# Or with explicit overrides (if config paths change):
+# sbatch synth/slurm/run_scene_generation.sh synth/configs/default_14_18mo.yaml \
+#   --rir-dir data/rir/simulated_rirs_16k \
+#   --noise-dir data/noise/musan/noise
 # Output: synth_results/synthetic_scenes/{wav,rttm,json}/
 #         synth_results/manifests/synthetic_manifest.csv
 
@@ -315,6 +323,31 @@ python synth/scripts/analyze_synthetic_quality.py \
   --synthetic-manifest synth_results/manifests/synthetic_manifest.csv \
   --real-train-csv     whisper-modeling/seen_child_splits/train.csv \
   --output-dir         synth_results/augmentation_experiments/default_14_18mo/figures/
+```
+
+### Child-adapted WavLM pretraining (spec-009 US3)
+
+Continued masked-speech-unit pretraining of WavLM-Base+ on 73k Providence/TinyVox child
+speech segments (~101 h). Outputs a checkpoint compatible with the frame-window MIL backbone.
+
+```bash
+# Step 1: build child WAV list (98k files: TinyVox Eng-NA + Providence segments)
+find data/tinyvox/audio -name "phon_Eng-NA_*.wav" > synth_results/child_wavs.txt
+find data/segments/child -name "*.wav" >> synth_results/child_wavs.txt
+
+# Step 2: submit pretraining (48h GPU, resumes automatically if checkpoint exists)
+sbatch synth/slurm/run_wavlm_pretrain.sh
+# Output: synth_results/child_wavlm_checkpoint/step_{N}/ (saved every 5000 steps)
+#         synth_results/child_wavlm_checkpoint/training_log.csv
+# Logs:   logs/synth/wavlm_pretrain_{SLURM_JOB_ID}.out
+
+# Step 3: wire child-adapted backbone into MIL (edit backbone_path in config)
+cp mil/configs/wavlm_mil.yaml mil/configs/wavlm_mil_child_adapted.yaml
+# Edit wavlm_mil_child_adapted.yaml: set backbone_path to synth_results/child_wavlm_checkpoint/step_50000
+
+# Step 4: train and evaluate child-adapted MIL (same pipeline as baseline)
+sbatch mil/slurm/train_mil.sh mil/configs/wavlm_mil_child_adapted.yaml
+sbatch mil/slurm/eval_mil.sh
 ```
 
 ### Frame-window MIL (WavLM-Base+ / Whisper-small)
