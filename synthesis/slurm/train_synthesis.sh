@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --gres=gpu:1
-#SBATCH --partition=gpu
+#SBATCH -p ou_bcs_normal,pi_satra
 
 # Usage:
 #   sbatch synthesis/slurm/train_synthesis.sh \

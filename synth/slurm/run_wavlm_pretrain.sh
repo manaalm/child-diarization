@@ -39,7 +39,10 @@ EXTRA_ARGS="${@}"  # pass any extra CLI args (e.g. --max-steps, --batch-size)
 
 # Auto-resume from most recent checkpoint if one exists
 RESUME_ARG=""
-LATEST=$(ls -d "${OUTPUT_DIR}"/step_* 2>/dev/null | sort -V | tail -1)
+LATEST=""
+if compgen -G "${OUTPUT_DIR}/step_*" > /dev/null 2>&1; then
+    LATEST=$(ls -d "${OUTPUT_DIR}"/step_* | sort -V | tail -1)
+fi
 if [[ -n "${LATEST}" && -f "${LATEST}/trainer_state.pt" ]]; then
     echo "Resuming from checkpoint: ${LATEST}"
     RESUME_ARG="--resume-from-checkpoint ${LATEST}"

@@ -131,7 +131,7 @@ to include all TinyVox languages or lower the floor).
 
 ### Checkpoint Validation
 
-- [x] T031 [US3] Submit pretraining: SLURM job 12646887 submitted; 48h GPU; auto-resumes; monitoring via logs/synth/wavlm_pretrain_12646887.out
+- [x] T031 [US3] Submit pretraining: SLURM job 12647523 running on A100 (12646887 failed: set -eo pipefail + ls glob killed script before Python; fixed with compgen -G guard); monitoring via logs/synth/wavlm_pretrain_12647523.out
 - [ ] T032 [US3] Create `mil/configs/wavlm_mil_child_adapted.yaml`: copy `mil/configs/wavlm_mil.yaml`; change `backbone_name` / `backbone_path` to point to `synth_results/child_wavlm_checkpoint/` (FR-012)
 - [ ] T033 [US3] Validate drop-in: `sbatch mil/slurm/train_mil.sh mil/configs/wavlm_mil_child_adapted.yaml`; confirm training runs without error and converges (FR-012 acceptance)
 - [ ] T034 [US3] Evaluate: `sbatch mil/slurm/eval_mil.sh`; confirm test AUPRC ≥ 0.946 (SC-005); compare to baseline `mil/mil_results/wavlm_mil/test_metrics_tuned.json` for regression check (SC-005 acceptance)
