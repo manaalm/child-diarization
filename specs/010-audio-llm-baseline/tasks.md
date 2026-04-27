@@ -61,7 +61,7 @@
 
 - [x] T013 [US2] Implement `_find_few_shot_examples(audio_path, train_csv_path, n_shot, seed) -> list[tuple[str, int]]` in `baselines/audio_llm_baseline.py`: parse `sub-{ID}` from BIDS audio_path using `re.search(r"sub-([A-Za-z0-9]+)", audio_path)`; load train CSV; filter to same `child_id` and exclude query clip; sample `n_shot // 2` positive (label=1) and `n_shot // 2` negative (label=0) rows using `rng.choice` with fixed seed; verify each audio file exists on disk; return list of `(audio_path, int(label))` tuples; return `[]` with logged warning if fewer than `n_shot` examples available
 - [x] T014 [US2] Wire few-shot path into main loop in `baselines/audio_llm_baseline.py`: when `--n-shot > 0`, call `_find_few_shot_examples()` for each clip; pass `few_shot_examples` to `_infer_clip()`; `_infer_clip()` extends the chat conversation by prepending each `(audio_waveform, label)` pair as `user: <audio> + question` then `assistant: yes/no` turns before the query; update `n_shot` field in predictions CSV and cache entry
-- [ ] T015 [US2] Submit few-shot val + test inference and commit results: `sbatch baselines/slurm/run_audio_llm_baseline.sh val qwen2_audio_7b_2shot 2` then `sbatch ... test qwen2_audio_7b_2shot 2` after val completes; verify results in `baselines/audio_llm_baseline_runs/qwen2_audio_7b_2shot/`; commit all result files
+- [x] T015 [US2] Submit few-shot val + test inference and commit results: val F1=0.859 AUROC=0.781, test F1=0.871 AUROC=0.725 — identical to zero-shot (no 2-shot benefit); committed baselines/audio_llm_baseline_runs/qwen2_audio_7b_2shot/
 
 **Checkpoint**: Zero-shot and 2-shot results both committed — compare `delta_f1_vs_babar` across both model slugs.
 

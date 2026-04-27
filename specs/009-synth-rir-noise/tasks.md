@@ -143,8 +143,8 @@ to include all TinyVox languages or lower the floor).
 ## Phase 6: Polish & Cross-Cutting Concerns
 
 - [ ] T035 [P] Update CLAUDE.md `Key Commands` section with acoustic scene generation command (including `--rir-dir` / `--noise-dir`) once cluster paths are known from T018–T019
-- [ ] T036 [P] Update `synth/slurm/run_ratio_sweep.sh` comment block to note that scenes must be regenerated with acoustic augmentation before sweeping, and that clean-mix scenes in `synth_results/synthetic_scenes/` are discarded
-- [ ] T037 Commit all spec artifacts: `specs/009-synth-rir-noise/{plan.md,research.md,data-model.md,quickstart.md,contracts/,tasks.md}`, updated configs (T001–T005), updated `synth/scripts/build_segment_manifest.py` (FR-014 already done), updated `synth/scene_generator.py` (T008–T012), updated `synth/scripts/generate_scenes.py` (T006), updated `synth/slurm/run_scene_generation.sh` (T007)
+- [x] T036 [P] Update `synth/slurm/run_ratio_sweep.sh` comment block to note that scenes must be regenerated with acoustic augmentation before sweeping, and that clean-mix scenes in `synth_results/synthetic_scenes/` are discarded
+- [x] T037 Commit all spec artifacts: `specs/009-synth-rir-noise/{plan.md,research.md,data-model.md,quickstart.md,contracts/,tasks.md}`, updated configs (T001–T005), updated `synth/scripts/build_segment_manifest.py` (FR-014 already done), updated `synth/scene_generator.py` (T008–T012), updated `synth/scripts/generate_scenes.py` (T006), updated `synth/slurm/run_scene_generation.sh` (T007)
 
 ---
 
