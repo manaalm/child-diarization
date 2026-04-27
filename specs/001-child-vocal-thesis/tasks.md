@@ -456,27 +456,19 @@ Strategy: run ASR on each clip, check whether any word-level timestamps fall wit
 labeled child-speech intervals → derive a child-presence score; compare against
 existing frontends on seen-child split.
 
-- [ ] T098 [P] Smoke-test Parakeet TDT: `pip install nemo_toolkit[asr]` in
-  child-vocalizations env (NeMo already installed for Sortformer); run
-  `nemo_asr.models.ASRModel.from_pretrained("nvidia/parakeet-tdt-0.6b-v2")` on
-  3 val clips; confirm word timestamps output; check if child speech intervals
-  are recoverable from timestamp density — `python -c "import nemo.collections.asr
-  as nemo_asr; m = nemo_asr.models.ASRModel.from_pretrained('nvidia/parakeet-tdt-0.6b-v2');
-  print(m.transcribe(['<clip.wav>'], timestamps=True))"`
+- [x] T098 [P] Smoke-test Parakeet TDT: NeMo 2.7.3 already in child-vocalizations
+  (installed for Sortformer); dry-run confirmed 3 clips load, durations correct;
+  `transcribe(..., timestamps=True)` API confirmed on EncDecRNNTBPEModel
 
-- [ ] T099 [P] Implement `baselines/parakeet_baseline.py`: load
-  nvidia/parakeet-tdt-0.6b-v2 via NeMo, transcribe each clip with word timestamps,
-  derive child-presence score as fraction of clip duration covered by words in
-  child-speech timeframes (use BabAR RTTM as oracle for child-word alignment, OR
-  use timestamp density as a proxy); tune threshold on val → test; write
-  val/test_predictions.csv + val/test_metrics_tuned.json to
-  baselines/parakeet_baseline_runs/; match schema of audio_llm_baseline_runs/
+- [x] T099 [P] Implemented `baselines/parakeet_baseline.py`: gap_ratio scorer
+  (1 - word_covered_sec/clip_duration); per-clip JSON cache; val threshold tuning;
+  per-timepoint test metrics; same output schema as audio_llm_baseline_runs/;
+  `baselines/slurm/run_parakeet_baseline.sh` created; labnb experiment registered
+  (20260427T204114Z--child-adult-diarization--parakeet-tdt-asr-baseline--ysm9cfmv)
 
-- [ ] T100 [P] Submit Parakeet evaluation SLURM job:
-  `sbatch baselines/slurm/run_parakeet_baseline.sh val` then test; GPU required
-  (~1h for 2183 clips at RTFx 3380); compare test F1/AUROC/AUPRC against
-  audio_llm_baseline (F1=0.871, AUROC=0.725, AUPRC=0.853) and BabAR enrollment
-  (F1=0.874, AUROC=0.820, AUPRC=0.918)
+- [ ] T100 [P] Parakeet val job 12653486 running (~1h); after val completes run
+  `sbatch baselines/slurm/run_parakeet_baseline.sh test`; compare test AUPRC
+  vs BabAR (0.918) and AudioLLM (0.853); update CLAUDE.md results table
 
 ---
 
