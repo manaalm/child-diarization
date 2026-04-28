@@ -574,13 +574,13 @@ def main():
     print("Building child prototypes from positive train clips...")
     prototypes, child_stats_df = build_child_prototypes(train_df, embedder, CFG)
     child_stats_df.to_csv(os.path.join(CFG.results_dir, "child_prototype_stats.csv"), index=False)
-    print(f"Built prototypes for {len(prototypes)} children.")
+    print(f"Built prototypes for {len(prototypes)} (child, timepoint) pairs.")
 
-    # Verify no seen children are missing prototypes
-    seen_children = set(train_df["child_id"].unique())
-    missing = seen_children - set(prototypes.keys())
+    # Verify no seen (child, timepoint) pairs are missing prototypes
+    seen_combos = set(zip(train_df["child_id"], train_df["timepoint_norm"]))
+    missing = {f"{c}__{t}" for c, t in seen_combos} - set(prototypes.keys())
     if missing:
-        print(f"WARNING: {len(missing)} seen children have no prototype "
+        print(f"WARNING: {len(missing)} seen (child, timepoint) pairs have no prototype "
               f"(diarizer found no child segments): {missing}")
 
     print("Running enrollment on val/test...")

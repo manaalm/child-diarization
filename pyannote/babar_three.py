@@ -749,12 +749,12 @@ def main():
         # Build prototypes
         print("Building prototypes...")
         prototypes = build_child_prototypes(train_df, args.babar_output, embedder)
-        print(f"Built prototypes for {len(prototypes)} children.")
+        print(f"Built prototypes for {len(prototypes)} (child, timepoint) pairs.")
 
-        seen = set(train_df["child_id"].unique())
-        missing = seen - set(prototypes.keys())
+        seen_combos = set(zip(train_df["child_id"], train_df["timepoint_norm"]))
+        missing = {f"{c}__{t}" for c, t in seen_combos} - set(prototypes.keys())
         if missing:
-            print(f"WARNING: {len(missing)} children missing prototypes: {missing}")
+            print(f"WARNING: {len(missing)} (child, timepoint) pairs missing prototypes: {missing}")
 
         # Extract features
         print("\nExtracting train features...")
