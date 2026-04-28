@@ -47,7 +47,8 @@ def evaluate(checkpoint_path: str, config_path: str) -> None:
         df = load_split(cfg["split_dir"], split_name)
         w_sec = cfg.get("window_sec", 2.0)
         s_sec = cfg.get("stride_sec", 1.0)
-        ds = MILBagDataset(df, window_sec=w_sec, stride_sec=s_sec)
+        pad_to_sec = cfg.get("pad_to_sec", None)
+        ds = MILBagDataset(df, window_sec=w_sec, stride_sec=s_sec, pad_to_sec=pad_to_sec)
 
         print(f"Pre-computing {split_name} embeddings ...", flush=True)
         emb_cache = _precompute_embeddings(model, ds, device)

@@ -18,6 +18,9 @@ class MILBagDataset(Dataset):
         window_sec: Window length in seconds (default 2.0).
         stride_sec: Window stride in seconds (default 1.0).
         sample_rate: Target sample rate; audio is resampled if needed (default 16000).
+        pad_to_sec: If set, zero-pad audio to at least this many seconds after loading.
+            Useful for short TinyVox clips so they produce the same number of windows
+            as full-length training clips.
     """
 
     def __init__(
@@ -26,11 +29,13 @@ class MILBagDataset(Dataset):
         window_sec: float = 2.0,
         stride_sec: float = 1.0,
         sample_rate: int = 16000,
+        pad_to_sec: float | None = None,
     ) -> None:
         self.records = df.reset_index(drop=True)
         self.window_samples = int(window_sec * sample_rate)
         self.stride_samples = int(stride_sec * sample_rate)
         self.sample_rate = sample_rate
+        self.pad_samples = int(pad_to_sec * sample_rate) if pad_to_sec else None
 
     def __len__(self) -> int:
         return len(self.records)
@@ -54,6 +59,8 @@ class MILBagDataset(Dataset):
             wav = wav.mean(dim=0, keepdim=True)
         if sr != self.sample_rate:
             wav = torchaudio.functional.resample(wav, sr, self.sample_rate)
+        if self.pad_samples and wav.shape[1] < self.pad_samples:
+            wav = torch.nn.functional.pad(wav, (0, self.pad_samples - wav.shape[1]))
         return wav  # (1, T)
 
     def _make_windows(self, waveform: torch.Tensor) -> List[torch.Tensor]:

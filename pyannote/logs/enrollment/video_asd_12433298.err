@@ -1,0 +1,43 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+Resolved 86 packages in 1ms
+Checked 79 packages in 7ms
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 1121, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 1042, in main
+    val_role_df = run_role_only(val_df, frontend, cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 637, in run_role_only
+    dur = total_child_duration(row["audio_path"], frontend, cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 629, in total_child_duration
+    return float(sum(s["dur"] for s in frontend.get_segments(audio_path, cfg)))
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/video_asd.py", line 111, in get_segments
+    ok = _run_asd_subprocess([
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/video_asd.py", line 75, in _run_asd_subprocess
+    raise RuntimeError(
+RuntimeError: run_asd.py failed (exit 1) for /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-A1H3H9Y3T1/ses-01/beh/sub-A1H3H9Y3T1_ses-01_task-generalsocialcommunicationinteraction_run-03_audio.wav:
+--- stderr ---
+Traceback (most recent call last):
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/run_asd.py", line 721, in <module>
+    main()
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/run_asd.py", line 699, in main
+    segments = run_talknet_asd(
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/run_asd.py", line 410, in run_talknet_asd
+    embedA, embedV = model.model.forward_cross_attention(embedA, embedV)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/video/TalkNet-ASD/model/talkNetModel.py", line 47, in forward_cross_attention
+    x1_c = self.crossA2V(src = x1, tar = x2)
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/video/TS-TalkNet/model/attentionLayer.py", line 29, in forward
+    src = src + self.dropout1(src2)
+RuntimeError: The size of tensor a (25) must match the size of tensor b (30) at non-singleton dimension 0
+
+--- stdout ---
+Video: /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-A1H3H9Y3T1/ses-01/beh/sub-A1H3H9Y3T1_ses-01_task-generalsocialcommunicationinteraction_run-03_desc-processed_beh.mp4
+Device: cuda
+04-23 22:15:09 Model para number = 15.01
+

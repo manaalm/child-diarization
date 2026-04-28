@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 816, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 720, in main
+    frontend = build_frontend(args.diarizer, cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 674, in build_frontend
+    return BabARFrontend(cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 374, in __init__
+    raise FileNotFoundError(f"BabAR directory not found: {cfg.babar_dir}")
+FileNotFoundError: BabAR directory not found: 

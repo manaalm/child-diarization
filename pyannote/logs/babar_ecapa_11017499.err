@@ -1,0 +1,77 @@
+[2026.03.26 02:21:46] [INFO] - Found 2183 audio file(s). Device: cuda
+[2026.03.26 02:21:46] [INFO] - Step 1/2: Running VTC on 2183/2183 file(s) (0 already have RTTM)...
+[2026.03.26 02:21:46] [INFO] - Running inference on audio files.
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 314, in <module>
+    main()
+    ~~~~^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 299, in main
+    run_pipeline(
+    ~~~~~~~~~~~~^
+        wavs=args.wavs,
+        ^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        max_utt_dur=args.max_utt_dur,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 133, in run_pipeline
+    vtc_infer(
+    ~~~~~~~~~^
+        wavs=str(wavs),
+        ^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        device=device,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/VTC/scripts/infer.py", line 206, in main
+    processed_files = run_inference_on_audios(
+        config=config,
+    ...<9 lines>...
+        logger=logger,
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/inference.py", line 435, in run_inference_on_audios
+    model = Models[config.model.name].load_from_checkpoint(
+        checkpoint_path=checkpoint, label_encoder=l_encoder, config=config, train=False
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/lightning/pytorch/utilities/model_helpers.py", line 130, in wrapper
+    return self.method(cls_type, *args, **kwargs)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/lightning/pytorch/core/module.py", line 1797, in load_from_checkpoint
+    loaded = _load_from_checkpoint(
+        cls,
+    ...<5 lines>...
+        **kwargs,
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/lightning/pytorch/core/saving.py", line 65, in _load_from_checkpoint
+    checkpoint = pl_load(checkpoint_path, map_location=map_location, weights_only=weights_only)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/lightning/fabric/utilities/cloud_io.py", line 73, in _load
+    return torch.load(
+           ~~~~~~~~~~^
+        f,
+        ^^
+        map_location=map_location,  # type: ignore[arg-type]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        weights_only=weights_only,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/serialization.py", line 1572, in load
+    raise pickle.UnpicklingError(_get_wo_message(str(e))) from None
+_pickle.UnpicklingError: Weights only load failed. In PyTorch 2.6, we changed the default value of the `weights_only` argument in `torch.load` from `False` to `True`. Re-running `torch.load` with `weights_only` set to `False` will likely succeed, but it can result in arbitrary code execution. Do it only if you got the file from a trusted source.
+Please file an issue with the following so that we can make `weights_only=True` compatible with your use case: WeightsUnpickler error: 
+
+Unsupported operand 118
+
+Check the documentation of torch.load to learn more about types accepted by default with weights_only https://pytorch.org/docs/stable/generated/torch.load.html.
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 817, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 731, in main
+    frontend.prepare(all_audio)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 420, in prepare
+    subprocess.run(
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/subprocess.py", line 526, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['uv', 'run', 'src/pipeline.py', '--wavs', '/home/manaal/orcd/scratch/child-adult-diarization/babar/babar_output/_input_staging', '--output', '/home/manaal/orcd/scratch/child-adult-diarization/babar/babar_output', '--device', 'gpu', '--batch_size', '32']' returned non-zero exit status 1.

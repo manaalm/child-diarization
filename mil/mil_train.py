@@ -95,8 +95,9 @@ def train(cfg: dict) -> None:
 
     w_sec = cfg.get("window_sec", 2.0)
     s_sec = cfg.get("stride_sec", 1.0)
-    train_ds = MILBagDataset(train_df, window_sec=w_sec, stride_sec=s_sec)
-    val_ds = MILBagDataset(val_df, window_sec=w_sec, stride_sec=s_sec)
+    pad_to_sec = cfg.get("pad_to_sec", None)
+    train_ds = MILBagDataset(train_df, window_sec=w_sec, stride_sec=s_sec, pad_to_sec=pad_to_sec)
+    val_ds = MILBagDataset(val_df, window_sec=w_sec, stride_sec=s_sec, pad_to_sec=pad_to_sec)
 
     # ── Model ──────────────────────────────────────────────────────────────
     model = build_mil_model(cfg).to(device)

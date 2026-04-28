@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 818, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 722, in main
+    frontend = build_frontend(args.diarizer, cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 676, in build_frontend
+    return BabARFrontend(cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 374, in __init__
+    raise ValueError("--babar-dir is required when using the babar diarizer.")
+ValueError: --babar-dir is required when using the babar diarizer.

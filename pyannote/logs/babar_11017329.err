@@ -1,0 +1,165 @@
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 30, in <module>
+    from scripts.infer import main as vtc_infer
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/VTC/scripts/infer.py", line 10, in <module>
+    from segma.inference import get_list_of_files_to_process, run_inference_on_audios
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/inference.py", line 18, in <module>
+    from segma.utils.io import get_audio_info, get_samples_in_range
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/utils/io.py", line 5, in <module>
+    from torchcodec.decoders import AudioDecoder
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/__init__.py", line 12, in <module>
+    from . import decoders, encoders, samplers, transforms  # noqa
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/decoders/__init__.py", line 7, in <module>
+    from .._core import AudioStreamMetadata, VideoStreamMetadata
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/_core/__init__.py", line 8, in <module>
+    from ._metadata import (
+    ...<5 lines>...
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/_core/_metadata.py", line 16, in <module>
+    from torchcodec._core.ops import (
+    ...<3 lines>...
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py", line 109, in <module>
+    ffmpeg_major_version, core_library_path = load_torchcodec_shared_libraries()
+                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py", line 76, in load_torchcodec_shared_libraries
+    raise RuntimeError(
+    ...<16 lines>...
+    )
+RuntimeError: Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, and 8, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.10.0+cu128) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             table:
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+          3. Another runtime dependency; see exceptions below.
+
+        The following exceptions were raised as we tried to load libtorchcodec:
+        
+[start of libtorchcodec loading traceback]
+FFmpeg version 8:
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1442, in load_library
+    ctypes.CDLL(path)
+    ~~~~~~~~~~~^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 361, in __init__
+    self._handle = self._load_library(name, mode, handle, winmode)
+                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 401, in _load_library
+    return _dlopen(name, mode)
+OSError: libavutil.so.60: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1444, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/libtorchcodec_core8.so
+
+FFmpeg version 7:
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1442, in load_library
+    ctypes.CDLL(path)
+    ~~~~~~~~~~~^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 361, in __init__
+    self._handle = self._load_library(name, mode, handle, winmode)
+                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 401, in _load_library
+    return _dlopen(name, mode)
+OSError: libavutil.so.59: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1444, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/libtorchcodec_core7.so
+
+FFmpeg version 6:
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1442, in load_library
+    ctypes.CDLL(path)
+    ~~~~~~~~~~~^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 361, in __init__
+    self._handle = self._load_library(name, mode, handle, winmode)
+                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 401, in _load_library
+    return _dlopen(name, mode)
+OSError: libavutil.so.58: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1444, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/libtorchcodec_core6.so
+
+FFmpeg version 5:
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1442, in load_library
+    ctypes.CDLL(path)
+    ~~~~~~~~~~~^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 361, in __init__
+    self._handle = self._load_library(name, mode, handle, winmode)
+                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 401, in _load_library
+    return _dlopen(name, mode)
+OSError: libavutil.so.57: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1444, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/libtorchcodec_core5.so
+
+FFmpeg version 4:
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1442, in load_library
+    ctypes.CDLL(path)
+    ~~~~~~~~~~~^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 361, in __init__
+    self._handle = self._load_library(name, mode, handle, winmode)
+                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/orcd/home/002/manaal/miniforge3/envs/babar/lib/python3.13/ctypes/__init__.py", line 401, in _load_library
+    return _dlopen(name, mode)
+OSError: libavutil.so.56: cannot open shared object file: No such file or directory
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py", line 57, in load_torchcodec_shared_libraries
+    torch.ops.load_library(core_library_path)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 1444, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: /orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/libtorchcodec_core4.so
+[end of libtorchcodec loading traceback].
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 817, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 731, in main
+    frontend.prepare(all_audio)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 420, in prepare
+    subprocess.run(
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/subprocess.py", line 526, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['uv', 'run', 'src/pipeline.py', '--wavs', '/home/manaal/orcd/scratch/child-adult-diarization/babar/babar_output/_input_staging', '--output', '/home/manaal/orcd/scratch/child-adult-diarization/babar/babar_output', '--device', 'gpu', '--batch_size', '32']' returned non-zero exit status 1.

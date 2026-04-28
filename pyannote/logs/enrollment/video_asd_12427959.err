@@ -1,0 +1,48 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+Resolved 86 packages in 1ms
+Checked 79 packages in 9ms
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 1121, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 1042, in main
+    val_role_df = run_role_only(val_df, frontend, cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 637, in run_role_only
+    dur = total_child_duration(row["audio_path"], frontend, cfg)
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified.py", line 629, in total_child_duration
+    return float(sum(s["dur"] for s in frontend.get_segments(audio_path, cfg)))
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/video_asd.py", line 111, in get_segments
+    ok = _run_asd_subprocess([
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/video_asd.py", line 75, in _run_asd_subprocess
+    raise RuntimeError(
+RuntimeError: run_asd.py failed (exit 1) for /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-A1H3H9Y3T1/ses-01/beh/sub-A1H3H9Y3T1_ses-01_task-generalsocialcommunicationinteraction_run-03_audio.wav:
+--- stderr ---
+Traceback (most recent call last):
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/.venv/lib/python3.10/site-packages/torchaudio/_torchcodec.py", line 82, in load_with_torchcodec
+    from torchcodec.decoders import AudioDecoder
+ModuleNotFoundError: No module named 'torchcodec'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/run_asd.py", line 719, in <module>
+    main()
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/run_asd.py", line 697, in main
+    segments = run_talknet_asd(
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/run_asd.py", line 368, in run_talknet_asd
+    audio_np, sr = load_audio_16k(audio_path)
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/run_asd.py", line 97, in load_audio_16k
+    wav, sr = torchaudio.load(audio_path)
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/.venv/lib/python3.10/site-packages/torchaudio/__init__.py", line 86, in load
+    return load_with_torchcodec(
+  File "/home/manaal/orcd/scratch/child-adult-diarization/video/.venv/lib/python3.10/site-packages/torchaudio/_torchcodec.py", line 84, in load_with_torchcodec
+    raise ImportError(
+ImportError: TorchCodec is required for load_with_torchcodec. Please install torchcodec to use this function.
+
+--- stdout ---
+Video: /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-A1H3H9Y3T1/ses-01/beh/sub-A1H3H9Y3T1_ses-01_task-generalsocialcommunicationinteraction_run-03_desc-processed_beh.mp4
+Device: cuda
+04-23 20:42:55 Model para number = 15.01
+

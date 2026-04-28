@@ -1,0 +1,65 @@
+[2026.04.15 15:55:30] [INFO] - Found 2339 audio file(s). Device: cuda
+[2026.04.15 15:55:30] [INFO] - Step 1/2: Running VTC on 2339/2339 file(s) (0 already have RTTM)...
+[2026.04.15 15:55:30] [INFO] - Running inference on audio files.
+[2026.04.15 15:55:33] [INFO] - (   1/2339) - running inference for file: 'cameron_AAE_B3_26_47_PE_S22__ef712e4ffa273009a64b849791a98189'
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 314, in <module>
+    main()
+    ~~~~^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 299, in main
+    run_pipeline(
+    ~~~~~~~~~~~~^
+        wavs=args.wavs,
+        ^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        max_utt_dur=args.max_utt_dur,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 133, in run_pipeline
+    vtc_infer(
+    ~~~~~~~~~^
+        wavs=str(wavs),
+        ^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        device=device,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/VTC/scripts/infer.py", line 207, in main
+    processed_files = run_inference_on_audios(
+        config=config,
+    ...<9 lines>...
+        logger=logger,
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/inference.py", line 449, in run_inference_on_audios
+    infer_file(
+    ~~~~~~~~~~^
+        audio_path=audio_path,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        save_logits=save_logits,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/inference.py", line 322, in infer_file
+    logits_t = apply_model_on_audio(
+        audio_path=audio_path,
+    ...<4 lines>...
+        device=device,
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/inference.py", line 154, in apply_model_on_audio
+    raise ValueError(
+        f"Error during unfolding of audio tensor, got '{batch_t.shape[0]}', expected '{batch_size}' elements in the batch"
+    )
+ValueError: Error during unfolding of audio tensor, got '383', expected '128' elements in the batch
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified_rttm.py", line 834, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified_rttm.py", line 755, in main
+    frontend.prepare([ap for ap, _ in pairs])
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified_rttm.py", line 604, in prepare
+    subprocess.run(cmd, cwd=self.cfg.babar_dir, check=True)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/subprocess.py", line 526, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['uv', 'run', 'src/pipeline.py', '--wavs', '/home/manaal/orcd/scratch/child-adult-diarization/babar/babar_output/_input_staging', '--output', '/home/manaal/orcd/scratch/child-adult-diarization/babar/babar_output', '--device', 'gpu', '--batch_size', '1']' returned non-zero exit status 1.

@@ -1,0 +1,95 @@
+[2026.04.16 16:49:37] [INFO] - Found 2339 audio file(s). Device: cuda
+[2026.04.16 16:49:37] [INFO] - Step 1/2: Running VTC on 2339/2339 file(s) (0 already have RTTM)...
+[2026.04.16 16:49:37] [INFO] - Running inference on audio files.
+[2026.04.16 16:49:38] [INFO] - (   1/2339) - running inference for file: 'cameron_AAE_B3_26_47_PE_S22__ef712e4ffa273009a64b849791a98189'
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 314, in <module>
+    main()
+    ~~~~^^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 299, in main
+    run_pipeline(
+    ~~~~~~~~~~~~^
+        wavs=args.wavs,
+        ^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        max_utt_dur=args.max_utt_dur,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/src/pipeline.py", line 133, in run_pipeline
+    vtc_infer(
+    ~~~~~~~~~^
+        wavs=str(wavs),
+        ^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        device=device,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/VTC/scripts/infer.py", line 207, in main
+    processed_files = run_inference_on_audios(
+        config=config,
+    ...<9 lines>...
+        logger=logger,
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/inference.py", line 453, in run_inference_on_audios
+    infer_file(
+    ~~~~~~~~~~^
+        audio_path=audio_path,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        save_logits=save_logits,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/inference.py", line 326, in infer_file
+    logits_t = apply_model_on_audio(
+        audio_path=audio_path,
+    ...<4 lines>...
+        device=device,
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/inference.py", line 144, in apply_model_on_audio
+    sub_audio_t = prepare_audio(
+        audio_path,
+    ...<3 lines>...
+        end_f=end_f,
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/inference.py", line 112, in prepare_audio
+    sub_audio_t = get_samples_in_range(
+        audio_p=audio_path, start_f=start_f, duration_f=num_frames
+    )
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/segma/utils/io.py", line 42, in get_samples_in_range
+    return decoder.get_samples_played_in_range(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        start_seconds=frames_to_seconds(start_f),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        else frames_to_seconds(start_f + duration_f),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).data
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torchcodec/decoders/_audio_decoder.py", line 137, in get_samples_played_in_range
+    frames, first_pts = core.get_frames_by_pts_in_range_audio(
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self._decoder,
+        ^^^^^^^^^^^^^^
+        start_seconds=start_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        stop_seconds=stop_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/BabAR/.venv/lib/python3.13/site-packages/torch/_ops.py", line 819, in __call__
+    return self._op(*args, **kwargs)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^
+RuntimeError: No audio frames were decoded. This is probably because start_seconds is too high(3056.64),or because stop_seconds(3566.1) is too low.
+Traceback (most recent call last):
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified_rttm.py", line 834, in <module>
+    main()
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified_rttm.py", line 755, in main
+    frontend.prepare([ap for ap, _ in pairs])
+  File "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pyannote/unified_rttm.py", line 604, in prepare
+    subprocess.run(cmd, cwd=self.cfg.babar_dir, check=True)
+  File "/home/manaal/miniforge3/envs/child-vocalizations/lib/python3.10/subprocess.py", line 526, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['uv', 'run', 'src/pipeline.py', '--wavs', '/home/manaal/orcd/scratch/child-adult-diarization/babar/babar_output/_input_staging', '--output', '/home/manaal/orcd/scratch/child-adult-diarization/babar/babar_output', '--device', 'gpu', '--batch_size', '1']' returned non-zero exit status 1.
