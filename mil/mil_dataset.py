@@ -42,7 +42,9 @@ class MILBagDataset(Dataset):
 
     def __getitem__(self, idx: int) -> Dict:
         row = self.records.iloc[idx]
-        waveform = self._load_audio(str(row["audio_path"]))
+        start_sec = float(row["start_sec"]) if "start_sec" in row and pd.notna(row["start_sec"]) else None
+        end_sec   = float(row["end_sec"])   if "end_sec"   in row and pd.notna(row["end_sec"])   else None
+        waveform = self._load_audio(str(row["audio_path"]), start_sec, end_sec)
         windows = self._make_windows(waveform)
         return {
             "windows": windows,
@@ -52,9 +54,20 @@ class MILBagDataset(Dataset):
             "audio_path": str(row["audio_path"]),
         }
 
-    def _load_audio(self, path: str) -> torch.Tensor:
-        """Load audio as (1, T) mono tensor at self.sample_rate."""
-        wav, sr = torchaudio.load(path)
+    def _load_audio(self, path: str, start_sec: float | None = None, end_sec: float | None = None) -> torch.Tensor:
+        """Load audio as (1, T) mono tensor at self.sample_rate.
+
+        If start_sec/end_sec are given, loads only that slice (used for hard-negative
+        windows extracted from long Playlogue/Providence recordings).
+        """
+        if start_sec is not None:
+            info = torchaudio.info(path)
+            sr_native = info.sample_rate
+            frame_offset = int(start_sec * sr_native)
+            num_frames = int((end_sec - start_sec) * sr_native) if end_sec is not None else -1
+            wav, sr = torchaudio.load(path, frame_offset=frame_offset, num_frames=num_frames)
+        else:
+            wav, sr = torchaudio.load(path)
         if wav.shape[0] > 1:
             wav = wav.mean(dim=0, keepdim=True)
         if sr != self.sample_rate:

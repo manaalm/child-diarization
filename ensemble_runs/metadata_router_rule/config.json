@@ -1,0 +1,19 @@
+{
+  "sub_feature": "A_rule",
+  "rule_distribution": {
+    "n_children_eq1\u2192vtc": 338,
+    "n_children_ge2\u2192whisper_mil": 86,
+    "n_adults_ge2\u2192mean(wavlm_mil,eend_eda)": 15,
+    "default\u2192mean(babar,vtc,wavlm_mil,whisper_mil)": 2
+  },
+  "val_threshold": 0.15499999999999997,
+  "seed": 42,
+  "created": "2026-04-28",
+  "rules": [
+    "context_unknown\u2192sortformer",
+    "n_adults_ge2\u2192mean(wavlm_mil,eend_eda)",
+    "n_children_ge2\u2192whisper_mil",
+    "n_children_eq1\u2192vtc",
+    "default\u2192mean(babar,vtc,wavlm_mil,whisper_mil)"
+  ]
+}

@@ -918,14 +918,14 @@ def run_loconet_asd(
         if not all_frame_scores:
             return []
 
-        # Average scores per frame, threshold at 0.5, merge into segments
+        # Average scores per frame; threshold=0.0 (logit decision boundary, not probability)
         n_frames_total = len(face_frames)
         frame_scores = np.zeros(n_frames_total, dtype=np.float32)
         for fi, sc_list in all_frame_scores.items():
             if fi < n_frames_total:
                 frame_scores[fi] = float(np.mean(sc_list))
 
-        segments = _scores_to_segments(frame_scores, fps_vid, min_seg_dur, threshold=0.5)
+        segments = _scores_to_segments(frame_scores, fps_vid, min_seg_dur, threshold=0.0)
         return segments
 
     except Exception as e:
@@ -1158,7 +1158,7 @@ def run_loconet_asd_per_track(
                 if frame_i < n_frames_total:
                     frame_scores[frame_i] = float(np.mean(sc_list))
 
-            segs = _scores_to_segments(frame_scores, fps_vid, min_seg_dur, threshold=0.5)
+            segs = _scores_to_segments(frame_scores, fps_vid, min_seg_dur, threshold=0.0)
             results.append({
                 "track_id": ti,
                 "mean_area": _track_area(track),

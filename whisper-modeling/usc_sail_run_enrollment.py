@@ -332,7 +332,8 @@ def build_child_prototypes(train_df: pd.DataFrame, embedder: ECAPAEmbedder, cfg:
 
     pos_train = train_df[train_df["label"] == 1].copy()
 
-    for child_id, sub in pos_train.groupby("child_id"):
+    for (child_id, timepoint), sub in pos_train.groupby(["child_id", "timepoint_norm"]):
+        proto_key = f"{child_id}__{timepoint}"
         all_pairs: List[Tuple[np.ndarray, float]] = []
 
         for _, row in sub.iterrows():
@@ -347,6 +348,7 @@ def build_child_prototypes(train_df: pd.DataFrame, embedder: ECAPAEmbedder, cfg:
         if len(all_pairs) == 0:
             stats.append({
                 "child_id": child_id,
+                "timepoint_norm": timepoint,
                 "n_segments": 0,
                 "status": "no_valid_segments",
             })
@@ -356,10 +358,11 @@ def build_child_prototypes(train_df: pd.DataFrame, embedder: ECAPAEmbedder, cfg:
         embs = np.stack([e for e, _ in all_pairs], axis=0)
         weights = np.array([d for _, d in all_pairs])
         proto = np.average(embs, axis=0, weights=weights)
-        prototypes[child_id] = l2_normalize(proto)
+        prototypes[proto_key] = l2_normalize(proto)
 
         stats.append({
             "child_id": child_id,
+            "timepoint_norm": timepoint,
             "n_segments": int(len(all_pairs)),
             "status": "ok",
         })
@@ -428,6 +431,7 @@ def role_df_to_pred_df(role_df: pd.DataFrame, threshold_sec: float):
 def score_clip_with_enrollment(
     audio_path: str,
     target_child_id: str,
+    timepoint_norm: str,
     prototypes: Dict[str, np.ndarray],
     embedder: ECAPAEmbedder,
     cfg: Config,
@@ -437,7 +441,8 @@ def score_clip_with_enrollment(
     enrolled prototype.  Returns 0.0 if the child has no prototype
     (unseen split) or if no valid child segments are found.
     """
-    if target_child_id not in prototypes:
+    proto_key = f"{target_child_id}__{timepoint_norm}"
+    if proto_key not in prototypes:
         return 0.0
 
     # Load audio once and pass to extract_segment_embeddings
@@ -447,7 +452,7 @@ def score_clip_with_enrollment(
     if len(emb_dur_pairs) == 0:
         return 0.0
 
-    proto = prototypes[target_child_id]
+    proto = prototypes[proto_key]
     scored = [(cosine_similarity(emb, proto), dur) for emb, dur in emb_dur_pairs]
 
     # Duration-weighted mean similarity
@@ -461,6 +466,7 @@ def run_enrollment(df: pd.DataFrame, prototypes: Dict[str, np.ndarray], embedder
         score = score_clip_with_enrollment(
             audio_path=row["audio_path"],
             target_child_id=row["child_id"],
+            timepoint_norm=row["timepoint_norm"],
             prototypes=prototypes,
             embedder=embedder,
             cfg=cfg,

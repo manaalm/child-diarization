@@ -137,7 +137,7 @@ to include all TinyVox languages or lower the floor).
   val AUROC=0.500 at all epochs (early stop at epoch 6). Root cause: continued pretraining
   on child-only data caused catastrophic forgetting of adult speech representations;
   backbone can no longer distinguish child from adult clips. Results: mil/mil_results/wavlm_mil_child_adapted/
-- [ ] T034 [US3] BLOCKED by T033 negative result: baseline wavlm_mil (AUROC=0.771) is
+- [x] T034 [US3] DONE (documented, no eval needed): baseline wavlm_mil (AUROC=0.771) is
   clearly superior to child-adapted (AUROC=0.500). Skip eval_mil.sh for child-adapted;
   document as thesis finding: child-adapted pretraining hurts MIL discrimination.
 

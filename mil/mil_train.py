@@ -91,6 +91,21 @@ def train(cfg: dict) -> None:
     # ── Data ───────────────────────────────────────────────────────────────
     train_df = load_split(cfg["split_dir"], "train")
     val_df = load_split(cfg["split_dir"], "val")
+
+    extra_neg_csv = cfg.get("extra_negatives_csv")
+    if extra_neg_csv:
+        extra_path = os.path.join(_REPO, extra_neg_csv)
+        extra_df = pd.read_csv(extra_path)
+        # Sub-sample to at most `extra_negatives_cap` rows (default: match original neg count)
+        cap = cfg.get("extra_negatives_cap", len(train_df[train_df["label"] == 0]))
+        if len(extra_df) > cap:
+            extra_df = extra_df.sample(n=cap, random_state=cfg["seed"])
+        train_df = pd.concat([train_df, extra_df], ignore_index=True)
+        n_orig_neg = (train_df["label"] == 0).sum() - len(extra_df)
+        print(f"Extra negatives: {len(extra_df)} rows from {extra_neg_csv}", flush=True)
+        print(f"  New train label dist: pos={( train_df['label']==1).sum()} "
+              f"neg={(train_df['label']==0).sum()}", flush=True)
+
     print(f"Train clips: {len(train_df)}  |  Val clips: {len(val_df)}", flush=True)
 
     w_sec = cfg.get("window_sec", 2.0)

@@ -114,10 +114,7 @@ on manifests from this phase.
 - [X] T011 [P] Run prepare_age_manifests.py for Playlogue:
   `python scripts/prepare_age_manifests.py --dataset playlogue` →
   playlogue/manifest.csv (2183 records: 12_16m=1165, 34_38m=1018)
-- [ ] T012 Run prepare_age_manifests.py for Seedlings (requires Databrary credentials
-  via seedlings_import.py):
-  `python scripts/prepare_age_manifests.py --dataset seedlings` →
-  seedlings/manifest.csv
+- [x] T012 CANCELLED — Seedlings .cha transcripts inaccessible (Databrary credentials required but not obtained); dataset scrapped. Playlogue + Providence sufficient (12_16m=1184, 34_38m=1028 PASS).
 - [X] T013 Run summarize_age_manifests.py to validate all manifests; confirm ≥ 500
   per age group: 12_16m=1184 PASS, 34_38m=1028 PASS (Seedlings excluded, Databrary req'd)
 
@@ -335,10 +332,7 @@ config run.
   thesis_tables.yaml, load each referenced JSON/CSV result file, assemble rows into
   per-table CSV outputs under evaluation/thesis_tables/; exit 1 with missing-file
   report if any required result file is absent; never manually construct numeric values
-- [ ] T054 [US4] Run pyannote/proxy_analysis.py on core dataset:
-  `python pyannote/proxy_analysis.py --core-dir core/audio/
-  --prototype-dir pyannote/age_group_prototypes/
-  --output-dir pyannote/core_proxy_analysis/`
+- [x] T054 [US4] CANCELLED — core/ dataset not accessible on this cluster (stretch goal, no mount available). Proxy analysis not required for thesis.
 - [x] T055 [US4] Run evaluation/aggregate_thesis_tables.py (2026-04-27): 11/13 tables complete (4/4 rows); table7_synthesis_eval blocked on synthesis TTS training; table8_augmentation_eval complete with null result (all ratios identical). Tables written to evaluation/thesis_tables/.
 - [x] T056 [US4] SC-006 verified: all thesis_tables/ CSVs sourced from committed result JSONs/CSVs via thesis_tables.yaml; table8 documents null result with _note field tracing to synth_results/augmentation_experiments/default_14_18mo/metrics_by_ratio.csv.
 - [x] T057 [US4] verify_reproducibility.py run (2026-04-27): 8 PASS / 0 FAIL / 0 MISSING across all baseline + enrollment result folders. Report: evaluation/reproducibility_report.txt
@@ -423,8 +417,8 @@ reproducibility verified — thesis pipeline complete.
 ### 8f: LocoNet + ECAPA Speaker Identity Frontend
 
 - [X] T094 [US1] Implement `LocoNetECAPAFrontend` in `pyannote/video_asd.py` + `run_loconet_asd_per_track()` in `video/run_asd.py`: per-track LocoNet inference with `--output_tracks_json`, ECAPA speaker identity matching (speechbrain EncoderClassifier), smallest-face fallback; registered as `loconet_ecapa` in `pyannote/unified.py` with `video_loconet_checkpoint` config field; SLURM submission script at `pyannote/run_loconet_ecapa_enrollment.sh`
-- [ ] T095 [P] [US1] Run LocoNet ECAPA enrollment on seen-child split: SLURM job 12618406 (`sbatch pyannote/run_loconet_ecapa_enrollment.sh`, 24h); results to `video_asd_ecapa_enrollment_runs/loconet_ecapa/`
-- [ ] T096 [P] [US1] Log LocoNet ECAPA enrollment metrics in CLAUDE.md results table (F1/AUROC/AUPRC) once T095 completes
+- [x] T095 [P] [US1] Run LocoNet ECAPA enrollment on seen-child split: SLURM job 12696180 completed; results at `video_asd_ecapa_enrollment_runs/loconet_ecapa/`
+- [x] T096 [P] [US1] Log LocoNet ECAPA enrollment metrics in CLAUDE.md results table — NEGATIVE RESULT: F1=0.000, AUROC=0.500 (face detection failure on all 109 children → empty prototypes)
 
 ### 8g: Audio LLM Zero-Shot Baseline (spec-010)
 

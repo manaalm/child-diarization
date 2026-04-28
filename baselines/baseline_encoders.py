@@ -34,6 +34,9 @@ from sklearn.metrics import (
 class Config:
     annotations_csv: str = "/orcd/scratch/bcs/001/sensein/sails/BIDS_data/anotated_processed.csv"
     results_root: str = "./baseline_results"
+    # Seen-child split mode: reads pre-made train/val/test.csv from seen_child_split_dir
+    seen_child_splits: bool = False
+    seen_child_split_dir: str = "whisper-modeling/seen_child_splits"
 
     # --- NEW: model_type now supports "fused" ---
     model_type: str = "whisper"   # "whisper", "wavlm", or "fused"
@@ -225,7 +228,25 @@ def make_reusable_group_split(
     return full
 
 
+def load_seen_child_split(cfg: Config) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Load pre-generated seen-child splits (within-child, 109 children across train/val/test)."""
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    split_dir = os.path.join(repo_root, cfg.seen_child_split_dir)
+
+    def _read(name):
+        df = pd.read_csv(os.path.join(split_dir, f"{name}.csv"))
+        if "audio_exists" in df.columns:
+            df = df[df["audio_exists"] == True].copy()
+        df["timepoint_feature"] = df["timepoint_norm"].map({"14_month": 0.0, "36_month": 1.0})
+        return df.reset_index(drop=True)
+
+    return _read("train"), _read("val"), _read("test")
+
+
 def load_or_create_split(cfg: Config) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    if cfg.seen_child_splits:
+        return load_seen_child_split(cfg)
+
     split_master = os.path.join(cfg.split_dir, "master_with_split.csv")
     if os.path.exists(split_master):
         full = pd.read_csv(split_master)
@@ -1125,8 +1146,25 @@ def _save_layer_weights(model, cfg, exp_dir):
 # =========================================================
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seen-child", action="store_true",
+                        help="Use seen-child splits from whisper-modeling/seen_child_splits/")
+    parser.add_argument("--results-root", default=None,
+                        help="Override results output directory")
+    parser.add_argument("--all-experiments", action="store_true",
+                        help="Run all experiment phases (default: only last phase)")
+    args = parser.parse_args()
+
+    if args.seen_child:
+        CFG.seen_child_splits = True
+        CFG.results_root = args.results_root or "./baseline_results_seen_child"
+    elif args.results_root:
+        CFG.results_root = args.results_root
+
     os.makedirs(CFG.results_root, exist_ok=True)
-    os.makedirs(CFG.split_dir, exist_ok=True)
+    if not CFG.seen_child_splits:
+        os.makedirs(CFG.split_dir, exist_ok=True)
 
     train_df, val_df, test_df = load_or_create_split(CFG)
 
@@ -1204,10 +1242,11 @@ def main():
                 save_path=os.path.join(CFG.results_root, "whisper_attn_aug_ptt", "best_model.pt")),
     ]
 
-    # Skip phases already completed
-    # all_experiments = baselines + layer_weighted + lw_stats + fused + unfrozen + no_new_params
-    # all_experiments = baselines + fused + unfrozen + no_new_params
-    all_experiments = no_new_params
+    if args.all_experiments or CFG.seen_child_splits:
+        all_experiments = baselines + layer_weighted + lw_stats + fused + unfrozen + no_new_params
+    else:
+        # Default: only run the last-added phase
+        all_experiments = no_new_params
 
     for exp_cfg in all_experiments:
         print("\n" + "=" * 80)

@@ -129,11 +129,12 @@
 
 - [X] T022 Implement `run_loconet_asd_per_track()` in `video/run_asd.py` with `--output_tracks_json` flag — runs LocoNet independently on every face track, returns per-track JSON with `{track_id, mean_area, segments:[{start,end}]}`; wired into `--model loconet` branch alongside existing smallest-face RTTM output
 - [X] T023 Implement `LocoNetECAPAFrontend` in `pyannote/video_asd.py` — loads ECAPA via speechbrain on init; checks/fills per-track JSON cache via `run_asd.py --output_tracks_json`; embeds reference audio and each track's active speech segments; picks best-cosine-similarity track as target child; falls back to smallest-face when no reference available; registered as `loconet_ecapa` in `pyannote/unified.py` with `video_loconet_checkpoint` config field
-- [ ] T024 Run LocoNet ECAPA enrollment: `sbatch pyannote/run_loconet_ecapa_enrollment.sh` (SLURM job 12615544, 24h); results to `video_asd_ecapa_enrollment_runs/loconet_ecapa/` with `enroll_test_metrics.json`
-- [ ] T025 [P] Log LocoNet ECAPA enrollment results in CLAUDE.md results table (F1/AUROC/AUPRC) once T024 completes
-- [ ] T026 [P] TS-TalkNet checkpoint acquisition: contact `jiang_yidi@outlook.com` for `video/pretrain/ts_talknet.model` and `video/TS-TalkNet/exps/pretrain.model`; once received, run `sbatch pyannote/run_ts_talknet_enrollment.sh`; results to `video_asd_ecapa_enrollment_runs/ts_talknet/`
+- [x] T024 Run LocoNet ECAPA enrollment: SLURM job 12696180 completed; results at `video_asd_ecapa_enrollment_runs/loconet_ecapa/`; NEGATIVE: F1=0.000, AUROC=0.500 (threshold bug + domain mismatch)
+- [x] T025 [P] Log LocoNet ECAPA enrollment results in CLAUDE.md results table — NEGATIVE RESULT: F1=0.000, AUROC=0.500 (face detection works but domain mismatch makes all logits uniformly negative)
+- [x] T026 Fine-tune TalkNet-ASD for clip-level child vocalization detection (replaces TS-TalkNet): SLURM job 12750229 completed — NEGATIVE RESULT: test AUROC=0.523, F1=0.863 (degenerate, recall=1.0 at threshold=0.01); results at `video_finetuned_talknet_runs/`
+- [x] T027 Log fine-tuned TalkNet results in CLAUDE.md results table — NEGATIVE RESULT: F1=0.863, AUROC=0.523, AUPRC=0.763 (degenerate classifier; ASD backbone trained on Hollywood ASD data has severe domain mismatch for SAILS BIDS home video)
 
-**Checkpoint**: LocoNet ECAPA enrollment results committed; TS-TalkNet checkpoint acquired or acquisition documented.
+**Checkpoint**: LocoNet ECAPA enrollment results committed; fine-tuned TalkNet results committed.
 
 ---
 

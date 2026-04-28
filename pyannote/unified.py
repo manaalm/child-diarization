@@ -562,12 +562,16 @@ def build_child_prototypes(
     embedder: SpeakerEmbedder,
     cfg: BaseConfig,
 ):
+    # Key prototypes by (child_id, timepoint_norm) so that 14-month and
+    # 36-month recordings are not pooled — the child's voice changes substantially
+    # between age bands.
     prototypes: Dict[str, np.ndarray] = {}
     stats = []
 
     pos_train = train_df[train_df["label"] == 1].copy()
 
-    for child_id, sub in pos_train.groupby("child_id"):
+    for (child_id, timepoint), sub in pos_train.groupby(["child_id", "timepoint_norm"]):
+        proto_key = f"{child_id}__{timepoint}"
         all_pairs: List[Tuple[np.ndarray, float]] = []
 
         for _, row in sub.iterrows():
@@ -580,14 +584,16 @@ def build_child_prototypes(
                 break
 
         if not all_pairs:
-            stats.append({"child_id": child_id, "n_segments": 0, "status": "no_valid_segments"})
+            stats.append({"child_id": child_id, "timepoint_norm": timepoint,
+                          "n_segments": 0, "status": "no_valid_segments"})
             continue
 
         embs = np.stack([e for e, _ in all_pairs])
         weights = np.array([d for _, d in all_pairs])
         proto = np.average(embs, axis=0, weights=weights)
-        prototypes[child_id] = l2_normalize(proto)
-        stats.append({"child_id": child_id, "n_segments": len(all_pairs), "status": "ok"})
+        prototypes[proto_key] = l2_normalize(proto)
+        stats.append({"child_id": child_id, "timepoint_norm": timepoint,
+                      "n_segments": len(all_pairs), "status": "ok"})
 
     return prototypes, pd.DataFrame(stats)
 
@@ -597,12 +603,14 @@ def build_child_prototypes(
 def score_clip(
     audio_path: str,
     target_child_id: str,
+    timepoint_norm: str,
     prototypes: Dict[str, np.ndarray],
     frontend: DiarizationFrontend,
     embedder: SpeakerEmbedder,
     cfg: BaseConfig,
 ) -> float:
-    if target_child_id not in prototypes:
+    proto_key = f"{target_child_id}__{timepoint_norm}"
+    if proto_key not in prototypes:
         return 0.0
 
     segs = frontend.get_segments(audio_path, cfg)
@@ -610,7 +618,7 @@ def score_clip(
         return 0.0
 
     wav = load_audio_mono(audio_path, cfg.sample_rate)
-    proto = prototypes[target_child_id]
+    proto = prototypes[proto_key]
 
     scored: List[Tuple[float, float]] = []
     for seg in segs:
@@ -639,7 +647,7 @@ def run_enrollment(
 ) -> pd.DataFrame:
     rows = []
     for _, row in df.iterrows():
-        s = score_clip(row["audio_path"], row["child_id"], prototypes, frontend, embedder, cfg)
+        s = score_clip(row["audio_path"], row["child_id"], row["timepoint_norm"], prototypes, frontend, embedder, cfg)
         rows.append({
             "audio_path": row["audio_path"],
             "child_id": row["child_id"],

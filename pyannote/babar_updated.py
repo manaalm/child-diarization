@@ -380,7 +380,8 @@ def build_child_prototypes(
     prototypes = {}
     pos_train = train_df[train_df["label"] == 1]
 
-    for child_id, sub in pos_train.groupby("child_id"):
+    for (child_id, timepoint), sub in pos_train.groupby(["child_id", "timepoint_norm"]):
+        proto_key = f"{child_id}__{timepoint}"
         all_pairs = []
 
         for _, row in sub.iterrows():
@@ -412,7 +413,7 @@ def build_child_prototypes(
         embs = np.stack([e for e, _ in all_pairs])
         weights = np.array([d for _, d in all_pairs])
         proto = np.average(embs, axis=0, weights=weights)
-        prototypes[child_id] = l2_normalize(proto)
+        prototypes[proto_key] = l2_normalize(proto)
 
     return prototypes
 
@@ -447,8 +448,9 @@ def extract_all_features(
         phon_path = find_babar_phonemes(ap, babar_output_dir)
         phon_rows = parse_phoneme_csv(phon_path)
 
-        # Get prototype for this child
-        proto = prototypes.get(child_id, None)
+        # Get prototype for this child at this timepoint
+        proto_key = f"{child_id}__{row['timepoint_norm']}"
+        proto = prototypes.get(proto_key, None)
 
         # Extract feature groups
         diar_feats = extract_diarizer_features(segs, clip_dur)

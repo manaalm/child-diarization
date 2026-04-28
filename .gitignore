@@ -64,3 +64,20 @@ synth_results/synthetic_scenes/wav/
 synth_results/synthetic_scenes/rttm/
 synth_results/synthetic_scenes/json/
 *.npy
+*.npz
+
+# External dependency repos (cloned separately — see CLAUDE.md)
+BabAR/
+VBx/
+
+# Temp/staging files
+recover.txt
+pyannote/vtc_input_staging/
+playlogue/audio/
+playlogue/trimmed/
+playlogue/cookies.txt
+playlogue/dscore/
+playlogue/playlogue_hf/
+providence/
+seedlings/
+synth_results/child_wavlm_checkpoint/

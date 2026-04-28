@@ -4,7 +4,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Child-adult speaker diarization system that classifies speakers (silence, child, adult, overlap) in audio recordings at 20ms frame-level resolution. Based on ICASSP 2025 / Interspeech 2024 papers by Xu et al.
 
 The goal is per-clip child presence detection: given a short audio clip, predict whether a target child is vocalizing. A synthetic scene generator (`synth/`) produces augmented training data by mixing Providence child speech and LibriSpeech adult speech under configurable SNR, RIR, overlap, and scene-type distributions. Nine diarization frontends are compared:
 1. **USC-SAIL** — Fine-tuned Whisper + LoRA frame classifier (`whisper-modeling/`)
@@ -13,7 +12,7 @@ The goal is per-clip child presence detection: given a short audio clip, predict
 4. **VTC** — VTC 2.0 standalone (no BabAR phoneme step); two variants: `vtc` (KCHI+OCH) and `vtc_kchi` (KCHI only)
 5. **VBx** — Variational Bayes HMM speaker diarization using pyannote VAD + ECAPA embeddings; anonymous speaker labels resolved via cosine similarity to target-child prototype
 6. **TalkNet-ASD** — Video-audio active speaker detection (SAILS BIDS .mp4 only); child identified as smallest face track
-7. **TS-TalkNet** — Speaker-conditioned video-audio ASD; uses a reference clip from the training split for target-child enrollment
+7. **Fine-tuned TalkNet** — TalkNet-ASD backbone fine-tuned for clip-level child vocalization (replaces TS-TalkNet, whose checkpoint was unavailable); phase 1 freezes backbone + trains clip-level pooling head; phase 2 full fine-tune; AV path for clips with cached face tracks, audio-only fallback; `video/talknet_child_finetune.py`
 8. **EEND-EDA** — End-to-End Neural Diarization with Encoder-Decoder Attractors (ESPnet2); handles overlapping speech natively; anonymous speaker labels resolved via ECAPA cosine similarity
 9. **Sortformer** — Sort-based transformer diarization (NeMo/NVIDIA); anonymous speaker labels resolved via ECAPA cosine similarity
 10. **Audio LLM Baseline** — Qwen2-Audio-7B-Instruct zero-shot child vocalization detection (`baselines/audio_llm_baseline.py`); prompted "Is there a child vocalizing?" → yes/no logit ratio → threshold-tuned on val
@@ -242,6 +241,14 @@ python av_fusion/scripts/extract_asd_features.py \
 python av_fusion/scripts/1kd_integration.py \
   --data-dir /path/to/1kd/ \
   --output av_fusion/av_results/manual_only/1kd_integration_report.json
+
+# Fine-tune TalkNet-ASD for child vocalization (replaces TS-TalkNet)
+# Pretrained checkpoint auto-downloads; face crops precomputed from video_face_cache/
+sbatch video/slurm/run_talknet_finetune.sh
+# Output: video_finetuned_talknet_runs/{best_checkpoint.pt, val/test_metrics_tuned.json,
+#          test_predictions.csv, config.json}
+# Manual run (from video/):
+# .venv/bin/python talknet_child_finetune.py --skip-precompute  # if crops already cached
 ```
 
 ### Audio LLM Zero-Shot Baseline (`baselines/audio_llm_baseline.py`)
@@ -267,6 +274,53 @@ sbatch baselines/slurm/run_audio_llm_baseline.sh test qwen2_audio_7b_2shot 2
 python baselines/audio_llm_baseline.py --split val --max-clips 10 \
   --output-dir /tmp/audio_llm_smoke --cache-dir /tmp/audio_llm_cache_smoke --seed 42
 ```
+
+### Metadata-Conditioned Routing and Ensemble Extensions (spec-012)
+
+CPU-only (US1/US2) and GPU SLURM (US3/US4) experiments extending the ensemble pipeline with BIDS metadata.
+
+```bash
+# Verify all 10 system prediction files are loadable (exits 0 if clean)
+python evaluation/metadata_router.py --verify
+
+# US1: Metadata-augmented LR/GBM stacker (train on val, eval on test, ~1 min)
+python evaluation/metadata_router.py --mode stack
+# Output: ensemble_runs/metadata_stack/{test_metrics_tuned.json, feature_importances.json,
+#          test_predictions.csv, val_metrics_tuned.json, config.json}
+
+# US2: Rule-based + learned metadata router (~1 min)
+python evaluation/metadata_router.py --mode router
+# Output: ensemble_runs/metadata_router_rule/  +  ensemble_runs/metadata_router_learned/
+#         (same file layout as above; config.json includes routed_system distribution)
+
+# Run both US1 and US2 together:
+python evaluation/metadata_router.py --mode all
+
+# US3: Multi-child FP suppressor (requires GPU, ~30 min)
+python evaluation/multi_child_suppressor.py --dry-run   # print stratum size, no training
+sbatch evaluation/slurm/run_multi_child_suppressor.sh
+# Output: mil/mil_results/multi_child_suppressor/{test_metrics_multi_child_only.json,
+#          test_metrics_single_child_only.json, test_metrics_tuned.json,
+#          test_predictions.csv, emb_cache.npz, config.json}
+
+# US4: Short-vocalization specialized head (requires GPU, ~4h)
+python evaluation/short_voc_head.py --dry-run           # print short-voc clip counts, no training
+sbatch evaluation/slurm/run_short_voc_head.sh
+# Output: mil/mil_results/short_voc_head/{best_checkpoint.pt, test_metrics_short_voc_clips.json,
+#          test_metrics_non_short_voc_clips.json, test_metrics_tuned.json,
+#          test_predictions.csv, config.json}
+```
+
+**Key results (spec-012):**
+
+| Config | F1 | AUROC | delta_F1 | delta_AUROC |
+|---|---|---|---|---|
+| Baseline (best_audio_mil mean) | 0.893 | 0.878 | — | — |
+| Metadata stacker (US1) | 0.901 | 0.900 | +0.009 | +0.022 |
+| Rule router (US2) | 0.883 | 0.705 | −0.010 | −0.173 |
+| Learned router (US2) | 0.873 | 0.731 | −0.020 | −0.147 |
+| Multi-child suppressor (US3) | TBD (SLURM) | TBD | — | — |
+| Short-voc head (US4) | TBD (SLURM) | TBD | — | — |
 
 ### Synthetic Data Generator (`synth/`)
 
@@ -380,6 +434,36 @@ python mil/mil_age_stratified.py \
 # Output: mil/mil_results/{variant}/age_stratified/{age_group}/test_metrics_tuned.json
 ```
 
+### Hard-negative MIL (balanced negatives from RTTM)
+
+Addresses class imbalance in the training split (73.8% positive). Extracts 30s windows from
+Playlogue/Providence RTTM files where CHI is silent but ≥3s of non-silence is active — these
+are harder negatives than silent windows since a speaker is present but not the target child.
+Brings pos:neg ratio from 967:344 (~2.8:1) down to 967:967 (1:1).
+
+```bash
+# Step 1: extract hard-negative windows (run inside 4-step SLURM script below, or manually)
+python mil/scripts/extract_hard_negatives.py \
+  --output synth_results/manifests/hard_negatives_manifest.csv \
+  --window-sec 30 --stride-sec 15 --min-activity-sec 3 --max-per-file 20 --seed 42
+# Output: synth_results/manifests/hard_negatives_manifest.csv
+#   Columns: audio_path, start_sec, end_sec, label (=0), child_id, timepoint_norm, source
+#   ~612 windows from 33 Playlogue + 579 Providence files (estimated)
+
+# Step 2-4: train + evaluate both variants (single SLURM job)
+sbatch mil/slurm/train_mil_hardneg.sh
+# Trains: wavlm_mil_hardneg (WavLM-Base+, extra_negatives_cap=623 → 1:1 ratio)
+#         whisper_mil_hardneg (Whisper-small, same cap)
+# Output: mil/mil_results/{wavlm_mil_hardneg,whisper_mil_hardneg}/
+#         best_checkpoint.pt, config.json, val/test_metrics_tuned.json, val/test_predictions.csv
+# Logs: logs/mil/hardneg_{jobid}.out  (SLURM job 12770452)
+```
+
+Configs: `mil/configs/wavlm_mil_hardneg.yaml` and `mil/configs/whisper_mil_hardneg.yaml`.
+Key config keys: `extra_negatives_csv` (path to manifest) and `extra_negatives_cap` (max rows to add).
+The `MILBagDataset` supports `start_sec`/`end_sec` columns for slice-loading long files without
+reading the full audio into memory.
+
 ### Segment-instance MIL sweep
 
 ```bash
@@ -476,7 +560,9 @@ Trains 8 feature-set combinations × LR + GBM = 16 models, plus per-timepoint va
 
 ### `baselines/` — Encoder baselines
 
-Three encoder variants (Whisper, WavLM, Fused) × two pooling strategies (mean, attention) → linear classifier. Results cached under `baselines/baseline_results/`.
+Three encoder variants (Whisper, WavLM, Fused) × two pooling strategies (mean, attention) → linear classifier. Results cached under `baselines/baseline_results/` (cross-child split) or `baselines/baseline_results_seen_child/` (seen-child split).
+
+**Seen-child mode** (`--seen-child`): reads pre-generated `whisper-modeling/seen_child_splits/{train,val,test}.csv` instead of re-splitting from scratch; enables direct comparison with enrollment-based diarizers on the same 109-child within-child split. Add `--all-experiments` to run all 13 variants (Phase 1–6). Submit via `sbatch baselines/slurm/run_baseline_seen_child.sh`.
 
 ### `av_fusion/` — Audio-Visual Fusion Pipeline
 
@@ -515,7 +601,8 @@ There are **three splits locations** representing different evaluation paradigms
 | Location | Strategy | Size | Used by |
 |---|---|---|---|
 | `whisper-modeling/seen_child_splits/` | **Within-child** (same 109 children in train/val/test), 60/20/20 | 2183 clips | Enrollment runs (all diarizers), combined feature models |
-| `baselines/splits/` | **Cross-child** (97 train / 21 val / 21 test children, disjoint) | 2377 clips | Baseline encoder models |
+| `baselines/splits/` | **Cross-child** (97 train / 21 val / 21 test children, disjoint) | 2377 clips | Baseline encoder models (default); `baseline_results/` |
+| `whisper-modeling/seen_child_splits/` (reused) | **Within-child** via `--seen-child` flag | 2183 clips | Baseline encoders on seen-child split; `baseline_results_seen_child/` |
 | `splits/` | Copy/alternate of baselines/splits | 2377 clips | — |
 
 **Split generation**: `make_seen_child_split.py` loads annotations from `/orcd/scratch/bcs/001/sensein/sails/BIDS_data/anotated_processed.csv`, filters to ≥5 clips per child per timepoint (14_month, 36_month), stratifies 60/20/20 within each (child, timepoint) group. Seed=42.
@@ -536,7 +623,7 @@ The `seen_child_splits/` approach tests enrollment-based personalization (the mo
 - `vtc_kchi_ecapa_enrollment_runs/` — VTC 2.0 standalone (KCHI only) enrollment
 - `vbx_ecapa_enrollment_runs/` — VBx speaker diarization enrollment
 - `video_asd_ecapa_enrollment_runs/talknet_asd/` — TalkNet-ASD video ASD enrollment
-- `video_asd_ecapa_enrollment_runs/ts_talknet/` — TS-TalkNet video ASD enrollment
+- `video_finetuned_talknet_runs/` — Fine-tuned TalkNet child vocalization; direct clip-level scores (no RTTM/ECAPA step); `best_checkpoint.pt`, `val/test_metrics_tuned.json`, `test_predictions.csv`, `config.json`
 - `mil/mil_results/wavlm_mil/` — Frame-window MIL with WavLM-Base+ backbone; `best_checkpoint.pt`, `config.json`, `val/test_metrics_tuned.json`, `val/test_predictions.csv`, `val/test_metrics_by_timepoint.csv`; `age_stratified/{14_month,36_month}/` after age-stratified eval
 - `mil/mil_results/whisper_mil/` — Frame-window MIL with Whisper-small backbone; same layout as `wavlm_mil/`
 - `mil/mil_results/seg_mil/` — Segment-instance MIL sweep results (28 configs); `all_configs.json` summary + per-config subdirs
@@ -561,6 +648,8 @@ Each folder contains:
 | VTC-KCHI | 0.874 | 0.912 | 0.839 | 0.820 | 0.918 |
 | VBx | 0.858 | 0.797 | 0.928 | 0.686 | 0.851 |
 | TalkNet-ASD | 0.336 | 0.908 | 0.206 | 0.569 | 0.791 |
+| LocoNet-ECAPA (video ASD, NEGATIVE) | 0.000 | 0.000 | 0.000 | 0.500 | 0.760 |
+| Fine-tuned TalkNet (NEGATIVE) | 0.863 | 0.760 | 1.000 | 0.523 | 0.763 |
 | EEND-EDA | 0.844 | 0.772 | 0.931 | 0.528 | 0.781 |
 | Sortformer | 0.844 | 0.796 | 0.899 | 0.664 | 0.841 |
 | WavLM-MIL | 0.882 | 0.807 | 0.973 | 0.771 | 0.893 |
@@ -568,6 +657,14 @@ Each folder contains:
 | Audio LLM (Qwen2-Audio-7B, zero-shot) | 0.871 | 0.807 | 0.946 | 0.725 | 0.853 |
 | Parakeet TDT 0.6B (gap_ratio, NEGATIVE) | 0.863 | 0.760 | 1.000 | 0.457 | 0.731 |
 | **Ensemble (best_audio_mil, mean)** | **0.893** | — | — | **0.878** | **0.956** |
+| Metadata stacker (spec-012 US1) | 0.901 | 0.901 | 0.901 | 0.900 | 0.964 |
+
+**spec-012 Metadata-Conditioned Routing/Ensemble** (`ensemble_runs/`, `mil/mil_results/`):
+- `ensemble_runs/metadata_stack/`: US1 stacker — F1=0.901, AUROC=0.900, delta_F1=+0.009
+- `ensemble_runs/metadata_router_rule/`: US2 rule router — F1=0.883, AUROC=0.705 (routed_system distribution in config.json)
+- `ensemble_runs/metadata_router_learned/`: US2 learned router — F1=0.873, AUROC=0.731
+- `mil/mil_results/multi_child_suppressor/`: US3 suppressor — test_metrics_multi_child_only.json + test_metrics_single_child_only.json; emb_cache.npz
+- `mil/mil_results/short_voc_head/`: US4 short-voc head — best_checkpoint.pt; test_metrics_short_voc_clips.json; test_metrics_non_short_voc_clips.json
 
 **BabAR per-timepoint combined features** (`babar_combined_runs/all_model_results.json`):
 - 14_month: F1=0.907, AUROC=0.892, AUPRC=0.949
@@ -616,17 +713,13 @@ If audio files change, delete the relevant cache directory before re-running.
 - **Audio LLM test-before-val guard** — `python baselines/audio_llm_baseline.py --split test` exits with code 2 if `val_metrics_tuned.json` is missing; run val first
 
 ## Recent Changes
-- **Ensemble results** (spec-001, 2026-04-27): 7 ensemble configurations evaluated in `ensemble_runs/`. Best: `best_audio_mil` (BabAR+VTC+WavLM-MIL-gated+VBx-MIL-max, mean) F1=0.893, AUROC=0.878, AUPRC=0.956 — project's highest AUPRC. `all_available` LR-stack: F1=0.897, AUROC=0.870, AUPRC=0.951. Results: `ensemble_runs/ensemble_results.json`.
-- **EEND-EDA and Sortformer enrollment** (spec-001, 2026-04-27): EEND-EDA test F1=0.844, AUROC=0.528, AUPRC=0.781; Sortformer test F1=0.844, AUROC=0.664, AUPRC=0.841. Both use anonymous-speaker → ECAPA cosine similarity enrollment. Results: `eend_eda_ecapa_enrollment_runs/`, `sortformer_ecapa_enrollment_runs/`.
-- **Age-stratified enrollment** (spec-001, 2026-04-27, job 12614919): All 6 diarizers × 2 age cohorts complete. 36_month consistently outperforms 14_month. Key results (`pyannote/{d}_age_stratified/{age}/{age}/test_metrics_tuned.json`): BabAR 12_16m F1=0.865/14_month consistent improvement; VTC 34_38m F1=0.916 (best); USC-SAIL shows largest age gap (14_month F1=0.825 vs 34_38m F1=0.906). Note: outputs are in doubly-nested `{age}/{age}/` subdirs due to unified_age_stratified.py path behavior.
-- **Synthetic augmentation null result** (spec-008, 2026-04-27): All 6 augmentation ratios (0×–10×) produce identical enrollment metrics (F1=0.874, AUROC=0.820, AUPRC=0.918). Root cause: ECAPA encoder is frozen; synthetic BabAR RTTM cache reused from baseline run; synthetic ECAPA embeddings are similar to real ones, so prototype averaging is unaffected. Error analysis: 360/441 test clips unchanged; 81 unchanged errors (44 short-vocalization, 23 overlap, 7 adult-background FP). Full results: `synth_results/augmentation_experiments/default_14_18mo/`
-- **Audio LLM results** (spec-010, 2026-04-27): Qwen2-Audio-7B-Instruct zero-shot — test F1=0.871, AUROC=0.725, AUPRC=0.853, val F1=0.859, AUROC=0.781, AUPRC=0.898. AUROC/AUPRC below BabAR (delta_auroc=-0.095, delta_auprc=-0.065) but F1 near-identical (delta=-0.003). 14_month F1=0.838, 36_month F1=0.904. Fixed 3 inference bugs: wrong model class, wrong processor kwarg (`audios=`→`audio=`), constrained decoding (`model.generate()`→`model(**inputs)` forward pass + logsumexp). Results: `baselines/audio_llm_baseline_runs/qwen2_audio_7b/`
-- **Parakeet TDT negative result** (spec-001, 2026-04-27, jobs 12672873/12674012): gap_ratio (ASR gap = 1 - covered_word_sec/duration) GENUINE NEGATIVE — AUROC=0.457 (test), 0.476 (val). Direction inverted: child-present clips score LOWER because adult background speech is still transcribed → smaller gap. Cannot distinguish child from adult-only clips. Results: `baselines/parakeet_baseline_runs/parakeet_tdt_0.6b_v2/`; timestamp bug fixed (NeMo start_offset vs start keys).
-- **VAE synthesis negative result** (spec-001, 2026-04-27, jobs 12674075/76): SC-003 FAIL for both age groups. MCD=1092 dB (34_38m) and 1233 dB (12_16m) vs threshold 8.0. Root cause: VAE Griffin-Lim decoder produces near-silent audio (RMS ~0.003 vs reference ~0.17). Age classifier: 34_38m=100% PASS, 12_16m=0% FAIL. Thesis finding: VAE synthesis unsuitable without better vocoder decoder.
-- **VAE augmentation negative result** (spec-001, 2026-04-28, job 12680810): Enrollment augmentation with near-silent VAE audio hurts performance. 12_16m: delta_f1=-0.013, delta_auroc=-0.013, delta_auprc=-0.046. 34_38m: delta_f1=-0.046, delta_auroc=-0.082, delta_auprc=-0.063. Root cause: ECAPA embeddings of near-silent audio are noise → corrupts child prototype. SC-003b FAIL. Results: `pyannote/babar_augmented/`, `evaluation/augmentation_delta.csv`.
-- 009-synth-rir-noise: Added Python 3.11, `child-vocalizations` conda env + `transformers>=4.45`, `accelerate`, `torchaudio`, `soundfile`, `pandas`, `scikit-learn`, `numpy`; optional: `bitsandbytes` for 4-bit quantization
-- evaluation analyses (cross-diarizer): Added `evaluation/build_master_table.py` (bootstrap CIs for 11 diarizers), `evaluation/stat_significance.py` (pairwise AUROC bootstrap tests, 55 pairs), `evaluation/weak_diarization_correlation.py` (attention-weight vs. classification AUROC Spearman), `evaluation/per_diarizer_error_analysis.py` (FP/FN breakdown by interaction/timepoint/n_children for all diarizers), `evaluation/comprehensive_stratified_analysis.py` (12 SAILS annotation factors × 11 diarizers → stratified_analysis/), `evaluation/cross_diarizer_persistent_errors.py` (persistent FP/FN across diarizers, pairwise agreement matrix, unique contributions, per-child error rates, confidence calibration), `evaluation/double_stratification.py` (2-way interaction effects: gestures×interaction, face_vis×diarizer_type, n_children×n_adults, timepoint×face_vis); outputs under `evaluation/cross_diarizer_errors/`, `evaluation/stratified_analysis/`, `evaluation/double_stratification/`
+- 009-synth-rir-noise: Added Python 3.11, `child-vocalizations` conda env + pandas, scikit-learn (LR, GBM via HistGradientBoosting), numpy, torch + torchaudio (sub-features C/D only), transformers (WavLM backbone for C/D)
+- **TinyVox MIL augmentation negative result** (spec-009, 2026-04-28, job 12748294): Adding 15,550 TinyVox Providence clips (padded to 10s, label=1) to WavLM-MIL train split HURTS performance. Test AUROC=0.670 vs baseline 0.771 (delta=-0.101); F1=0.866 vs 0.882 (delta=-0.017); AUPRC=0.819 vs 0.893 (delta=-0.074). Early stopping at epoch 12. Root cause: TinyVox short clips padded with silence create uniform 0-energy windows; model overfits on pad-pattern as a positive signal → worse generalization on real clips. Results: `mil/mil_results/wavlm_mil_tinyvox/`.
+- **LocoNet-ECAPA negative result** (spec-007, 2026-04-28, job 12696180): All 109 seen children have empty LocoNet segments → zero prototype coverage → F1=0.000, AUROC=0.500, AUPRC=0.760 (all scores degenerate). Root causes: (1) **threshold bug**: `run_loconet_asd_per_track` used threshold=0.5 on raw logits — fixed to 0.0 (logit decision boundary); (2) **domain mismatch**: LocoNet trained on Hollywood AVA close-up faces; all SAILS BIDS logit scores fall in [-4.4, -1.6] range (uniformly "silent"), so even threshold=0.0 gives 0 segments. Face detection itself works (1839/2183 clips have face cache with up to 37 tracks/clip). Results: `video_asd_ecapa_enrollment_runs/loconet_ecapa/`.
+- **Hard-negative MIL negative result** (spec-012, 2026-04-28, job 12770452): Adding 344 hard-negative windows (30s Playlogue/Providence clips, CHI silent but another speaker active) to bring pos:neg to 1:1 HURTS both variants. WavLM-MIL: AUROC=0.642 vs baseline 0.771 (delta=-0.129); val AUROC never exceeded 0.572 even after 20 epochs; model degenerates to recall=1.0 at threshold=0.05. Whisper-MIL: AUROC=0.818 vs baseline 0.853 (delta=-0.035); stable training but consistent degradation. Root cause: hard negatives come from Playlogue/Providence (different acoustic domain than SAILS BIDS), introducing cross-dataset distribution shift. Domain-matched hard negatives required. Results: `mil/mil_results/{wavlm_mil_hardneg,whisper_mil_hardneg}/`.
+- **Multi-child suppressor null result** (spec-012, 2026-04-28, job 12774458): LR on WavLM mean-pool embeddings of n_children≥2 train clips (n=283) tuned to alpha=1.0 on val — suppressor score completely ignored. Overall F1=0.904/AUROC=0.892 reflects 4-system ensemble with re-tuned threshold (0.39), not suppressor effect. Multi-child clips remain harder (F1=0.837 vs 0.921 single-child) but suppressor provides no additional benefit. Results: `mil/mil_results/multi_child_suppressor/`.
+- **Metadata stacker positive result** (spec-012, 2026-04-28): LR/GBM stacker on 10 system scores + 7 BIDS metadata features achieves F1=0.901/AUROC=0.900 — project's highest AUROC (+2.2pp over best_audio_mil baseline). Results: `ensemble_runs/metadata_stack/`.
 
 ## Active Technologies
-- Python 3.11, `child-vocalizations` conda env + `transformers>=4.45`, `accelerate`, `torchaudio`, `soundfile`, `pandas`, `scikit-learn`, `numpy`; optional: `bitsandbytes` for 4-bit quantization (009-synth-rir-noise)
-- Per-clip JSON cache at `baselines/audio_llm_cache/{model_slug}/`; result CSVs and JSONs at `baselines/audio_llm_baseline_runs/{model_slug}/`; no database (009-synth-rir-noise)
+- Python 3.11, `child-vocalizations` conda env + pandas, scikit-learn (LR, GBM via HistGradientBoosting), numpy, torch + torchaudio (sub-features C/D only), transformers (WavLM backbone for C/D) (009-synth-rir-noise)
+- CSV predictions in-place; new results written to `ensemble_runs/metadata_router_rule/`, `ensemble_runs/metadata_router_learned/`, `ensemble_runs/metadata_stack/`; suppressor/short-voc head results in `mil/mil_results/multi_child_suppressor/`, `mil/mil_results/short_voc_head/` (009-synth-rir-noise)
