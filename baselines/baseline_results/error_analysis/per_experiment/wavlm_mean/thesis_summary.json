@@ -1,0 +1,21 @@
+{
+  "experiment": "wavlm_mean",
+  "model_type": "wavlm",
+  "pooling": "mean",
+  "use_layer_weights": false,
+  "per_timepoint_threshold": false,
+  "augmentation": false,
+  "total_test_clips": 496,
+  "total_errors": 108,
+  "error_rate": 0.21774193548387097,
+  "n_false_positives": 95,
+  "n_false_negatives": 13,
+  "fp_rate_multi_child": 0.896551724137931,
+  "fp_rate_single_child": 0.7419354838709677,
+  "fn_rate_with_interaction": 0.027777777777777776,
+  "fn_rate_without_interaction": 0.08,
+  "n_children_perfect": 5,
+  "n_children_below_70pct": 6,
+  "hardest_task": "specialoccasion",
+  "easiest_task": "unknown"
+}

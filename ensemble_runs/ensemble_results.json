@@ -1,0 +1,262 @@
+{
+  "best3": {
+    "systems": [
+      "babar_enroll",
+      "vtc_enroll",
+      "mil_babar_gated"
+    ],
+    "individual_test_auroc": {
+      "babar_enroll": 0.8203604618417346,
+      "vtc_enroll": 0.7869050971557308,
+      "mil_babar_gated": 0.8079977471134892
+    },
+    "mean_ensemble": {
+      "f1": 0.8921713441654358,
+      "auroc": 0.8622359898620108,
+      "auprc": 0.9457938578116896,
+      "threshold": 0.31999999999999995,
+      "n": 441
+    },
+    "lr_stack": {
+      "f1": 0.8938053097345132,
+      "auroc": 0.8531681216558716,
+      "auprc": 0.9413111978312595,
+      "threshold": 0.6399999999999999,
+      "n": 441
+    },
+    "lr_weights": {
+      "babar_enroll": 1.490335279151204,
+      "vtc_enroll": 1.3467740988037258,
+      "mil_babar_gated": 0.6429909991370896
+    }
+  },
+  "top4_enroll": {
+    "systems": [
+      "babar_enroll",
+      "vtc_enroll",
+      "vbx_enroll",
+      "usc_sail_enroll"
+    ],
+    "individual_test_auroc": {
+      "babar_enroll": 0.8203604618417346,
+      "vtc_enroll": 0.7869050971557308,
+      "vbx_enroll": 0.6862573922838636,
+      "usc_sail_enroll": 0.62466910729372
+    },
+    "mean_ensemble": {
+      "f1": 0.888243831640058,
+      "auroc": 0.8323289214305831,
+      "auprc": 0.9255084061221002,
+      "threshold": 0.24,
+      "n": 441
+    },
+    "lr_stack": {
+      "f1": 0.8908554572271387,
+      "auroc": 0.8404111517882287,
+      "auprc": 0.9338178725230524,
+      "threshold": 0.6399999999999999,
+      "n": 441
+    },
+    "lr_weights": {
+      "babar_enroll": 1.4676794720966362,
+      "vtc_enroll": 1.2861643348502938,
+      "vbx_enroll": 0.7417870730348585,
+      "usc_sail_enroll": 0.42813343544071675
+    }
+  },
+  "babar_mil": {
+    "systems": [
+      "babar_enroll",
+      "mil_babar_gated"
+    ],
+    "individual_test_auroc": {
+      "babar_enroll": 0.8203604618417346,
+      "mil_babar_gated": 0.8079977471134892
+    },
+    "mean_ensemble": {
+      "f1": 0.8898678414096917,
+      "auroc": 0.8642072655589975,
+      "auprc": 0.9488282293396705,
+      "threshold": 0.36999999999999994,
+      "n": 441
+    },
+    "lr_stack": {
+      "f1": 0.8785046728971962,
+      "auroc": 0.8556462968177978,
+      "auprc": 0.9449484009076412,
+      "threshold": 0.6699999999999999,
+      "n": 441
+    },
+    "lr_weights": {
+      "babar_enroll": 1.7665408553161812,
+      "mil_babar_gated": 0.7431341348875724
+    }
+  },
+  "vtc_mil": {
+    "systems": [
+      "vtc_enroll",
+      "mil_babar_gated"
+    ],
+    "individual_test_auroc": {
+      "vtc_enroll": 0.7869050971557308,
+      "mil_babar_gated": 0.8079977471134892
+    },
+    "mean_ensemble": {
+      "f1": 0.8862275449101796,
+      "auroc": 0.8531962827372573,
+      "auprc": 0.9394022201497902,
+      "threshold": 0.4599999999999999,
+      "n": 441
+    },
+    "lr_stack": {
+      "f1": 0.890190336749634,
+      "auroc": 0.8393128696141933,
+      "auprc": 0.9304805221453,
+      "threshold": 0.6599999999999999,
+      "n": 441
+    },
+    "lr_weights": {
+      "vtc_enroll": 1.6647152262981306,
+      "mil_babar_gated": 0.7963518540500877
+    }
+  },
+  "best_audio_mil": {
+    "systems": [
+      "babar_enroll",
+      "vtc_enroll",
+      "mil_babar_gated",
+      "mil_vbx_max"
+    ],
+    "individual_test_auroc": {
+      "babar_enroll": 0.8203604618417346,
+      "vtc_enroll": 0.7869050971557308,
+      "mil_babar_gated": 0.8079977471134892,
+      "mil_vbx_max": 0.8024218529991551
+    },
+    "mean_ensemble": {
+      "f1": 0.8928571428571429,
+      "auroc": 0.878231484088989,
+      "auprc": 0.9558898217513747,
+      "threshold": 0.42999999999999994,
+      "n": 441
+    },
+    "lr_stack": {
+      "f1": 0.8951255539143279,
+      "auroc": 0.8659250915235145,
+      "auprc": 0.9494458362881613,
+      "threshold": 0.6399999999999999,
+      "n": 441
+    },
+    "lr_weights": {
+      "babar_enroll": 1.4507201537621475,
+      "vtc_enroll": 1.322797173395825,
+      "mil_babar_gated": 0.5847879682558357,
+      "mil_vbx_max": 0.6033637199490138
+    }
+  },
+  "with_vtc_combined": {
+    "systems": [
+      "babar_enroll",
+      "vtc_combined",
+      "mil_babar_gated"
+    ],
+    "individual_test_auroc": {
+      "babar_enroll": 0.8203604618417346,
+      "vtc_combined": 0.8535623767952689,
+      "mil_babar_gated": 0.8079977471134892
+    },
+    "mean_ensemble": {
+      "f1": 0.88125,
+      "auroc": 0.8702900591382708,
+      "auprc": 0.9540103387043545,
+      "threshold": 0.36999999999999994,
+      "n": 441
+    },
+    "lr_stack": {
+      "f1": 0.8775193798449612,
+      "auroc": 0.8678682061391157,
+      "auprc": 0.9530476132785038,
+      "threshold": 0.5499999999999999,
+      "n": 441
+    },
+    "lr_weights": {
+      "babar_enroll": 1.1484865752311926,
+      "vtc_combined": 1.7135880844393165,
+      "mil_babar_gated": 0.4790407501959797
+    }
+  },
+  "with_babar_combined": {
+    "systems": [
+      "vtc_enroll",
+      "mil_babar_gated"
+    ],
+    "individual_test_auroc": {
+      "vtc_enroll": 0.7869050971557308,
+      "mil_babar_gated": 0.8079977471134892
+    },
+    "mean_ensemble": {
+      "f1": 0.8862275449101796,
+      "auroc": 0.8531962827372573,
+      "auprc": 0.9394022201497902,
+      "threshold": 0.4599999999999999,
+      "n": 441
+    },
+    "lr_stack": {
+      "f1": 0.890190336749634,
+      "auroc": 0.8393128696141933,
+      "auprc": 0.9304805221453,
+      "threshold": 0.6599999999999999,
+      "n": 441
+    },
+    "lr_weights": {
+      "vtc_enroll": 1.6647152262981306,
+      "mil_babar_gated": 0.7963518540500877
+    }
+  },
+  "all_available": {
+    "systems": [
+      "babar_enroll",
+      "vtc_enroll",
+      "vbx_enroll",
+      "usc_sail_enroll",
+      "pyannote_enroll",
+      "mil_babar_gated",
+      "mil_vbx_max",
+      "vtc_combined"
+    ],
+    "individual_test_auroc": {
+      "babar_enroll": 0.8203604618417346,
+      "vtc_enroll": 0.7869050971557308,
+      "vbx_enroll": 0.6862573922838636,
+      "usc_sail_enroll": 0.62466910729372,
+      "pyannote_enroll": 0.6613348352576739,
+      "mil_babar_gated": 0.8079977471134892,
+      "mil_vbx_max": 0.8024218529991551,
+      "vtc_combined": 0.8535623767952689
+    },
+    "mean_ensemble": {
+      "f1": 0.8935532233883059,
+      "auroc": 0.8712193748239933,
+      "auprc": 0.9498209593500953,
+      "threshold": 0.37999999999999995,
+      "n": 441
+    },
+    "lr_stack": {
+      "f1": 0.8968609865470852,
+      "auroc": 0.8704590256265841,
+      "auprc": 0.9510319285653506,
+      "threshold": 0.58,
+      "n": 441
+    },
+    "lr_weights": {
+      "babar_enroll": 0.950771747424611,
+      "vtc_enroll": 0.9541998925237113,
+      "vbx_enroll": 0.5056108188419838,
+      "usc_sail_enroll": 0.3378257170834269,
+      "pyannote_enroll": 0.407713828133072,
+      "mil_babar_gated": 0.35583345248228204,
+      "mil_vbx_max": 0.38611663743211905,
+      "vtc_combined": 1.4697398690137762
+    }
+  }
+}

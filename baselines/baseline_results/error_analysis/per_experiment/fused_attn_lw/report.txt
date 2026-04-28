@@ -1,0 +1,257 @@
+============================================================
+EXPERIMENT: fused_attn_lw
+============================================================
+  model=fused | pooling=attn | layer_weights=True | per_tp_threshold=False | augmentation=False
+
+Confusion Matrix:
+  TN=48  FP=74
+  FN=20  TP=354
+
+Outcome counts:
+outcome
+TP    354
+FP     74
+TN     48
+FN     20
+
+Label balance: 0.754 positive
+
+Per timepoint:
+  14_month (n=283, pos_rate=0.75): FP_rate=0.563, FN_rate=0.080
+  36_month (n=213, pos_rate=0.76): FP_rate=0.667, FN_rate=0.019
+
+============================================================
+NUMBER OF CHILDREN & FALSE POSITIVES
+============================================================
+
+Outcome by #_children (negative clips only):
+  #_children=-1: n=1, FPs=1, FP_rate=1.000
+  #_children=0: n=1, FPs=0, FP_rate=0.000
+  #_children=1: n=91, FPs=51, FP_rate=0.560
+  #_children=2: n=17, FPs=13, FP_rate=0.765
+  #_children=3: n=5, FPs=4, FP_rate=0.800
+  #_children=4: n=1, FPs=1, FP_rate=1.000
+  #_children=5: n=1, FPs=1, FP_rate=1.000
+  #_children=6: n=2, FPs=2, FP_rate=1.000
+  #_children=7: n=1, FPs=0, FP_rate=0.000
+  #_children=8: n=2, FPs=1, FP_rate=0.500
+
+Multi-child clips (>1 child) vs single-child:
+  single-child: n=93, FPs=52, FP_rate=0.559
+  multi-child: n=29, FPs=22, FP_rate=0.759
+
+============================================================
+INTERACTION WITH CHILD & FALSE NEGATIVES
+============================================================
+
+Outcome by Interaction_with_child (positive clips only):
+  interaction=no/missing: n=50, FNs=7, FN_rate=0.140
+  interaction=yes: n=324, FNs=13, FN_rate=0.040
+
+============================================================
+NUMBER OF ADULTS & ERRORS
+============================================================
+
+Outcome by #_adults:
+  TP (n=354): mean #_adults=0.26
+  TN (n=48): mean #_adults=0.52
+  FP (n=74): mean #_adults=0.45
+  FN (n=20): mean #_adults=0.20
+
+Outcome by #_people_interacting:
+  TP (n=354): mean #_people_interacting=1.01
+  TN (n=48): mean #_people_interacting=0.69
+  FP (n=74): mean #_people_interacting=0.82
+  FN (n=20): mean #_people_interacting=0.80
+
+============================================================
+FALSE POSITIVE ANALYSIS
+============================================================
+
+74 false positives total
+
+FP by timepoint:
+timepoint_norm
+14_month    40
+36_month    34
+
+FP by task type:
+task
+motorplay                                23
+toyplay                                  16
+generalsocialcommunicationinteraction    12
+other                                     8
+specialoccasion                           7
+dailyroutine                              6
+socialroutine                             1
+bookshare                                 1
+
+FP mean prob: 0.933
+FP mean #_children: 1.58
+FP with >1 child: 22 / 74
+FP mean #_people_background: 0.16
+
+FP by child (top 10):
+child_id
+N3L7A1I2B9    11
+D4Y7P4G2V4    10
+F3N4H0K1Z1     8
+C0O6X3N5Y7     7
+D8G5K7I0D6     7
+Y4W4H9A8X5     6
+T2H0J0N2Z5     4
+C1G1X2G4C6     4
+Z3H6O7C3O9     3
+L4M8P2T7S0     3
+
+High-confidence FPs (prob >= 0.7): 74
+  Mean #_children: 1.58
+
+============================================================
+FALSE NEGATIVE ANALYSIS
+============================================================
+
+20 false negatives total
+
+FN by timepoint:
+timepoint_norm
+14_month    17
+36_month     3
+
+FN by task type:
+task
+other                                    5
+toyplay                                  4
+generalsocialcommunicationinteraction    4
+dailyroutine                             3
+motorplay                                2
+socialroutine                            2
+
+FN mean prob: 0.380
+FN mean #_adults: 0.20
+
+FN by child (top 10):
+child_id
+N3L7A1I2B9    7
+C0O6X3N5Y7    4
+F3N4H0K1Z1    2
+L4M8P2T7S0    2
+C1G1X2G4C6    1
+T2H0J0N2Z5    1
+U6O5F2B7T5    1
+G3D3S2N7W8    1
+D4Y7P4G2V4    1
+
+============================================================
+PER-CHILD ERROR RATES
+============================================================
+
+Hardest children (lowest accuracy):
+  child_id timepoint  n_clips  accuracy  n_fp  n_fn  mean_n_children  pct_interaction
+Y4W4H9A8X5  14_month       11  0.454545     6     0         2.909091         0.909091
+Z3H6O7C3O9  36_month        7  0.571429     3     0         1.142857         0.714286
+D4Y7P4G2V4  14_month       28  0.607143    10     1         1.571429         0.964286
+D8G5K7I0D6  14_month       20  0.650000     7     0         1.150000         1.000000
+R2C7W8X7N9  36_month       10  0.700000     3     0         1.600000         0.700000
+C1G1X2G4C6  14_month       18  0.722222     4     1         1.388889         0.611111
+C0O6X3N5Y7  14_month       47  0.765957     7     4         1.340426         0.872340
+B8I6G9P2G8  14_month        9  0.777778     2     0         1.000000         0.888889
+T2H0J0N2Z5  14_month       23  0.782609     4     1         1.086957         0.652174
+F3N4H0K1Z1  36_month       54  0.814815     8     2         1.444444         0.796296
+
+Easiest children (highest accuracy):
+  child_id timepoint  n_clips  accuracy  n_fp  n_fn  mean_n_children  pct_interaction
+D8O8B2C4X2  36_month       18  0.944444     1     0         1.166667         0.944444
+G7P6U6U2J5  36_month        5  1.000000     0     0         1.800000         0.800000
+S7Y0I2P0S8  14_month       19  1.000000     0     0         1.000000         0.894737
+X2V2P0U5X4  36_month        2  1.000000     0     0         1.500000         1.000000
+Y6Z4H0C5U2  36_month       14  1.000000     0     0         1.142857         1.000000
+
+============================================================
+TASK-TYPE BREAKDOWN
+============================================================
+                                 task   n  pos_rate  accuracy  fp_rate  fn_rate  mean_n_children  pct_interaction
+                      specialoccasion  13  0.461538  0.461538 1.000000 0.000000         2.076923         0.846154
+                                other  36  0.611111  0.638889 0.571429 0.227273         1.111111         0.361111
+                            motorplay  83  0.614458  0.698795 0.718750 0.039216         1.506024         0.795181
+                              toyplay  97  0.680412  0.793814 0.516129 0.060606         1.195876         0.773196
+                         dailyroutine  50  0.820000  0.820000 0.666667 0.073171         1.060000         0.860000
+                        socialroutine  22  0.954545  0.863636 1.000000 0.095238         1.181818         0.954545
+                            bookshare  10  0.700000  0.900000 0.333333 0.000000         1.100000         0.800000
+generalsocialcommunicationinteraction 184  0.864130  0.913043 0.480000 0.025157         1.179348         0.961957
+                              unknown   1  1.000000  1.000000 0.000000 0.000000         1.000000         1.000000
+
+============================================================
+CONFIDENCE ANALYSIS
+============================================================
+
+Calibration:
+     prob_bin   n  mean_prob  actual_pos_rate  accuracy
+(-0.001, 0.2]  27   0.057385         0.259259  0.740741
+   (0.2, 0.4]  11   0.302839         0.090909  0.909091
+   (0.4, 0.5]   9   0.436760         0.333333  0.666667
+   (0.5, 0.6]  11   0.540588         0.363636  0.636364
+   (0.6, 0.8]  23   0.710383         0.478261  0.478261
+   (0.8, 1.0] 415   0.981862         0.838554  0.838554
+
+Uncertain predictions (prob 0.35-0.65): 31 / 496 (6.2%)
+
+============================================================
+MOST CONFIDENT MISTAKES
+============================================================
+
+Top 15 most confident errors:
+
+  FP | prob=1.000 | child=D4Y7P4G2V4 | tp=14_month
+    task=toyplay | #_children=2 | #_adults=0 | interaction=yes | #_people_interacting=1
+
+  FP | prob=1.000 | child=C1G1X2G4C6 | tp=36_month
+    task=toyplay | #_children=1 | #_adults=0 | interaction=no | #_people_interacting=0
+
+  FP | prob=1.000 | child=F3N4H0K1Z1 | tp=36_month
+    task=toyplay | #_children=1 | #_adults=0 | interaction=yes | #_people_interacting=1
+
+  FP | prob=1.000 | child=F3N4H0K1Z1 | tp=36_month
+    task=motorplay | #_children=2 | #_adults=0 | interaction=yes | #_people_interacting=1
+
+  FP | prob=1.000 | child=F3N4H0K1Z1 | tp=14_month
+    task=dailyroutine | #_children=2 | #_adults=0 | interaction=no | #_people_interacting=0
+
+  FP | prob=1.000 | child=N3L7A1I2B9 | tp=36_month
+    task=dailyroutine | #_children=1 | #_adults=0 | interaction=yes | #_people_interacting=1
+
+  FN | prob=0.000 | child=N3L7A1I2B9 | tp=14_month
+    task=other | #_children=1 | #_adults=0 | interaction=no | #_people_interacting=0
+
+  FP | prob=1.000 | child=D8O8B2C4X2 | tp=14_month
+    task=generalsocialcommunicationinteraction | #_children=1 | #_adults=0 | interaction=yes | #_people_interacting=2
+
+  FP | prob=1.000 | child=D8G5K7I0D6 | tp=36_month
+    task=motorplay | #_children=1 | #_adults=1 | interaction=yes | #_people_interacting=2
+
+  FP | prob=1.000 | child=F3N4H0K1Z1 | tp=36_month
+    task=other | #_children=1 | #_adults=0 | interaction=no | #_people_interacting=0
+
+  FP | prob=0.999 | child=D8G5K7I0D6 | tp=14_month
+    task=motorplay | #_children=1 | #_adults=0 | interaction=yes | #_people_interacting=1
+
+  FP | prob=0.999 | child=D8G5K7I0D6 | tp=14_month
+    task=toyplay | #_children=1 | #_adults=0 | interaction=yes | #_people_interacting=1
+
+  FP | prob=0.999 | child=T2H0J0N2Z5 | tp=14_month
+    task=other | #_children=1 | #_adults=0 | interaction=no | #_people_interacting=0
+
+  FP | prob=0.998 | child=L4M8P2T7S0 | tp=36_month
+    task=other | #_children=1 | #_adults=0 | interaction=yes | #_people_interacting=1
+
+  FP | prob=0.998 | child=B8I6G9P2G8 | tp=14_month
+    task=generalsocialcommunicationinteraction | #_children=1 | #_adults=0 | interaction=yes | #_people_interacting=1
+
+============================================================
+MULTI-CHILD x INTERACTION CROSS-TAB
+============================================================
+ multi_child  has_interaction   n  accuracy  n_fp  n_fn  fp_rate  fn_rate
+       False            False  66  0.787879     7     7 0.304348 0.162791
+       False             True 347  0.835735    45    12 0.642857 0.043321
+        True            False  15  0.600000     6     0 0.750000 0.000000
+        True             True  68  0.750000    16     1 0.761905 0.021277

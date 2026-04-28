@@ -1,0 +1,21 @@
+{
+  "experiment": "whisper_stats_lw",
+  "model_type": "whisper",
+  "pooling": "stats",
+  "use_layer_weights": true,
+  "per_timepoint_threshold": false,
+  "augmentation": false,
+  "total_test_clips": 496,
+  "total_errors": 112,
+  "error_rate": 0.22580645161290322,
+  "n_false_positives": 90,
+  "n_false_negatives": 22,
+  "fp_rate_multi_child": 0.8620689655172413,
+  "fp_rate_single_child": 0.6989247311827957,
+  "fn_rate_with_interaction": 0.043209876543209874,
+  "fn_rate_without_interaction": 0.16,
+  "n_children_perfect": 3,
+  "n_children_below_70pct": 6,
+  "hardest_task": "specialoccasion",
+  "easiest_task": "unknown"
+}

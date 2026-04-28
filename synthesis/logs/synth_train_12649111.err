@@ -1,0 +1,136 @@
+Using CPython 3.11.7 interpreter at: /usr/bin/python3.11
+Creating virtual environment at: .venv
+Resolved 169 packages in 192ms
+   Building child-speech-synthesis @ file:///orcd/scratch/orcd/008/manaal/child-adult-diarization/synthesis
+Downloading grpcio (6.5MiB)
+Downloading pillow (6.8MiB)
+Downloading fonttools (4.8MiB)
+Downloading cuda-bindings (6.0MiB)
+Downloading tensorboard (5.3MiB)
+Downloading sudachipy (1.6MiB)
+Downloading sudachidict-core (68.8MiB)
+Downloading torch (506.0MiB)
+Downloading spacy (30.8MiB)
+Downloading numpy (17.4MiB)
+Downloading pandas (11.5MiB)
+Downloading kiwisolver (1.4MiB)
+Downloading scipy (33.7MiB)
+Downloading scikit-learn (8.7MiB)
+Downloading babel (9.7MiB)
+Downloading nltk (1.5MiB)
+Downloading numba (3.6MiB)
+Downloading srsly (1.1MiB)
+Downloading networkx (1.9MiB)
+Downloading triton (179.5MiB)
+Downloading matplotlib (8.4MiB)
+Downloading pydantic-core (2.0MiB)
+Downloading cython (3.2MiB)
+Downloading llvmlite (53.7MiB)
+Downloading aiohttp (1.7MiB)
+Downloading sentencepiece (1.3MiB)
+Downloading thinc (3.9MiB)
+Downloading torchaudio (1.7MiB)
+Downloading python-crfsuite (1.2MiB)
+Downloading blis (10.9MiB)
+   Building gruut-lang-es==2.0.1
+   Building jieba==0.42.1
+   Building gruut-lang-de==2.0.1
+   Building gruut-lang-en==2.0.1
+   Building gruut-lang-fr==2.0.2
+   Building encodec==0.1.1
+   Building gruut-ipa==0.13.0
+   Building gruut==2.2.3
+   Building bnnumerizer==0.0.2
+ Downloaded python-crfsuite
+ Downloaded sentencepiece
+   Building fastdtw==0.3.4
+ Downloaded kiwisolver
+ Downloaded srsly
+ Downloaded sudachipy
+ Downloaded aiohttp
+ Downloaded torchaudio
+ Downloaded pydantic-core
+ Downloaded nltk
+      Built gruut-lang-de==2.0.1
+      Built jieba==0.42.1
+      Built gruut-lang-en==2.0.1
+ Downloaded cython
+ Downloaded networkx
+      Built encodec==0.1.1
+      Built gruut==2.2.3
+  × Failed to build `child-speech-synthesis @
+  │ file:///orcd/scratch/orcd/008/manaal/child-adult-diarization/synthesis`
+  ├─▶ The build backend returned an error
+  ╰─▶ Call to `hatchling.build.build_editable` failed (exit status: 1)
+
+      [stderr]
+      Traceback (most recent call last):
+        File "<string>", line 11, in <module>
+        File
+      "/home/manaal/.cache/uv/builds-v0/.tmp4gHUY8/lib64/python3.11/site-packages/hatchling/build.py",
+      line 83, in build_editable
+          return os.path.basename(next(builder.build(directory=wheel_directory,
+      versions=["editable"])))
+      
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/manaal/.cache/uv/builds-v0/.tmp4gHUY8/lib64/python3.11/site-packages/hatchling/builders/plugin/interface.py",
+      line 157, in build
+          artifact = version_api[version](directory, **build_data)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/manaal/.cache/uv/builds-v0/.tmp4gHUY8/lib64/python3.11/site-packages/hatchling/builders/wheel.py",
+      line 524, in build_editable
+          return self.build_editable_detection(directory, **build_data)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/manaal/.cache/uv/builds-v0/.tmp4gHUY8/lib64/python3.11/site-packages/hatchling/builders/wheel.py",
+      line 536, in build_editable_detection
+          for included_file in self.recurse_selected_project_files():
+        File
+      "/home/manaal/.cache/uv/builds-v0/.tmp4gHUY8/lib64/python3.11/site-packages/hatchling/builders/plugin/interface.py",
+      line 182, in recurse_selected_project_files
+          if self.config.only_include:
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/usr/lib64/python3.11/functools.py", line 1001, in __get__
+          val = self.func(instance)
+                ^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/manaal/.cache/uv/builds-v0/.tmp4gHUY8/lib64/python3.11/site-packages/hatchling/builders/config.py",
+      line 715, in only_include
+          only_include = only_include_config.get("only-include",
+      self.default_only_include()) or self.packages
+      
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/manaal/.cache/uv/builds-v0/.tmp4gHUY8/lib64/python3.11/site-packages/hatchling/builders/wheel.py",
+      line 270, in default_only_include
+          return self.default_file_selection_options.only_include
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/usr/lib64/python3.11/functools.py", line 1001, in __get__
+          val = self.func(instance)
+                ^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/manaal/.cache/uv/builds-v0/.tmp4gHUY8/lib64/python3.11/site-packages/hatchling/builders/wheel.py",
+      line 258, in default_file_selection_options
+          raise ValueError(message)
+      ValueError: Unable to determine which files to ship
+      inside the wheel using the following heuristics:
+      https://hatch.pypa.io/latest/plugins/builder/wheel/#default-file-selection
+
+      The most likely cause of this is that there is no directory that matches
+      the name of your project (child_speech_synthesis).
+
+      At least one file selection option must be defined
+      in the `tool.hatch.build.targets.wheel` table, see:
+      https://hatch.pypa.io/latest/config/build/
+
+      As an example, if you intend to ship a directory named `foo` that
+      resides within a `src` directory located at the root of your project,
+      you can define the following:
+
+      [tool.hatch.build.targets.wheel]
+      packages = ["src/foo"]
+
+      hint: This usually indicates a problem with the package or the build
+      environment.

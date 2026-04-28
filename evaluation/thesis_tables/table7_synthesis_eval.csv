@@ -1,3 +1,3 @@
-age_group,model,mcd_mean,mcd_std,speaker_similarity_mean,age_classifier_accuracy,f0_mean,f0_std,_source
-12_16m,VAE,,,,,,,synthesis/eval_results/12_16m/eval_results.json
-34_38m,VITS,,,,,,,synthesis/eval_results/34_38m/eval_results.json
+age_group,model,mcd_mean,mcd_std,speaker_similarity_mean,age_classifier_accuracy,f0_mean,f0_std,sc003_pass,notes,_source
+12_16m,VAE,1233.01,242.17,,0.0,71.4,8.9,FAIL,MCD>>8 and age_acc=0%; near-silent audio (RMS~0.002),synthesis/eval_results/12_16m/eval_results.json
+34_38m,VAE,1092.23,161.75,,1.0,69.9,8.0,FAIL,MCD>>8; near-silent audio (RMS~0.003); age_acc=1.0 (fluke),synthesis/eval_results/34_38m/eval_results.json

@@ -1,0 +1,21 @@
+{
+  "experiment": "whisper_attn",
+  "model_type": "whisper",
+  "pooling": "attn",
+  "use_layer_weights": false,
+  "per_timepoint_threshold": false,
+  "augmentation": false,
+  "total_test_clips": 496,
+  "total_errors": 91,
+  "error_rate": 0.18346774193548387,
+  "n_false_positives": 56,
+  "n_false_negatives": 35,
+  "fp_rate_multi_child": 0.7241379310344828,
+  "fp_rate_single_child": 0.3763440860215054,
+  "fn_rate_with_interaction": 0.08950617283950617,
+  "fn_rate_without_interaction": 0.12,
+  "n_children_perfect": 3,
+  "n_children_below_70pct": 4,
+  "hardest_task": "specialoccasion",
+  "easiest_task": "unknown"
+}

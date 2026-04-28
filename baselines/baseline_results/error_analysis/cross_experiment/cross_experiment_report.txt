@@ -1,0 +1,224 @@
+================================================================================
+CROSS-EXPERIMENT ANALYSIS (15 experiments)
+================================================================================
+
+------------------------------------------------------------
+1. EXPERIMENT COMPARISON
+------------------------------------------------------------
+
+Ranked by error rate:
+            experiment model_type pooling  use_layer_weights  per_timepoint_threshold  augmentation  total_errors  error_rate  n_false_positives  n_false_negatives  fp_rate_multi_child  fp_rate_single_child  fn_rate_with_interaction  fn_rate_without_interaction
+  fused_attn_unfreeze2      fused    attn              False                     True         False            79    0.159274                 47                 32             0.551724              0.333333                  0.080247                         0.12
+          whisper_mean    whisper    mean              False                    False         False            90    0.181452                 58                 32             0.655172              0.419355                  0.083333                         0.10
+          whisper_attn    whisper    attn              False                    False         False            91    0.183468                 56                 35             0.724138              0.376344                  0.089506                         0.12
+         fused_attn_lw      fused    attn               True                    False         False            94    0.189516                 74                 20             0.758621              0.559140                  0.040123                         0.14
+      whisper_attn_ptt    whisper    attn              False                     True         False            99    0.199597                 67                 32             0.655172              0.516129                  0.083333                         0.10
+whisper_attn_unfreeze2    whisper    attn              False                     True         False            99    0.199597                 67                 32             0.551724              0.548387                  0.067901                         0.20
+      whisper_attn_aug    whisper    attn              False                    False          True           100    0.201613                 56                 44             0.586207              0.419355                  0.104938                         0.20
+            wavlm_attn      wavlm    attn              False                    False         False           100    0.201613                 74                 26             0.689655              0.580645                  0.064815                         0.10
+            fused_attn      fused    attn              False                     True         False           103    0.207661                 72                 31             0.724138              0.548387                  0.080247                         0.10
+  whisper_attn_aug_ptt    whisper    attn              False                     True          True           105    0.211694                 72                 33             0.551724              0.602151                  0.070988                         0.20
+         wavlm_attn_lw      wavlm    attn               True                    False         False           106    0.213710                 91                 15             0.758621              0.741935                  0.027778                         0.12
+            wavlm_mean      wavlm    mean              False                    False         False           108    0.217742                 95                 13             0.896552              0.741935                  0.027778                         0.08
+      whisper_stats_lw    whisper   stats               True                    False         False           112    0.225806                 90                 22             0.862069              0.698925                  0.043210                         0.16
+        wavlm_stats_lw      wavlm   stats               True                    False         False           118    0.237903                115                  3             0.965517              0.935484                  0.003086                         0.04
+       whisper_attn_lw    whisper    attn               True                    False         False           122    0.245968                 93                 29             0.896552              0.720430                  0.058642                         0.20
+
+------------------------------------------------------------
+2. PERSISTENT FALSE POSITIVES
+------------------------------------------------------------
+(Files misclassified as FP across multiple experiments)
+
+Total unique FP files across all experiments: 120
+FP in ALL 15 experiments: 17
+FP in >= half of experiments: 79
+
+Files that are FP in EVERY experiment:
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-C0O6X3N5Y7/ses-02/beh/sub-C0O6X3N5Y7_ses-02_task-motorplay_run-03_audio.wav
+    child=C0O6X3N5Y7 | tp=36_month | task=motorplay
+    #_children=3 | #_adults=1 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-D8G5K7I0D6/ses-01/beh/sub-D8G5K7I0D6_ses-01_task-toyplay_run-04_audio.wav
+    child=D8G5K7I0D6 | tp=14_month | task=toyplay
+    #_children=1 | #_adults=0 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-B8I6G9P2G8/ses-01/beh/sub-B8I6G9P2G8_ses-01_task-generalsocialcommunicationinteraction_run-03_audio.wav
+    child=B8I6G9P2G8 | tp=14_month | task=generalsocialcommunicationinteraction
+    #_children=1 | #_adults=0 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-C1G1X2G4C6/ses-02/beh/sub-C1G1X2G4C6_ses-02_task-toyplay_run-04_audio.wav
+    child=C1G1X2G4C6 | tp=36_month | task=toyplay
+    #_children=1 | #_adults=0 | interaction=no
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-Y4W4H9A8X5/ses-02/beh/sub-Y4W4H9A8X5_ses-02_task-specialoccasion_run-01_audio.wav
+    child=Y4W4H9A8X5 | tp=36_month | task=specialoccasion
+    #_children=-1 | #_adults=3 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-Y4W4H9A8X5/ses-02/beh/sub-Y4W4H9A8X5_ses-02_task-other_run-01_audio.wav
+    child=Y4W4H9A8X5 | tp=36_month | task=other
+    #_children=5 | #_adults=2 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-Y4W4H9A8X5/ses-02/beh/sub-Y4W4H9A8X5_ses-02_task-motorplay_run-01_audio.wav
+    child=Y4W4H9A8X5 | tp=36_month | task=motorplay
+    #_children=8 | #_adults=1 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-D8O8B2C4X2/ses-01/beh/sub-D8O8B2C4X2_ses-01_task-generalsocialcommunicationinteraction_run-06_audio.wav
+    child=D8O8B2C4X2 | tp=14_month | task=generalsocialcommunicationinteraction
+    #_children=1 | #_adults=0 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-Z3H6O7C3O9/ses-02/beh/sub-Z3H6O7C3O9_ses-02_task-other_run-01_audio.wav
+    child=Z3H6O7C3O9 | tp=36_month | task=other
+    #_children=2 | #_adults=0 | interaction=no
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-F3N4H0K1Z1/ses-02/beh/sub-F3N4H0K1Z1_ses-02_task-toyplay_run-09_audio.wav
+    child=F3N4H0K1Z1 | tp=36_month | task=toyplay
+    #_children=1 | #_adults=1 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-F3N4H0K1Z1/ses-02/beh/sub-F3N4H0K1Z1_ses-02_task-other_run-02_audio.wav
+    child=F3N4H0K1Z1 | tp=36_month | task=other
+    #_children=1 | #_adults=0 | interaction=no
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-F3N4H0K1Z1/ses-01/beh/sub-F3N4H0K1Z1_ses-01_task-dailyroutine_run-05_audio.wav
+    child=F3N4H0K1Z1 | tp=14_month | task=dailyroutine
+    #_children=2 | #_adults=0 | interaction=no
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-F3N4H0K1Z1/ses-02/beh/sub-F3N4H0K1Z1_ses-02_task-toyplay_run-03_audio.wav
+    child=F3N4H0K1Z1 | tp=36_month | task=toyplay
+    #_children=1 | #_adults=0 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-F3N4H0K1Z1/ses-02/beh/sub-F3N4H0K1Z1_ses-02_task-motorplay_run-05_audio.wav
+    child=F3N4H0K1Z1 | tp=36_month | task=motorplay
+    #_children=2 | #_adults=0 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-L7Z6Q2U6Y6/ses-01/beh/sub-L7Z6Q2U6Y6_ses-01_task-dailyroutine_run-02_audio.wav
+    child=L7Z6Q2U6Y6 | tp=14_month | task=dailyroutine
+    #_children=1 | #_adults=0 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-L4M8P2T7S0/ses-02/beh/sub-L4M8P2T7S0_ses-02_task-other_run-07_audio.wav
+    child=L4M8P2T7S0 | tp=36_month | task=other
+    #_children=1 | #_adults=0 | interaction=yes
+  /orcd/scratch/bcs/001/sensein/sails/BIDS_data/final_bids-dataset/derivatives/preprocessed/sub-D4Y7P4G2V4/ses-01/beh/sub-D4Y7P4G2V4_ses-01_task-generalsocialcommunicationinteraction_run-02_audio.wav
+    child=D4Y7P4G2V4 | tp=14_month | task=generalsocialcommunicationinteraction
+    #_children=1 | #_adults=1 | interaction=yes
+
+------------------------------------------------------------
+3. PERSISTENT FALSE NEGATIVES
+------------------------------------------------------------
+(Files misclassified as FN across multiple experiments)
+
+Total unique FN files across all experiments: 100
+FN in ALL 15 experiments: 0
+FN in >= half of experiments: 17
+
+------------------------------------------------------------
+4. PERSISTENT HARD CHILDREN
+------------------------------------------------------------
+
+Hardest children (lowest mean accuracy across experiments):
+  child_id timepoint  n_clips  mean_accuracy  std_accuracy  min_accuracy  max_accuracy  mean_n_fp  mean_n_fn
+Y4W4H9A8X5  14_month       11       0.387879      0.105720      0.272727      0.636364   6.733333   0.000000
+Z3H6O7C3O9  36_month        7       0.523810      0.128534      0.285714      0.714286   3.333333   0.000000
+C1G1X2G4C6  14_month       18       0.614815      0.161926      0.277778      0.833333   6.466667   0.466667
+B8I6G9P2G8  14_month        9       0.637037      0.122198      0.444444      0.888889   3.133333   0.133333
+D4Y7P4G2V4  14_month       28       0.669048      0.051343      0.607143      0.750000   8.533333   0.733333
+D8G5K7I0D6  14_month       20       0.676667      0.059362      0.600000      0.850000   6.066667   0.400000
+G3D3S2N7W8  14_month       11       0.733333      0.159199      0.454545      0.909091   0.800000   2.133333
+R2C7W8X7N9  36_month       10       0.733333      0.104654      0.500000      0.900000   2.666667   0.000000
+C0O6X3N5Y7  14_month       47       0.758865      0.045254      0.638298      0.829787   7.133333   4.200000
+L7Z6Q2U6Y6  36_month       11       0.763636      0.057496      0.636364      0.818182   2.600000   0.000000
+
+Most variable children (highest std in accuracy):
+  child_id timepoint  n_clips  mean_accuracy  std_accuracy  min_accuracy  max_accuracy  mean_n_fp  mean_n_fn
+X2V2P0U5X4  36_month        2       0.866667      0.228869      0.500000      1.000000   0.000000   0.266667
+C1G1X2G4C6  14_month       18       0.614815      0.161926      0.277778      0.833333   6.466667   0.466667
+G3D3S2N7W8  14_month       11       0.733333      0.159199      0.454545      0.909091   0.800000   2.133333
+Z3H6O7C3O9  36_month        7       0.523810      0.128534      0.285714      0.714286   3.333333   0.000000
+B8I6G9P2G8  14_month        9       0.637037      0.122198      0.444444      0.888889   3.133333   0.133333
+L5Q0Z1W8S2  14_month        7       0.838095      0.106175      0.571429      1.000000   0.933333   0.200000
+Y4W4H9A8X5  14_month       11       0.387879      0.105720      0.272727      0.636364   6.733333   0.000000
+R2C7W8X7N9  36_month       10       0.733333      0.104654      0.500000      0.900000   2.666667   0.000000
+T2H0J0N2Z5  14_month       23       0.794203      0.068680      0.608696      0.913043   2.600000   2.133333
+D8G5K7I0D6  14_month       20       0.676667      0.059362      0.600000      0.850000   6.066667   0.400000
+
+------------------------------------------------------------
+5. PERSISTENT HARD TASKS
+------------------------------------------------------------
+                                 task   n  mean_accuracy  std_accuracy  mean_fp_rate  mean_fn_rate
+                      specialoccasion  13       0.497436      0.064139      0.885714      0.055556
+                                other  36       0.666667      0.039284      0.604762      0.160606
+                            motorplay  83       0.684337      0.047804      0.675000      0.090196
+                              toyplay  97       0.765636      0.040768      0.576344      0.073737
+                         dailyroutine  50       0.812000      0.034476      0.614815      0.094309
+                            bookshare  10       0.840000      0.105560      0.355556      0.076190
+generalsocialcommunicationinteraction 184       0.884420      0.021096      0.557333      0.046122
+                        socialroutine  22       0.909091      0.045455      0.466667      0.073016
+                              unknown   1       1.000000      0.000000      0.000000      0.000000
+
+------------------------------------------------------------
+6. PAIRWISE EXPERIMENT AGREEMENT
+------------------------------------------------------------
+(What fraction of predictions agree between each pair?)
+
+Lowest agreement pairs:
+        experiment_a     experiment_b  n_clips  n_agree  agreement
+fused_attn_unfreeze2  whisper_attn_lw      496      379   0.764113
+        whisper_attn  whisper_attn_lw      496      385   0.776210
+    whisper_attn_aug  whisper_attn_lw      496      388   0.782258
+      wavlm_stats_lw whisper_attn_aug      496      390   0.786290
+     whisper_attn_lw     whisper_mean      496      390   0.786290
+          fused_attn  whisper_attn_lw      496      393   0.792339
+fused_attn_unfreeze2   wavlm_stats_lw      496      393   0.792339
+whisper_attn_aug_ptt  whisper_attn_lw      496      393   0.792339
+     whisper_attn_lw whisper_attn_ptt      496      395   0.796371
+          wavlm_mean whisper_attn_aug      496      396   0.798387
+
+Highest agreement pairs:
+        experiment_a     experiment_b  n_clips  n_agree  agreement
+whisper_attn_aug_ptt whisper_attn_ptt      496      460   0.927419
+       fused_attn_lw whisper_stats_lw      496      462   0.931452
+          wavlm_mean   wavlm_stats_lw      496      462   0.931452
+    whisper_attn_aug     whisper_mean      496      466   0.939516
+        whisper_attn     whisper_mean      496      469   0.945565
+
+------------------------------------------------------------
+7. UNIQUE CONTRIBUTIONS
+------------------------------------------------------------
+(Clips that only THIS experiment gets correct while majority get wrong)
+
+  fused_attn: 26 clips correct here but wrong in majority of others
+
+  fused_attn_lw: 23 clips correct here but wrong in majority of others
+
+  fused_attn_unfreeze2: 51 clips correct here but wrong in majority of others
+
+  wavlm_attn: 28 clips correct here but wrong in majority of others
+
+  wavlm_attn_lw: 21 clips correct here but wrong in majority of others
+
+  wavlm_mean: 24 clips correct here but wrong in majority of others
+
+  wavlm_stats_lw: 23 clips correct here but wrong in majority of others
+
+  whisper_attn: 33 clips correct here but wrong in majority of others
+
+  whisper_attn_aug: 32 clips correct here but wrong in majority of others
+
+  whisper_attn_aug_ptt: 23 clips correct here but wrong in majority of others
+
+  whisper_attn_lw: 32 clips correct here but wrong in majority of others
+
+  whisper_attn_ptt: 30 clips correct here but wrong in majority of others
+
+  whisper_attn_unfreeze2: 31 clips correct here but wrong in majority of others
+
+  whisper_mean: 32 clips correct here but wrong in majority of others
+
+  whisper_stats_lw: 16 clips correct here but wrong in majority of others
+
+------------------------------------------------------------
+8. METADATA PATTERNS IN PERSISTENT ERRORS
+------------------------------------------------------------
+
+Persistent FP metadata (FP in >= half of experiments, n=79):
+  Mean #_children: 1.56
+  Multi-child: 22 / 79
+  Mean #_adults: 0.49
+  Has interaction: 65 / 79
+  Timepoint distribution:
+    timepoint_norm
+    36_month    40
+    14_month    39
+
+Persistent FN metadata (FN in >= half of experiments, n=17):
+  Mean #_children: 1.18
+  Mean #_adults: 0.18
+  Has interaction: 12 / 17
+  Timepoint distribution:
+    timepoint_norm
+    14_month    15
+    36_month     2

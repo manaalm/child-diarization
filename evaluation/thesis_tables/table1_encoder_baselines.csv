@@ -1,0 +1,5 @@
+model,pooling,f1,precision,recall,auroc,auprc,_source
+Whisper-Base,mean,0.8837209302325582,0.855,0.9144385026737968,0.8567107916191813,0.9509068769521702,baselines/baseline_results/whisper_mean/test_metrics_tuned.json
+Whisper-Base,attn,0.881664499349805,0.8582278481012658,0.9064171122994652,0.8497633032348558,0.9473139270144216,baselines/baseline_results/whisper_attn/test_metrics_tuned.json
+WavLM-Base,mean,0.8698795180722891,0.7916666666666666,0.9652406417112299,0.7950600508459718,0.9225653773624534,baselines/baseline_results/wavlm_mean/test_metrics_tuned.json
+WavLM-Base,attn,0.8743718592964824,0.8246445497630331,0.93048128342246,0.8079249583589024,0.924424476130741,baselines/baseline_results/wavlm_attn/test_metrics_tuned.json

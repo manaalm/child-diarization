@@ -1,0 +1,21 @@
+{
+  "experiment": "fused_attn",
+  "model_type": "fused",
+  "pooling": "attn",
+  "use_layer_weights": false,
+  "per_timepoint_threshold": true,
+  "augmentation": false,
+  "total_test_clips": 496,
+  "total_errors": 103,
+  "error_rate": 0.20766129032258066,
+  "n_false_positives": 72,
+  "n_false_negatives": 31,
+  "fp_rate_multi_child": 0.7241379310344828,
+  "fp_rate_single_child": 0.5483870967741935,
+  "fn_rate_with_interaction": 0.08024691358024691,
+  "fn_rate_without_interaction": 0.1,
+  "n_children_perfect": 3,
+  "n_children_below_70pct": 6,
+  "hardest_task": "specialoccasion",
+  "easiest_task": "unknown"
+}

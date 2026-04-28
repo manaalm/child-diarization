@@ -1,0 +1,566 @@
+{
+  "logistic_role_only": {
+    "features": [
+      "kchi_total_dur"
+    ],
+    "threshold": 0.27,
+    "val_metrics": {
+      "f1": 0.8914473684210527,
+      "precision": 0.928082191780822,
+      "recall": 0.8575949367088608,
+      "auroc": 0.8805861309851404,
+      "auprc": 0.939199605595148
+    },
+    "test_metrics": {
+      "f1": 0.8775193798449612,
+      "precision": 0.9129032258064517,
+      "recall": 0.844776119402985,
+      "auroc": 0.8555336524922557,
+      "auprc": 0.941502213771202
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8644258187159768,
+        "auprc": 0.9299900066969102,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8861538461538462,
+        "precision": 0.9411764705882353,
+        "recall": 0.8372093023255814,
+        "auroc": 0.8371262458471762,
+        "auprc": 0.9543422989149705,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 5.141640363522898
+    }
+  },
+  "gbm_role_only": {
+    "features": [
+      "kchi_total_dur"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8877887788778878,
+      "precision": 0.9275862068965517,
+      "recall": 0.8512658227848101,
+      "auroc": 0.8620665932856356,
+      "auprc": 0.9309758193013855
+    },
+    "test_metrics": {
+      "f1": 0.8740279937791602,
+      "precision": 0.9123376623376623,
+      "recall": 0.8388059701492537,
+      "auroc": 0.8367924528301887,
+      "auprc": 0.932536298660293
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8506005357297157,
+        "auprc": 0.9209303763500696,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8792569659442725,
+        "precision": 0.9403973509933775,
+        "recall": 0.8255813953488372,
+        "auroc": 0.8168604651162792,
+        "auprc": 0.9475023890694309,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 1.0
+    }
+  },
+  "logistic_enrollment_only": {
+    "features": [
+      "sim_weighted_mean"
+    ],
+    "threshold": 0.29000000000000004,
+    "val_metrics": {
+      "f1": 0.8910891089108911,
+      "precision": 0.9310344827586207,
+      "recall": 0.8544303797468354,
+      "auroc": 0.8634837644468905,
+      "auprc": 0.9259185474535276
+    },
+    "test_metrics": {
+      "f1": 0.8740279937791602,
+      "precision": 0.9123376623376623,
+      "recall": 0.8388059701492537,
+      "auroc": 0.8203604618417346,
+      "auprc": 0.9177605297462264
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8261470664477664,
+        "auprc": 0.8940536789497637,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8792569659442725,
+        "precision": 0.9403973509933775,
+        "recall": 0.8255813953488372,
+        "auroc": 0.8106312292358805,
+        "auprc": 0.9420022366061511,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "sim_weighted_mean": 1.6659662101527357
+    }
+  },
+  "gbm_enrollment_only": {
+    "features": [
+      "sim_weighted_mean"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8855721393034826,
+      "precision": 0.9303135888501742,
+      "recall": 0.8449367088607594,
+      "auroc": 0.8541001651073198,
+      "auprc": 0.9209789400963183
+    },
+    "test_metrics": {
+      "f1": 0.8665620094191523,
+      "precision": 0.9139072847682119,
+      "recall": 0.8238805970149253,
+      "auroc": 0.790509715573078,
+      "auprc": 0.899863501360341
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8535031847133758,
+        "precision": 0.8874172185430463,
+        "recall": 0.8220858895705522,
+        "auroc": 0.7965523200553011,
+        "auprc": 0.8741933819760205,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8792569659442725,
+        "precision": 0.9403973509933775,
+        "recall": 0.8255813953488372,
+        "auroc": 0.7780730897009968,
+        "auprc": 0.9278979020619493,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "sim_weighted_mean": 1.0
+    }
+  },
+  "logistic_diarizer_all": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion"
+    ],
+    "threshold": 0.2,
+    "val_metrics": {
+      "f1": 0.8914473684210527,
+      "precision": 0.928082191780822,
+      "recall": 0.8575949367088608,
+      "auroc": 0.8805586130985139,
+      "auprc": 0.938704077110258
+    },
+    "test_metrics": {
+      "f1": 0.8775193798449612,
+      "precision": 0.9129032258064517,
+      "recall": 0.844776119402985,
+      "auroc": 0.8568290622359899,
+      "auprc": 0.9422353712279693
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8653763069212823,
+        "auprc": 0.930648052998837,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8861538461538462,
+        "precision": 0.9411764705882353,
+        "recall": 0.8372093023255814,
+        "auroc": 0.8408637873754153,
+        "auprc": 0.9556345551747272,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": -1.61913803940173,
+      "kchi_n_segments": 3.3991328951900237,
+      "kchi_mean_seg_dur": 0.34277599916741763,
+      "kchi_max_seg_dur": 0.5060686148663213,
+      "kchi_proportion": 0.622847145754591
+    }
+  },
+  "gbm_diarizer_all": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8851913477537438,
+      "precision": 0.9333333333333333,
+      "recall": 0.8417721518987342,
+      "auroc": 0.8586268574573472,
+      "auprc": 0.9295227236013885
+    },
+    "test_metrics": {
+      "f1": 0.8665620094191523,
+      "precision": 0.9139072847682119,
+      "recall": 0.8238805970149253,
+      "auroc": 0.8213883413123063,
+      "auprc": 0.9238010187327494
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8571428571428571,
+        "precision": 0.8881578947368421,
+        "recall": 0.8282208588957055,
+        "auroc": 0.8358247645381491,
+        "auprc": 0.9182509994775285,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8757763975155279,
+        "precision": 0.94,
+        "recall": 0.8197674418604651,
+        "auroc": 0.7916943521594686,
+        "auprc": 0.9332565780584026,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 0.245647857098293,
+      "kchi_n_segments": 0.02487718968138986,
+      "kchi_mean_seg_dur": 0.09318010430363291,
+      "kchi_max_seg_dur": 0.10600582717597469,
+      "kchi_proportion": 0.5302890217407095
+    }
+  },
+  "logistic_embedding_all": {
+    "features": [
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "threshold": 0.15000000000000002,
+    "val_metrics": {
+      "f1": 0.8896210873146623,
+      "precision": 0.9278350515463918,
+      "recall": 0.8544303797468354,
+      "auroc": 0.8752889378095763,
+      "auprc": 0.9399750533932815
+    },
+    "test_metrics": {
+      "f1": 0.8775193798449612,
+      "precision": 0.9129032258064517,
+      "recall": 0.844776119402985,
+      "auroc": 0.8509152351450295,
+      "auprc": 0.9381906878181602
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8595005616521213,
+        "auprc": 0.923284351078838,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8861538461538462,
+        "precision": 0.9411764705882353,
+        "recall": 0.8372093023255814,
+        "auroc": 0.8388704318936877,
+        "auprc": 0.955005849036554,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "sim_weighted_mean": -1.2954357500301235,
+      "sim_max": 1.5220209678198457,
+      "sim_top3_mean": 1.5177809690169566
+    }
+  },
+  "gbm_embedding_all": {
+    "features": [
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8822553897180763,
+      "precision": 0.926829268292683,
+      "recall": 0.8417721518987342,
+      "auroc": 0.8560264171711612,
+      "auprc": 0.925869222277252
+    },
+    "test_metrics": {
+      "f1": 0.8701095461658842,
+      "precision": 0.9144736842105263,
+      "recall": 0.8298507462686567,
+      "auroc": 0.8220501267248662,
+      "auprc": 0.9246136705879712
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8643533123028391,
+        "precision": 0.8896103896103896,
+        "recall": 0.8404907975460123,
+        "auroc": 0.8334485440248856,
+        "auprc": 0.909607504866782,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8757763975155279,
+        "precision": 0.94,
+        "recall": 0.8197674418604651,
+        "auroc": 0.8022425249169436,
+        "auprc": 0.9417106105857158,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "sim_weighted_mean": 0.2619239972123899,
+      "sim_max": 0.4022100525471039,
+      "sim_top3_mean": 0.3358659502405062
+    }
+  },
+  "logistic_diarizer_plus_embedding": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "threshold": 0.15000000000000002,
+    "val_metrics": {
+      "f1": 0.8877887788778878,
+      "precision": 0.9275862068965517,
+      "recall": 0.8512658227848101,
+      "auroc": 0.879746835443038,
+      "auprc": 0.9424910412348737
+    },
+    "test_metrics": {
+      "f1": 0.8775193798449612,
+      "precision": 0.9129032258064517,
+      "recall": 0.844776119402985,
+      "auroc": 0.8535623767952689,
+      "auprc": 0.9401114972021267
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.86875,
+        "precision": 0.8853503184713376,
+        "recall": 0.852760736196319,
+        "auroc": 0.8653763069212823,
+        "auprc": 0.9301265906950307,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.8861538461538462,
+        "precision": 0.9411764705882353,
+        "recall": 0.8372093023255814,
+        "auroc": 0.8368770764119602,
+        "auprc": 0.9532025561239492,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 0.08310893203534764,
+      "kchi_n_segments": 0.7336292630239272,
+      "kchi_mean_seg_dur": -1.1705788778669097,
+      "kchi_max_seg_dur": 1.0409097340942521,
+      "kchi_proportion": 0.525772614397965,
+      "sim_weighted_mean": 0.46947237415205084,
+      "sim_max": 0.16600210863266582,
+      "sim_top3_mean": 0.9894919731496316
+    }
+  },
+  "gbm_diarizer_plus_embedding": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "threshold": 0.33,
+    "val_metrics": {
+      "f1": 0.8781302170283807,
+      "precision": 0.9293286219081273,
+      "recall": 0.8322784810126582,
+      "auroc": 0.8385525591634562,
+      "auprc": 0.9212315002077249
+    },
+    "test_metrics": {
+      "f1": 0.8621236133122029,
+      "precision": 0.918918918918919,
+      "recall": 0.8119402985074626,
+      "auroc": 0.8096029287524642,
+      "auprc": 0.9166840275481207
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8553054662379421,
+        "precision": 0.8986486486486487,
+        "recall": 0.8159509202453987,
+        "auroc": 0.8205305452345976,
+        "auprc": 0.9076790573935876,
+        "timepoint": "14_month",
+        "n": 234
+      },
+      {
+        "f1": 0.86875,
+        "precision": 0.9391891891891891,
+        "recall": 0.8081395348837209,
+        "auroc": 0.7862126245847175,
+        "auprc": 0.9307627856373639,
+        "timepoint": "36_month",
+        "n": 207
+      }
+    ],
+    "importances": {
+      "kchi_total_dur": 0.056996642770402936,
+      "kchi_n_segments": 0.021830129383908357,
+      "kchi_mean_seg_dur": 0.05337871961496527,
+      "kchi_max_seg_dur": 0.032051770752242324,
+      "kchi_proportion": 0.15890956678635343,
+      "sim_weighted_mean": 0.17456110005326847,
+      "sim_max": 0.2648247454820863,
+      "sim_top3_mean": 0.23744732515677294
+    }
+  },
+  "pertp_logistic_diarizer_plus_embedding": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "test_metrics": {
+      "f1": 0.8477905073649754,
+      "precision": 0.9384057971014492,
+      "recall": 0.7731343283582089,
+      "auroc": 0.8658124471979725,
+      "auprc": 0.9479219463266013
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8589743589743589,
+        "precision": 0.8993288590604027,
+        "recall": 0.8220858895705522,
+        "auroc": 0.8678821394625421,
+        "auprc": 0.9318016126709489,
+        "timepoint": "14_month",
+        "n": 234,
+        "threshold": 0.39
+      },
+      {
+        "f1": 0.8827160493827161,
+        "precision": 0.9407894736842105,
+        "recall": 0.8313953488372093,
+        "auroc": 0.8289036544850499,
+        "auprc": 0.9505003520084119,
+        "timepoint": "36_month",
+        "n": 207,
+        "threshold": 0.15000000000000002
+      }
+    ]
+  },
+  "pertp_gbm_diarizer_plus_embedding": {
+    "features": [
+      "kchi_total_dur",
+      "kchi_n_segments",
+      "kchi_mean_seg_dur",
+      "kchi_max_seg_dur",
+      "kchi_proportion",
+      "sim_weighted_mean",
+      "sim_max",
+      "sim_top3_mean"
+    ],
+    "test_metrics": {
+      "f1": 0.8608,
+      "precision": 0.9275862068965517,
+      "recall": 0.8029850746268656,
+      "auroc": 0.8333568009011546,
+      "auprc": 0.9260568072546156
+    },
+    "test_by_timepoint": [
+      {
+        "f1": 0.8553054662379421,
+        "precision": 0.8986486486486487,
+        "recall": 0.8159509202453987,
+        "auroc": 0.8267519225784151,
+        "auprc": 0.9103271208306072,
+        "timepoint": "14_month",
+        "n": 234,
+        "threshold": 0.26
+      },
+      {
+        "f1": 0.875,
+        "precision": 0.9459459459459459,
+        "recall": 0.813953488372093,
+        "auroc": 0.7911129568106312,
+        "auprc": 0.9267551125359043,
+        "timepoint": "36_month",
+        "n": 207,
+        "threshold": 0.41000000000000003
+      }
+    ]
+  }
+}

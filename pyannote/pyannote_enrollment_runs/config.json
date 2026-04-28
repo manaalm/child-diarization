@@ -1,0 +1,15 @@
+{
+  "split_dir": "/home/manaal/orcd/scratch/child-adult-diarization/whisper-modeling/seen_child_splits",
+  "results_dir": "/home/manaal/orcd/scratch/child-adult-diarization/pyannote/pyannote_enrollment_runs",
+  "sample_rate": 16000,
+  "min_seg_dur_sec": 0.4,
+  "max_enrollment_segments_per_child": 200,
+  "ecapa_source": "speechbrain/spkrec-ecapa-voxceleb",
+  "device": "cuda",
+  "pyannote_model": "pyannote/speaker-diarization-community-1",
+  "hf_token": "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",
+  "pyannote_cache_dir": "/home/manaal/orcd/scratch/child-adult-diarization/pyannote/pyannote_rttm_cache",
+  "similarity_threshold_min": 0.1,
+  "similarity_threshold_max": 0.95,
+  "similarity_threshold_steps": 171
+}
