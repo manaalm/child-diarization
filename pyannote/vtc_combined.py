@@ -261,7 +261,7 @@ def extract_all_features(
         clip_dur = get_clip_duration(ap)
         rttm = find_vtc_rttm(ap)
         segs = parse_rttm_kchi(rttm)
-        proto = prototypes.get(row["child_id"])
+        proto = prototypes.get(f"{row['child_id']}__{row['timepoint_norm']}")
         rows.append({
             "audio_path": ap,
             "child_id": row["child_id"],
@@ -282,7 +282,8 @@ def build_child_prototypes(
     embedder: ECAPAEmbedder,
 ) -> Dict[str, np.ndarray]:
     prototypes = {}
-    for child_id, sub in train_df[train_df["label"] == 1].groupby("child_id"):
+    for (child_id, timepoint), sub in train_df[train_df["label"] == 1].groupby(["child_id", "timepoint_norm"]):
+        proto_key = f"{child_id}__{timepoint}"
         all_pairs = []
         for _, row in sub.iterrows():
             ap = row["audio_path"]
@@ -305,7 +306,7 @@ def build_child_prototypes(
         if all_pairs:
             embs = np.stack([e for e, _ in all_pairs])
             weights = np.array([d for _, d in all_pairs])
-            prototypes[child_id] = l2_normalize(np.average(embs, axis=0, weights=weights))
+            prototypes[proto_key] = l2_normalize(np.average(embs, axis=0, weights=weights))
     return prototypes
 
 
