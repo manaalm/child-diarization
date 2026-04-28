@@ -127,7 +127,8 @@ class VAEModel(nn.Module):
     def loss(self, mel: torch.Tensor, recon: torch.Tensor,
              mu: torch.Tensor, logvar: torch.Tensor,
              kl_weight: float = 0.01) -> torch.Tensor:
-        recon_loss = F.l1_loss(recon, mel)
+        min_len = min(recon.shape[2], mel.shape[2])
+        recon_loss = F.l1_loss(recon[:, :, :min_len], mel[:, :, :min_len])
         kl_loss = -0.5 * torch.mean(1 + logvar - mu.pow(2) - logvar.exp())
         return recon_loss + kl_weight * kl_loss
 

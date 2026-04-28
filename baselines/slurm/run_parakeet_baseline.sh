@@ -22,13 +22,14 @@ source /home/manaal/miniforge3/etc/profile.d/conda.sh
 conda activate child-vocalizations
 
 export HF_HOME=/orcd/scratch/orcd/008/manaal/.cache/huggingface
+export CUDA_LAUNCH_BLOCKING=1
 
 cd /orcd/scratch/orcd/008/manaal/child-adult-diarization
 mkdir -p logs/baselines
 
 python baselines/parakeet_baseline.py \
     --split "${SPLIT}" \
-    --batch-size 32 \
+    --batch-size 4 \
     --seed 42
 
 echo "Done: $(date)"

@@ -75,19 +75,20 @@ def _clip_duration(audio_path: str) -> float:
 # Word timestamp parsing
 # ---------------------------------------------------------------------------
 
-def _word_coverage(hypothesis, clip_duration: float, frame_stride_sec: float = 0.04) -> dict:
+def _word_coverage(hypothesis, clip_duration: float) -> dict:
     """
     Extract word-level coverage from a NeMo Hypothesis.
     Returns gap_ratio (1 - covered / duration) and auxiliary features.
 
-    NeMo 2.x timestamp format:
+    NeMo 2.x timestamp format after process_timestamp():
       hypothesis.timestamp['word'] = [
-          {'word': str, 'start_offset': int, 'end_offset': int},
+          {'word': str, 'start_offset': int, 'end_offset': int,
+           'start': float,  # seconds = start_offset * window_stride * subsampling_factor
+           'end':   float}  # seconds
           ...
       ]
-    Offsets are in encoder-output frames. FastConformer TDT with 8x
-    subsampling at 10ms frame shift = 80ms per stride (0.08s).
-    For safety we detect second-valued offsets vs frame-index offsets.
+    Use 'start'/'end' (already in seconds). 'start_offset'/'end_offset' are raw
+    pre-subsampling frame indices and must NOT be used directly as seconds.
     """
     word_stamps = []
     if hasattr(hypothesis, "timestamp") and hypothesis.timestamp:
@@ -99,19 +100,10 @@ def _word_coverage(hypothesis, clip_duration: float, frame_stride_sec: float = 0
                 "covered_sec": 0.0, "words_per_sec": 0.0,
                 "clip_duration": clip_duration}
 
-    # Determine if offsets are already in seconds or frame indices
-    max_offset = max(w.get("end_offset", 0) for w in word_stamps)
-    if max_offset > clip_duration * 10:
-        # Frame indices — convert using frame_stride_sec
-        scale = frame_stride_sec
-    else:
-        # Already in seconds
-        scale = 1.0
-
     covered = 0.0
     for w in word_stamps:
-        start = w.get("start_offset", 0) * scale
-        end = w.get("end_offset", 0) * scale
+        start = w.get("start", w.get("start_offset", 0))
+        end = w.get("end", w.get("end_offset", 0))
         if end > start:
             covered += min(end, clip_duration) - max(start, 0.0)
 
