@@ -38,7 +38,6 @@ if __name__ == '__main__':
     checkpoint_path = os.path.join(configs["save"], "checkpoints", configs["name"])
     if os.path.exists(checkpoint_path):
         print("Removing previous checkpoints: ", checkpoint_path)
-        import pdb; pdb.set_trace()
         shutil.rmtree(checkpoint_path)
 
     # train
