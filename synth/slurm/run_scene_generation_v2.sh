@@ -62,6 +62,20 @@ if [[ ! -f "${MANIFEST}" ]]; then
         --skip-quality
 fi
 
+# ---- Step 1b: Pre-extract every segment to WAV (avoids 8 sec/draw flac/MP3 decode) ----
+# Without this, scene gen runs at ~2.5 scenes/min instead of ~40/min because
+# every draw seeks into a long Providence MP3 or decodes a fresh LibriSpeech flac.
+# extract_segments writes per-segment 16kHz WAVs to data/segments_v2/{role}/ and
+# updates the manifest's audio_path column in place.
+SEG_DIR=data/segments_v2
+if [[ ! -d "${SEG_DIR}" ]] || [[ "$(find ${SEG_DIR} -name '*.wav' 2>/dev/null | wc -l)" -lt 100000 ]]; then
+    echo "=== Pre-extracting segments to ${SEG_DIR} (one-time, ~30-60 min) ==="
+    python synth/scripts/extract_segments.py \
+        --manifest    "${MANIFEST}" \
+        --output-dir  "${SEG_DIR}" \
+        --sample-rate 16000
+fi
+
 # ---- Step 2: Generate scenes ----
 EXTRA=""
 if [[ -n "${N_SCENES_OVERRIDE}" ]]; then

@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 
-The goal is per-clip child presence detection: given a short audio clip, predict whether a target child is vocalizing. A synthetic scene generator (`synth/`) produces augmented training data by mixing Providence child speech and LibriSpeech adult speech under configurable SNR, RIR, overlap, and scene-type distributions. Nine diarization frontends are compared:
+The goal is per-clip child presence detection: given a short audio clip, predict whether a target child is vocalizing. A synthetic scene generator (`synth/`) produces augmented training data by mixing child speech (Providence + TinyVox + Playlogue) and adult speech (Providence parents + LibriSpeech + Playlogue) under configurable SNR, RIR, overlap, and scene-type distributions. (Note: the original 5000-scene v1 corpus inadvertently used **only Providence parents** for adults — the LibriSpeech and Playlogue sources were added in the v2 rebuild on 2026-04-30; see "Synthetic Data Generator" below.) Nine diarization frontends are compared:
 1. **USC-SAIL** — Fine-tuned Whisper + LoRA frame classifier (`whisper-modeling/`)
 2. **Pyannote** — `pyannote/speaker-diarization-community-1` model
 3. **BabAR** — VTC 2.0 child speech diarizer (full pipeline with phoneme step)
@@ -388,15 +388,22 @@ python pseudo_frame/audio2video_distill.py
 
 7-step pipeline: build segment manifest → extract segments → generate scenes → make training manifests → train at each ratio → evaluate → error analysis. No GPU required for steps 1–3.
 
+> **v1 vs v2 corpus** (2026-04-30): the original 5000-scene corpus (`synth_results/synthetic_scenes/`, `synthetic_manifest_v1.csv`) was built **without LibriSpeech and without Playlogue** despite both being listed in `synth/configs/default_14_18mo.yaml` — the build_segment_manifest.py invocation in `synth/slurm/run_scene_generation.sh` did not pass `--librispeech-dir` and the script had no `--playlogue-dir` support at all. Adult speech in v1 came entirely from `providence_adults` (the parents in the Providence corpus). The v2 corpus (`synth_results/synthetic_scenes_v2/`, `synthetic_manifest.csv` after re-run, segment manifest `segment_manifest_v2.csv` with 294,745 segments) properly includes LibriSpeech (28,539 adult segs, ~100 h) and Playlogue (24,412 child + 27,558 adult segs from cameron/ew/gleason/vh CHILDES corpora — disjoint from BIDS test). v2 use is preferred for all new spec-016-style augmentation experiments. Use `synth/slurm/run_scene_generation_v2.sh` to regenerate.
+
 ```bash
-# Step 1: build Providence + TinyVox + LibriSpeech segment manifest
+# Step 1: build Providence + TinyVox + Playlogue + LibriSpeech segment manifest
 python synth/scripts/build_segment_manifest.py \
   --providence-dir        providence/ \
   --providence-rttm-dir   providence/rttm/ \
   --tinyvox-dir           data/tinyvox/ \
-  --librispeech-dir       /path/to/LibriSpeech/train-clean-100/ \
+  --playlogue-dir         playlogue/audio/ \
+  --playlogue-rttm-dir    playlogue/rttm/ \
+  --librispeech-dir       data/LibriSpeech/LibriSpeech/train-clean-100/ \
   --exclude-speakers-csv  whisper-modeling/seen_child_splits/test.csv \
-  --output                synth_results/manifests/segment_manifest.csv
+  --output                synth_results/manifests/segment_manifest_v2.csv
+# v2 outputs: ~295k segments (providence 74k + providence_adults 91k + tinyvox 25k +
+#             librispeech 29k + playlogue 49k + playlogue_adults 28k)
+# Original v1 manifest used Providence + TinyVox only (~190k segments, no LibriSpeech, no Playlogue).
 # TinyVox adds ~24k Eng-NA child segments (~10 h) with age_band from session YYMMDD
 
 # Step 2: extract segment WAVs
@@ -840,6 +847,7 @@ If audio files change, delete the relevant cache directory before re-running.
 - **Custom WhisperWrapper API drift on transformers ≥4.57** (whisper-modeling/models/whisper.py) — newer transformers changed Whisper internals: (1) `WhisperAttention.__init__` now requires `config=` arg or `self.config` is None, breaking later `_attn_implementation` access — fixed by passing `config=config`; (2) `WhisperAttention.forward` now returns 2-tuple instead of 3-tuple (dropped `past_key_value`) — fixed by robust unpacking `result[0], result[1]`. Both fixes committed.
 - **Granite-Speech requires `<|audio|>` placeholder** — `processor(text=prompt, ...)` raises "Number of audio tokens does not match number of audio features" if prompt lacks the `<|audio|>` token. `score_granite_llm` injects it automatically. Even with the fix, the 1B model produces near-random scores on zero-shot child-vocalization (AUROC≈0.45-0.50) — this is a model-capability ceiling, not a setup bug.
 - **Audio model error fallback poisons cache** — `baselines/audio_model_baseline.py` `run_inference` writes `score=0.5` to cache on any per-clip exception. If a buggy model run errors all clips, the cache fills with 431×0.5 entries. Subsequent runs see "all cached", skip model load, compute AUROC=0.5 exactly. After fixing model code, **delete the cache** before resubmitting: `rm baselines/audio_model_cache/{model_slug}{_cross_child}/{val,test}_scores.json`.
+- **synth corpus v1 lacked LibriSpeech and Playlogue** (2026-04-30 audit). The original 5000-scene corpus (`synth_results/synthetic_scenes/`) was generated from a manifest containing 0 LibriSpeech segments and 0 Playlogue segments — the SLURM script `synth/slurm/run_scene_generation.sh` did not pass `--librispeech-dir` to `build_segment_manifest.py`, and the script had no `--playlogue-dir` support at all. All v1 adult speech came from `providence_adults` (the parents of the children in Providence). v2 corpus (`synthetic_scenes_v2/`, manifest `segment_manifest_v2.csv` with 294,745 segments) corrects this. Verify the source mix in any new synth corpus by inspecting the `source_dataset` field in scene JSONs (`synth_results/synthetic_scenes_v?/json/*.json` under `source_segments`). Spec-016 results were produced on v1; re-runs should target v2.
 - **Canary-Qwen-2.5b NeMo↔HF format mismatch** — `EncDecMultiTaskModel.from_pretrained("nvidia/canary-qwen-2.5b")` fails with `FileNotFoundError: model_config.yaml` because the HF-uploaded model has HF format (config.json + safetensors) but NeMo's loader expects a `.nemo` bundle with `model_config.yaml`. NeMo 2.7.3 doesn't support loading HF-only Canary uploads. Currently blocked; would require either NGC download (NeMo format) or rewriting the loader to use `transformers.AutoModel`.
 
 ## Recent Changes
