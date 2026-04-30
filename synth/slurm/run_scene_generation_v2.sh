@@ -45,11 +45,12 @@ echo "Start time: $(date)"
 
 mkdir -p logs/synth synth_results/manifests
 
-MANIFEST=synth_results/manifests/segment_manifest_v2.csv
+MANIFEST_FULL=synth_results/manifests/segment_manifest_v2.csv
+MANIFEST=synth_results/manifests/segment_manifest_v2_sampled.csv
 
-# ---- Step 1: Build v2 segment manifest (Providence + TinyVox + Playlogue + LibriSpeech) ----
-if [[ ! -f "${MANIFEST}" ]]; then
-    echo "=== Building v2 segment manifest ==="
+# ---- Step 1: Build v2 segment manifest if missing (Providence + TinyVox + Playlogue + LibriSpeech) ----
+if [[ ! -f "${MANIFEST_FULL}" ]]; then
+    echo "=== Building full v2 segment manifest ==="
     python synth/scripts/build_segment_manifest.py \
         --providence-dir        providence/ \
         --providence-rttm-dir   providence/rttm/ \
@@ -58,18 +59,31 @@ if [[ ! -f "${MANIFEST}" ]]; then
         --playlogue-rttm-dir    playlogue/rttm/ \
         --librispeech-dir       data/LibriSpeech/LibriSpeech/train-clean-100/ \
         --exclude-speakers-csv  whisper-modeling/seen_child_splits/test.csv \
-        --output                "${MANIFEST}" \
+        --output                "${MANIFEST_FULL}" \
         --skip-quality
 fi
 
+# ---- Step 1a: Subsample to 3000 segs/source = 18000 total ----
+# Scene gen for 5000 scenes only draws ~15k segment uses; 18k pool gives ~5x
+# reuse with full source diversity. Cuts extract from 5h (295k segs) to ~70 min.
+if [[ ! -f "${MANIFEST}" ]]; then
+    echo "=== Subsampling manifest (3k per source_dataset) ==="
+    python -c "
+import pandas as pd
+df = pd.read_csv('${MANIFEST_FULL}')
+sampled = []
+for ds, grp in df.groupby('source_dataset'):
+    sampled.append(grp.sample(n=min(3000, len(grp)), random_state=42))
+out = pd.concat(sampled, ignore_index=True)
+out.to_csv('${MANIFEST}', index=False)
+print(f'Subsampled: {len(out)} segments')
+"
+fi
+
 # ---- Step 1b: Pre-extract every segment to WAV (avoids 8 sec/draw flac/MP3 decode) ----
-# Without this, scene gen runs at ~2.5 scenes/min instead of ~40/min because
-# every draw seeks into a long Providence MP3 or decodes a fresh LibriSpeech flac.
-# extract_segments writes per-segment 16kHz WAVs to data/segments_v2/{role}/ and
-# updates the manifest's audio_path column in place.
 SEG_DIR=data/segments_v2
-if [[ ! -d "${SEG_DIR}" ]] || [[ "$(find ${SEG_DIR} -name '*.wav' 2>/dev/null | wc -l)" -lt 100000 ]]; then
-    echo "=== Pre-extracting segments to ${SEG_DIR} (one-time, ~30-60 min) ==="
+if [[ ! -d "${SEG_DIR}" ]] || [[ "$(find ${SEG_DIR} -name '*.wav' 2>/dev/null | wc -l)" -lt 15000 ]]; then
+    echo "=== Pre-extracting subsampled segments to ${SEG_DIR} (one-time, ~70 min) ==="
     python synth/scripts/extract_segments.py \
         --manifest    "${MANIFEST}" \
         --output-dir  "${SEG_DIR}" \
