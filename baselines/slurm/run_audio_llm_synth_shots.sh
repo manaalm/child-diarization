@@ -20,9 +20,13 @@ source /home/manaal/miniforge3/etc/profile.d/conda.sh
 conda activate child-vocalizations
 
 export HF_HOME=/orcd/scratch/orcd/008/manaal/.cache/huggingface
+# transformers >=4.57 has_file() bug — force offline mode (cache is populated)
+export TRANSFORMERS_OFFLINE=1
+export HF_HUB_OFFLINE=1
 
 cd /orcd/scratch/orcd/008/manaal/child-adult-diarization
 
+set -e
 python baselines/audio_llm_baseline.py \
     --split "${SPLIT}" \
     --model-slug "${MODEL_SLUG}" \

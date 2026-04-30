@@ -15,6 +15,11 @@ set -euo pipefail
 CONFIG=${1:-pseudo_frame/configs/wavlm_pseudo.yaml}
 
 export PATH="$HOME/.local/bin:$PATH"
+# transformers >=4.57 has a bug where has_file() does a network roundtrip even
+# for cached models and misinterprets responses → "is not a local folder"
+# error. Force offline mode so it uses ~/.cache/huggingface/hub directly.
+export TRANSFORMERS_OFFLINE=1
+export HF_HUB_OFFLINE=1
 source /orcd/home/002/manaal/miniforge3/etc/profile.d/conda.sh
 conda activate child-vocalizations
 

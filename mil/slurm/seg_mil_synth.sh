@@ -10,6 +10,10 @@
 set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
 export PYTHONUNBUFFERED=1
+# transformers >=4.57 bug: has_file() does network roundtrip even for cached
+# models and misinterprets responses. Force offline mode.
+export TRANSFORMERS_OFFLINE=1
+export HF_HUB_OFFLINE=1
 source /orcd/home/002/manaal/miniforge3/etc/profile.d/conda.sh
 conda activate child-vocalizations
 
