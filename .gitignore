@@ -96,6 +96,14 @@ VBx/
 .specify/
 .cache/
 
+# Large local-only docs and notebooks (kept on disk, not pushed to remote)
+THESIS_MEGADOC.md
+results_summary.md
+related_works.MD
+*.ipynb
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
 # Temp/staging files
 recover.txt
 pyannote/vtc_input_staging/
