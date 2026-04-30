@@ -1,0 +1,31 @@
+variant_name: "wavlm_pseudo_frame_c1distill"
+backbone: "microsoft/wavlm-base-plus"
+backbone_layer: -1
+
+# Frame head (matches baseline wavlm_pseudo.yaml)
+hidden_dim: 256
+dropout: 0.2
+
+# Train (matches baseline)
+crop_sec: 10.0
+batch_size: 8
+num_workers: 2
+lr: 1.0e-3
+weight_decay: 1.0e-4
+epochs: 25
+patience: 5
+seed: 42
+
+# Pseudo-label loss
+# C1 produces softmax probabilities in [0, 1] — fewer 0.5-disagreement frames than
+# the baseline VTC+USC-SAIL average, so confidence_weight has less to downweight.
+# Keep enabled for symmetry with the baseline run.
+confidence_weight: true
+pos_weight: 3.0
+
+split_dir: "whisper-modeling/seen_child_splits"
+device: "cuda"
+
+# Spec-016 follow-up #8: read C1-distilled pseudo-labels instead of the
+# default VTC+USC-SAIL averaged labels.
+pseudo_labels_dir: "pseudo_frame/pseudo_labels_c1"

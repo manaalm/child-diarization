@@ -115,11 +115,13 @@ def train(cfg: dict) -> None:
     os.makedirs(out_dir, exist_ok=True)
 
     # Data
-    idx_path = os.path.join(_REPO, "pseudo_frame/pseudo_labels/index.csv")
+    pseudo_labels_dir = cfg.get("pseudo_labels_dir", "pseudo_frame/pseudo_labels")
+    idx_path = os.path.join(_REPO, pseudo_labels_dir, "index.csv")
     if not os.path.exists(idx_path):
         raise FileNotFoundError(
             f"Missing pseudo-label index: {idx_path}. "
-            f"Run `python pseudo_frame/build_pseudo_labels.py` first."
+            f"Run the appropriate pseudo_frame/build_*.py first "
+            f"(or distill_c1_pseudo_labels.py for C1 self-distillation)."
         )
     pl_index = pd.read_csv(idx_path)
 
