@@ -1,0 +1,42 @@
+[
+  {
+    "frontend": "usc_sail_synth_combined",
+    "aggregator": "gated_attention",
+    "val_f1": 0.848314606741573,
+    "val_auroc": 0.6028893780957623,
+    "val_auprc": 0.7754494301349112,
+    "test_f1": 0.8647925033467202,
+    "test_precision": 0.7839805825242718,
+    "test_recall": 0.9641791044776119,
+    "test_auroc": 0.6361447479583215,
+    "test_auprc": 0.8335737710075455,
+    "test_auroc_14month": 0.6330251447334313,
+    "test_auroc_36month": 0.6410299003322258,
+    "test_f1_14month": 0.8253968253968254,
+    "test_f1_36month": 0.9051490514905149,
+    "threshold": 0.35,
+    "n_train_bags": 6311,
+    "n_empty_bags_train": 901,
+    "config_path": "mil/mil_results/seg_mil/usc_sail_synth_combined_gated_attention/config.json"
+  },
+  {
+    "frontend": "usc_sail_synth_combined",
+    "aggregator": "transformer",
+    "val_f1": 0.8583106267029973,
+    "val_auroc": 0.655462300495322,
+    "val_auprc": 0.8160017328064906,
+    "test_f1": 0.8713910761154856,
+    "test_precision": 0.7775175644028103,
+    "test_recall": 0.991044776119403,
+    "test_auroc": 0.6365108420163335,
+    "test_auprc": 0.8291134404528522,
+    "test_auroc_14month": 0.6181629655232006,
+    "test_auroc_36month": 0.6534883720930231,
+    "test_f1_14month": 0.8350515463917526,
+    "test_f1_36month": 0.9090909090909091,
+    "threshold": 0.3,
+    "n_train_bags": 6311,
+    "n_empty_bags_train": 901,
+    "config_path": "mil/mil_results/seg_mil/usc_sail_synth_combined_transformer/config.json"
+  }
+]

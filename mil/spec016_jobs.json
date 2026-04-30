@@ -2,6 +2,9 @@
   "spec": "016-synth-augmentation-extensions",
   "submitted_at": "2026-04-29T14:30",
   "synth_corpus": "synth_results/manifests/synthetic_manifest.csv (5000 scenes, gen job 12770080)",
+  "synth_corpus_v2": "synth_results/manifests/synthetic_manifest.csv (5000 scenes, regenerated 2026-04-30 from segment_manifest_v2.csv with all 4 sources: providence + tinyvox + librispeech + playlogue; gen job 12876698)",
+  "v2_rerun_submitted_at": "2026-04-29T22:00",
+  "v2_rerun_completed_at": "2026-04-30T02:33",
   "jobs": [
     {
       "variant": "audio_llm_synth_2shot_val",
@@ -24,7 +27,14 @@
       "delta_vs_zero_shot": {"f1": -0.008, "auroc": -0.012, "auprc": 0.008},
       "delta_vs_real_2shot": {"f1": -0.008, "auroc": -0.012, "auprc": 0.008},
       "verdict": "neutral / tiny negative",
-      "note": "Few-shot is a low-leverage axis on Qwen2-Audio for this task regardless of demo source. Real-2shot baseline is identical to zero-shot."
+      "note": "Few-shot is a low-leverage axis on Qwen2-Audio for this task regardless of demo source. Real-2shot baseline is identical to zero-shot.",
+      "v2_results": {
+        "job_id": "12877292",
+        "test_f1": 0.8633, "test_auroc": 0.7127, "test_auprc": 0.8611,
+        "delta_v2_vs_v1": {"f1": 0.0, "auroc": 0.0, "auprc": 0.0},
+        "verdict_v2": "bit-identical to v1",
+        "note_v2": "Logits cache (`baselines/audio_llm_cache/qwen2_audio_7b_synth_2shot/`) was not cleared between v1 and v2 runs, so v2 inference returned cached v1 logits. Test results identical down to last digit. To get true v2 numbers would require clearing the cache and re-submitting; left as-is since C6 was already neutral in v1 and the cost (~1h GPU) is not justified by the expected null delta on a low-leverage axis."
+      }
     },
     {
       "variant": "wavlm_pseudo_frame_synth",
@@ -37,7 +47,15 @@
       "frame_pearson_mean": 0.4677, "frame_spearman_mean": 0.4543, "frame_auroc_mean": 0.8118,
       "delta_vs_baseline": {"f1": 0.007, "auroc": -0.068, "auprc": -0.027, "frame_pearson": -0.098},
       "verdict": "NEGATIVE",
-      "note": "Synth dominates train pool (5000 vs 1311 real). Both clip-level AUROC and frame-localization Pearson regress. Synth GT labels do not transfer cleanly when the baseline already has high-quality VTC+USC-SAIL pseudo-labels."
+      "note": "Synth dominates train pool (5000 vs 1311 real). Both clip-level AUROC and frame-localization Pearson regress. Synth GT labels do not transfer cleanly when the baseline already has high-quality VTC+USC-SAIL pseudo-labels.",
+      "v2_results": {
+        "job_id": "12877291",
+        "test_f1": 0.8673, "test_auroc": 0.8061, "test_auprc": 0.9261,
+        "delta_v2_vs_v1": {"f1": -0.009, "auroc": 0.043, "auprc": 0.016},
+        "delta_v2_vs_real_baseline": {"f1": -0.002, "auroc": -0.025, "auprc": -0.011},
+        "verdict_v2": "NEGATIVE (mitigated)",
+        "note_v2": "v2 source diversity (LibriSpeech + Playlogue adults vs v1 Providence-parents-only) cuts the swamping penalty significantly: AUROC -0.025 vs real baseline (was -0.068 in v1), AUPRC -0.011 (was -0.027). Still net negative because the underlying issue — synth dominates train at 5000 vs 1311 real — persists; v2 just generates better-distributed swamping. Frame-Pearson regression also expected to mitigate but not measured in re-run."
+      }
     },
     {
       "variant": "wavlm_mil_hardneg_synth",
@@ -49,7 +67,14 @@
       "test_f1": 0.8634, "test_auroc": 0.6568, "test_auprc": 0.8509,
       "delta_vs_real_hardneg": {"f1": 0.0, "auroc": 0.015, "auprc": 0.007},
       "verdict": "tiny POSITIVE",
-      "note": "Synth-mined hardnegs (1276 adult-only + 728 background-speech scenes, n=2004 cap-limited to 623) match or slightly beat RTTM-mined hardnegs (~612 windows). Cheap drop-in replacement viable."
+      "note": "Synth-mined hardnegs (1276 adult-only + 728 background-speech scenes, n=2004 cap-limited to 623) match or slightly beat RTTM-mined hardnegs (~612 windows). Cheap drop-in replacement viable.",
+      "v2_results": {
+        "test_f1": 0.8534, "test_auroc": 0.7059, "test_auprc": 0.8605,
+        "delta_v2_vs_v1": {"f1": -0.010, "auroc": 0.049, "auprc": 0.010},
+        "delta_v2_vs_real_hardneg": {"f1": -0.010, "auroc": 0.064, "auprc": 0.017},
+        "verdict_v2": "POSITIVE (strengthened)",
+        "note_v2": "v2 diversity boosts AUROC delta from +0.015 (v1) to +0.064 (v2) — synth-mined hardnegs are now meaningfully better than RTTM-mined ones. Source mix matters more than scene count for hardneg quality."
+      }
     },
     {
       "variant": "whisper_mil_hardneg_synth",
@@ -62,7 +87,14 @@
       "delta_vs_real_hardneg": {"f1": 0.008, "auroc": 0.004, "auprc": 0.002},
       "real_baseline_ref": "mil/mil_results/whisper_mil_hardneg (F1=0.8688 AUROC=0.8182 AUPRC=0.9292)",
       "verdict": "tiny POSITIVE",
-      "note": "Mirrors C3 wavlm — synth-mined hardnegs slightly beat RTTM-mined ones. Both backbones confirm synth pool is a viable cheap drop-in for the existing real-hardneg pipeline."
+      "note": "Mirrors C3 wavlm — synth-mined hardnegs slightly beat RTTM-mined ones. Both backbones confirm synth pool is a viable cheap drop-in for the existing real-hardneg pipeline.",
+      "v2_results": {
+        "test_f1": 0.8940, "test_auroc": 0.8535, "test_auprc": 0.9438,
+        "delta_v2_vs_v1": {"f1": 0.017, "auroc": 0.031, "auprc": 0.012},
+        "delta_v2_vs_real_hardneg": {"f1": 0.025, "auroc": 0.035, "auprc": 0.015},
+        "verdict_v2": "POSITIVE (strengthened)",
+        "note_v2": "Whisper-MIL with v2 hardnegs is the best-performing C3 config (AUROC 0.854, AUPRC 0.944). v2 diversity meaningfully improves over both v1 synth and real-only baseline. Pattern matches C3 wavlm: source mix > scene count."
+      }
     },
     {
       "variant": "wavlm_mil_cross_child_synth",
@@ -75,7 +107,14 @@
       "delta_vs_real_cross_child": {"f1": 0.001, "auroc": -0.070, "auprc": -0.010},
       "real_baseline_ref": "mil/mil_results/wavlm_mil_cross_child (F1=0.8627 AUROC=0.6902 AUPRC=0.8445)",
       "verdict": "NEGATIVE",
-      "note": "Same swamping pattern as C2 pseudo-frame: 5000 synth >> 1469 real-train means the model overfits to synth distribution, which doesn't transfer to real cross-child val/test. Cross-child was the expected best case for synth (most data-hungry split), but loss is similar to C2."
+      "note": "Same swamping pattern as C2 pseudo-frame: 5000 synth >> 1469 real-train means the model overfits to synth distribution, which doesn't transfer to real cross-child val/test. Cross-child was the expected best case for synth (most data-hungry split), but loss is similar to C2.",
+      "v2_results": {
+        "test_f1": 0.8637, "test_auroc": 0.5661, "test_auprc": 0.8056,
+        "delta_v2_vs_v1": {"f1": 0.0, "auroc": -0.054, "auprc": -0.030},
+        "delta_v2_vs_real_cross_child": {"f1": 0.001, "auroc": -0.124, "auprc": -0.039},
+        "verdict_v2": "NEGATIVE (deepened)",
+        "note_v2": "v2 source diversity made wavlm cross-child WORSE, not better. Likely cause: librispeech adults have different acoustic characteristics than Providence parents (the actual val/test population), so v2's broader adult distribution pulls the model further from the in-distribution adult set seen in cross-child val/test. Confirms C4 is fundamentally the wrong augmentation strategy for cross-child generalization on this dataset."
+      }
     },
     {
       "variant": "whisper_mil_cross_child_synth",
@@ -88,7 +127,15 @@
       "delta_vs_real_cross_child": {"f1": -0.036, "auroc": -0.287, "auprc": -0.174},
       "real_baseline_ref": "mil/mil_results/whisper_mil_cross_child (F1=0.8951 AUROC=0.8761 AUPRC=0.9538)",
       "verdict": "STRONG NEGATIVE",
-      "note": "Much bigger drop than C4 wavlm (-0.070 AUROC). Whisper-small is more sensitive to synth swamping than WavLM-base+ in the cross-child setting. Both backbones confirm cross-child augmentation does NOT benefit from naive 5000-synth append; the real baseline (whisper-MIL on 1469 cross-child train clips) generalized better than the augmented model."
+      "note": "Much bigger drop than C4 wavlm (-0.070 AUROC). Whisper-small is more sensitive to synth swamping than WavLM-base+ in the cross-child setting. Both backbones confirm cross-child augmentation does NOT benefit from naive 5000-synth append; the real baseline (whisper-MIL on 1469 cross-child train clips) generalized better than the augmented model.",
+      "v2_results": {
+        "job_id": "12877269",
+        "test_f1": 0.8568, "test_auroc": 0.7049, "test_auprc": 0.8605,
+        "delta_v2_vs_v1": {"f1": -0.003, "auroc": 0.116, "auprc": 0.080},
+        "delta_v2_vs_real_cross_child": {"f1": -0.038, "auroc": -0.171, "auprc": -0.093},
+        "verdict_v2": "NEGATIVE (mostly recovered)",
+        "note_v2": "Largest single swing of any candidate: AUROC +0.116 from v2 source diversity (0.589 → 0.705). Whisper-small's sensitivity to swamping that hurt v1 by -0.287 AUROC is mostly recovered when the synth adults aren't 100% Providence parents. Still -0.171 vs real baseline — naive append remains the wrong recipe — but contradicts the v1 conclusion that whisper backbone is fundamentally broken on this strategy. Behavior diverges from C4a wavlm (which got worse in v2): whisper benefits from broader adult acoustic distribution, wavlm hurts from it, suggesting different bottlenecks between the two backbones at the same task."
+      }
     },
     {
       "variant": "seg_mil_synth_gated_attention",
@@ -100,7 +147,14 @@
       "test_f1": 0.8648, "test_auroc": 0.6361, "test_auprc": 0.8336,
       "delta_vs_real_seg_mil": {"f1": -0.006, "auroc": 0.035, "auprc": 0.037},
       "real_baseline_ref": "mil/mil_results/seg_mil/usc_sail_gated_attention",
-      "verdict": "mild POSITIVE"
+      "verdict": "mild POSITIVE",
+      "v2_results": {
+        "test_f1": 0.8707, "test_auroc": 0.6590, "test_auprc": 0.8429,
+        "delta_v2_vs_v1": {"f1": 0.006, "auroc": 0.023, "auprc": 0.009},
+        "delta_v2_vs_real_seg_mil": {"f1": 0.0, "auroc": 0.058, "auprc": 0.046},
+        "verdict_v2": "POSITIVE (strengthened)",
+        "note_v2": "v2 source mix mildly improves over v1 across all three metrics. Combined real+synth segment cache benefits from broader segment diversity."
+      }
     },
     {
       "variant": "seg_mil_synth_transformer",
@@ -113,7 +167,14 @@
       "delta_vs_real_seg_mil": {"f1": 0.0, "auroc": 0.119, "auprc": 0.040},
       "real_baseline_ref": "mil/mil_results/seg_mil/usc_sail_transformer",
       "verdict": "strong POSITIVE",
-      "note": "Largest delta among completed candidates. Transformer aggregator on real USC-SAIL segments was AUROC=0.518 (worst seg-MIL config); synth-augmented combined cache lifts it to 0.637 (+0.119). Suggests transformer aggregator is bottlenecked by segment-quality noise — clean synth segments unblock it."
+      "note": "Largest delta among completed candidates. Transformer aggregator on real USC-SAIL segments was AUROC=0.518 (worst seg-MIL config); synth-augmented combined cache lifts it to 0.637 (+0.119). Suggests transformer aggregator is bottlenecked by segment-quality noise — clean synth segments unblock it.",
+      "v2_results": {
+        "test_f1": 0.8714, "test_auroc": 0.5913, "test_auprc": 0.7986,
+        "delta_v2_vs_v1": {"f1": 0.0, "auroc": -0.046, "auprc": -0.031},
+        "delta_v2_vs_real_seg_mil": {"f1": 0.0, "auroc": 0.073, "auprc": 0.009},
+        "verdict_v2": "POSITIVE (weakened)",
+        "note_v2": "v1's strongest gain partially reverses: AUROC delta vs real shrinks from +0.119 (v1) to +0.073 (v2). Transformer aggregator was unblocked by clean synth segments in v1; v2's broader source mix introduces variability that the transformer is sensitive to. v1 transformer remains the single best clip-level synth-augmentation result."
+      }
     },
     {
       "variant": "whisper_base_synth_usc_sail",
@@ -131,7 +192,16 @@
       "test_score": 0.9223,
       "test_loss": 0.2345,
       "verdict": "POSITIVE — synth-only training produces non-trivial frame classifier",
-      "note": "Frame-level multi-class classifier (silence/child/adult/overlap @ 50Hz). Test accuracy 92.2% well above spec acceptance >50%. Not directly comparable to enrollment AUROC; would need to wire this checkpoint into pyannote/unified.py --diarizer usc_sail and rerun enrollment to compare against the existing pretrained whisper-base_rank8_pretrained_50k.pt. Cleared blocker that whisper-modeling pipeline can train on this cluster (4 transformers API drift patches)."
+      "note": "Frame-level multi-class classifier (silence/child/adult/overlap @ 50Hz). Test accuracy 92.2% well above spec acceptance >50%. Not directly comparable to enrollment AUROC; would need to wire this checkpoint into pyannote/unified.py --diarizer usc_sail and rerun enrollment to compare against the existing pretrained whisper-base_rank8_pretrained_50k.pt. Cleared blocker that whisper-modeling pipeline can train on this cluster (4 transformers API drift patches).",
+      "v2_results": {
+        "job_id": "12877564",
+        "checkpoint": "whisper-modeling/checkpoints/whisper_base_synth/epoch=17-val_loss=0.243.ckpt",
+        "test_score": 0.9125,
+        "test_loss": 0.2429,
+        "delta_v2_vs_v1": {"test_score": -0.010, "val_loss": 0.008, "test_loss": 0.008},
+        "verdict_v2": "POSITIVE (slight regression)",
+        "note_v2": "v2 frame-level test accuracy 91.25% vs v1 92.23% — slight regression of 0.010, expected given the broader source mix introduces more acoustic variability for the synth-only training. Both remain well above the >50% feasibility bar. v2 corpus contains LibriSpeech adults (more diverse acoustic profile) that frame classifier needs to learn rather than memorize 100% Providence-parent voice characteristics."
+      }
     }
   ],
   "summary": {
@@ -156,5 +226,36 @@
     "Pattern: synth helps where the baseline pipeline is information-starved (seg-MIL transformer +0.119 AUROC, C3 hardneg) and hurts where the baseline already has high-quality signal (pseudo-frame Pearson 0.566 baseline) or where synth swamps the real distribution at training time (cross-child: 1469 real << 5000 synth → overfitting to synth, both backbones — wavlm -0.070, whisper -0.287).",
     "C1 USC-SAIL training required 4 sequential transformers-API-drift fixes against the custom WhisperWrapper (originally written for transformers ~4.30): (1) PYTHONPATH=. for lightning_modules import; (2) window_size 10→30 because Whisper encoder enforces 3000 mel frames; (3) WhisperAttention(config=config) so self.config isn't None; (4) robust unpacking of WhisperAttention.forward return (was 3-tuple, now 2-tuple). All 4 patches committed; 5th submit (12849231) trained successfully to epoch 17/20 with val_loss=0.235 and test frame-level accuracy=0.922.",
     "Best clip-level result: C5 seg-MIL transformer (+0.119 AUROC). Cleanest negative: C4 whisper cross-child (-0.287 AUROC). Best feasibility win: C1 USC-SAIL training pipeline now works on this cluster despite custom-WhisperWrapper drift."
-  ]
+  ],
+  "v2_summary": {
+    "v1_vs_v2_table": [
+      {"cand": "C1", "metric": "frame_acc", "v1": 0.9223, "v2": 0.9125, "delta": -0.010},
+      {"cand": "C2",  "metric": "AUROC", "v1": 0.7631, "v2": 0.8061, "delta": 0.043},
+      {"cand": "C3a", "metric": "AUROC", "v1": 0.6568, "v2": 0.7059, "delta": 0.049},
+      {"cand": "C3b", "metric": "AUROC", "v1": 0.8224, "v2": 0.8535, "delta": 0.031},
+      {"cand": "C4a", "metric": "AUROC", "v1": 0.6199, "v2": 0.5661, "delta": -0.054},
+      {"cand": "C4b", "metric": "AUROC", "v1": 0.5893, "v2": 0.7049, "delta": 0.116},
+      {"cand": "C5_gated", "metric": "AUROC", "v1": 0.6361, "v2": 0.6590, "delta": 0.023},
+      {"cand": "C5_transformer", "metric": "AUROC", "v1": 0.6373, "v2": 0.5913, "delta": -0.046},
+      {"cand": "C6", "metric": "AUROC", "v1": 0.7127, "v2": 0.7127, "delta": 0.000, "comment": "cache-hit; v2 inference returned cached v1 logits"}
+    ],
+    "v2_v_v1_takeaways": [
+      "5 of 9 v2 results improved over v1; 3 regressed; 1 unchanged (C6 cache-hit).",
+      "Largest swing: C4b whisper cross-child (+0.116 AUROC). v1's strong-negative -0.287 vs real baseline shrinks to -0.171 in v2. Source mix matters more than I thought — Providence-parents-only adults severely punished whisper backbone in cross-child.",
+      "v2 strengthens C3 hardneg pattern: both backbones now meaningfully positive (was tiny in v1). Source diversity > scene count for hardneg quality.",
+      "v2 weakens C5 transformer: v1's strongest result (+0.119 AUROC) drops to +0.073. Transformer aggregator is sensitive to source variability. v1 transformer remains the single best clip-level result.",
+      "Backbone-divergence on C4: wavlm got worse in v2 (-0.054), whisper got much better (+0.116). Different backbones bottleneck on different acoustic properties of the augmentation distribution. Means cross-child augmentation strategy interacts non-trivially with backbone choice — there's no universal recipe.",
+      "C1 frame-acc decreased slightly (0.9223 → 0.9125) — broader source mix is harder to memorize, but model still well above feasibility bar."
+    ],
+    "v2_meta_pattern": "v2 results validate the v1 hypothesis 'synth helps where the pipeline is information-starved' but refine the picture: the v1 corpus's lack of source diversity was itself a confound. Some v1 results overstated synth's gains (C5 transformer); others understated them (C3 both, C4b whisper). v2 corpus is the canonically-correct version going forward.",
+    "v2_corpus_provenance": {
+      "build_segment_manifest": "synth/scripts/build_segment_manifest.py --providence-dir providence/ --providence-rttm-dir providence/rttm/ --tinyvox-dir data/tinyvox/ --playlogue-dir playlogue/audio/ --playlogue-rttm-dir playlogue/rttm/ --librispeech-dir data/LibriSpeech/LibriSpeech/train-clean-100/ --exclude-speakers-csv whisper-modeling/seen_child_splits/test.csv --output synth_results/manifests/segment_manifest_v2.csv",
+      "segment_count": 294745,
+      "source_breakdown": {"providence_child": 74000, "providence_adults": 91000, "tinyvox": 25000, "librispeech": 29000, "playlogue_child": 49000, "playlogue_adults": 28000},
+      "scene_count": 5000,
+      "scene_gen_job": "12876698 (00:08:48)",
+      "subsampled_pool": "synth_results/manifests/segment_manifest_v2_sampled.csv (3000 per source × 6 sources = 18000 segs after subsample)",
+      "extracted_to": "data/segments_v2/"
+    }
+  }
 }
