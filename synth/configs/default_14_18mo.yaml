@@ -10,8 +10,12 @@ scene:
   max_speakers: 3
 
 sources:
-  child_segments: [providence, tinyvox]
-  adult_segments: [providence_adults, librispeech]
+  # NOTE: Playlogue child segments are tagged age_band=playlogue_unknown
+  # (CHILDES timestamps are not parsed); the scene generator falls back to the
+  # full child_pool when the age-banded subset is empty for a target_age_band,
+  # so the playlogue children are still drawable for the 14_18_months target.
+  child_segments: [providence, tinyvox, playlogue]
+  adult_segments: [providence_adults, librispeech, playlogue_adults]
   noise: [musan_noise, musan_music]
   rirs: [rirs_noises, mit_ir_survey]
 

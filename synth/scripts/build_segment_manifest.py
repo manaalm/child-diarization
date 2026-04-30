@@ -247,6 +247,141 @@ def _scan_librispeech(librispeech_dir: str, min_dur: float) -> list:
     return rows
 
 
+def _scan_playlogue(
+    playlogue_audio_dir: str,
+    playlogue_rttm_dir: str,
+    min_dur: float,
+    exclude_speakers: set,
+) -> list:
+    """Scan Playlogue RTTM + audio, return CHI + ADULT segment rows.
+
+    Playlogue RTTM labels: CHI / ADULT / OVL.  We map CHI→target_child,
+    ADULT→adult, skip OVL (overlap regions, not single-speaker segments).
+
+    Audio filenames may differ from RTTM stems in case (e.g.
+    ``cameron_AAE_...mp3`` vs ``cameron_aae_...rttm``); we match
+    case-insensitively.
+
+    Recording IDs of the form ``<child>_<corpus>_<...>`` give the speaker_id
+    as the first ``_``-delimited token (cameron, ew, gleason, vh, ...).
+    """
+    rows = []
+    rttm_root = Path(playlogue_rttm_dir)
+    audio_root = Path(playlogue_audio_dir)
+
+    if not rttm_root.exists():
+        print(f"  [WARN] Playlogue RTTM dir not found: {rttm_root}", file=sys.stderr)
+        return rows
+    if not audio_root.exists():
+        print(f"  [WARN] Playlogue audio dir not found: {audio_root}", file=sys.stderr)
+        return rows
+
+    rttm_files = list(rttm_root.glob("*.rttm"))
+    print(f"  Scanning {len(rttm_files)} Playlogue .rttm files …")
+
+    # Build lowercase-stem → audio path index
+    audio_index = {}
+    for ext in ("*.mp3", "*.wav", "*.flac"):
+        for af in audio_root.glob(ext):
+            audio_index[af.stem.lower()] = af
+
+    n_chi = n_adult = n_skip_no_audio = n_excluded = 0
+
+    for rttm_path in rttm_files:
+        recording_id = rttm_path.stem
+        speaker_prefix = recording_id.split("_")[0] if "_" in recording_id else recording_id
+
+        audio_path = audio_index.get(recording_id.lower())
+        if audio_path is None:
+            n_skip_no_audio += 1
+            continue
+
+        is_excluded = speaker_prefix in exclude_speakers
+        split = "test" if is_excluded else "train"
+        if is_excluded:
+            n_excluded += 1
+        usable = not is_excluded
+
+        try:
+            with open(rttm_path) as f:
+                for line in f:
+                    parts = line.strip().split()
+                    if len(parts) < 9 or parts[0] != "SPEAKER":
+                        continue
+                    label = parts[7]
+                    start = float(parts[3])
+                    dur = float(parts[4])
+                    if dur < min_dur:
+                        continue
+
+                    if label == "CHI":
+                        role = "target_child"
+                        ds = "playlogue"
+                        voc = "speech"
+                        speaker_id = speaker_prefix
+                        n_chi += 1
+                    elif label == "ADULT":
+                        role = "adult"
+                        ds = "playlogue_adults"
+                        voc = "speech"
+                        # Disambiguate adult speakers by recording (true ID is unknown
+                        # in the simplified Playlogue label set).
+                        speaker_id = f"{speaker_prefix}_ADULT_{recording_id}"
+                        n_adult += 1
+                    else:
+                        # Skip OVL and any other labels
+                        continue
+
+                    start_ms = int(start * 1000)
+                    end_ms = int((start + dur) * 1000)
+                    # Emit one row per target age band so the segment is selectable
+                    # under either default config (14-18 mo or 34-38 mo). Playlogue
+                    # CHILDES recordings span a wider age range than Providence; we
+                    # don't have reliable per-recording ages, so we make these
+                    # segments available across both bands rather than dropping them.
+                    if role == "target_child":
+                        emitted_bands = ["14_18_months", "34_38_months"]
+                    else:
+                        emitted_bands = ["adult"]
+                    for band in emitted_bands:
+                        band_suffix = f"_{band}" if role == "target_child" else ""
+                        seg_id = (
+                            f"playlogue_{label}_{recording_id}"
+                            f"_{start_ms}_{end_ms}{band_suffix}"
+                        )
+                        rows.append(
+                            {
+                                "segment_id": seg_id,
+                                "source_dataset": ds,
+                                "source_recording_id": recording_id,
+                                "speaker_id": speaker_id,
+                                "speaker_role": role,
+                                "age_months": None,
+                                "age_band": band,
+                                "start_time_sec": start,
+                                "end_time_sec": start + dur,
+                                "duration_sec": dur,
+                                "audio_path": str(audio_path.resolve()),
+                                "sample_rate": 16000,
+                                "transcript": "",
+                                "phonetic_transcript": "",
+                                "vocalization_type": voc,
+                                "quality_score": min(1.0, dur / 1.0),
+                                "split": split,
+                                "usable_for_training": usable,
+                            }
+                        )
+        except Exception as e:
+            print(f"  [WARN] Could not parse Playlogue RTTM {rttm_path}: {e}", file=sys.stderr)
+
+    print(
+        f"  Playlogue: {n_chi} CHI + {n_adult} ADULT segments "
+        f"({n_skip_no_audio} RTTMs skipped — no matching audio; "
+        f"{n_excluded} marked test/excluded by --exclude-speakers-csv)."
+    )
+    return rows
+
+
 def _scan_tinyvox(
     tinyvox_dir: str,
     min_dur: float,
@@ -381,9 +516,21 @@ def main() -> None:
         help="Path to LibriSpeech train-clean-100 directory.",
     )
     parser.add_argument(
-        "--exclude-speakers-csv",
+        "--playlogue-dir",
         default=None,
-        help="CSV with child_id column; matching speakers become usable_for_training=false.",
+        help="Path to Playlogue audio dir (e.g. playlogue/audio/).",
+    )
+    parser.add_argument(
+        "--playlogue-rttm-dir",
+        default=None,
+        help="Path to Playlogue RTTM dir (e.g. playlogue/rttm/).",
+    )
+    parser.add_argument(
+        "--exclude-speakers-csv",
+        required=True,
+        help="CSV with child_id column; matching speakers become usable_for_training=false. "
+             "REQUIRED to prevent test-child speech from leaking into training segments. "
+             "Pass whisper-modeling/seen_child_splits/test.csv for the default project setup.",
     )
     parser.add_argument(
         "--output",
@@ -563,6 +710,17 @@ def main() -> None:
         lib_rows = _scan_librispeech(args.librispeech_dir, args.min_duration_sec)
         print(f"LibriSpeech: {len(lib_rows)} adult segments.")
         rows.extend(lib_rows)
+
+    # ---- Playlogue ----
+    if args.playlogue_dir and args.playlogue_rttm_dir:
+        pl_rows = _scan_playlogue(
+            args.playlogue_dir,
+            args.playlogue_rttm_dir,
+            args.min_duration_sec,
+            exclude_speakers,
+        )
+        print(f"Playlogue: {len(pl_rows)} segments (CHI + ADULT).")
+        rows.extend(pl_rows)
 
     if not rows:
         print("No segments extracted.  Check input paths.", file=sys.stderr)
