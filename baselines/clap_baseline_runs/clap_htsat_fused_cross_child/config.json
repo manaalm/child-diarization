@@ -1,0 +1,16 @@
+{
+  "model": "laion/clap-htsat-fused",
+  "split": "test",
+  "splits_dir": "baselines/splits",
+  "positive_prompts": [
+    "a young child vocalizing",
+    "a baby or toddler making sounds",
+    "child speech and vocalizations"
+  ],
+  "negative_prompts": [
+    "an adult speaking",
+    "adult voice talking",
+    "silence and background noise"
+  ],
+  "seed": 42
+}

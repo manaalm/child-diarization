@@ -1,0 +1,160 @@
+{
+  "spec": "016-synth-augmentation-extensions",
+  "submitted_at": "2026-04-29T14:30",
+  "synth_corpus": "synth_results/manifests/synthetic_manifest.csv (5000 scenes, gen job 12770080)",
+  "jobs": [
+    {
+      "variant": "audio_llm_synth_2shot_val",
+      "job_id": "12845414",
+      "story": "C6",
+      "expected_output": "baselines/audio_llm_baseline_runs/qwen2_audio_7b_synth_2shot/val_metrics_tuned.json",
+      "last_state": "COMPLETED",
+      "elapsed": "00:01:15",
+      "val_f1": 0.8607, "val_auroc": 0.7581, "val_auprc": 0.8693,
+      "verdict": "neutral"
+    },
+    {
+      "variant": "audio_llm_synth_2shot_test",
+      "job_id": "12845610",
+      "story": "C6",
+      "expected_output": "baselines/audio_llm_baseline_runs/qwen2_audio_7b_synth_2shot/test_metrics_tuned.json",
+      "last_state": "COMPLETED",
+      "elapsed": "00:01:18",
+      "test_f1": 0.8633, "test_auroc": 0.7127, "test_auprc": 0.8611,
+      "delta_vs_zero_shot": {"f1": -0.008, "auroc": -0.012, "auprc": 0.008},
+      "delta_vs_real_2shot": {"f1": -0.008, "auroc": -0.012, "auprc": 0.008},
+      "verdict": "neutral / tiny negative",
+      "note": "Few-shot is a low-leverage axis on Qwen2-Audio for this task regardless of demo source. Real-2shot baseline is identical to zero-shot."
+    },
+    {
+      "variant": "wavlm_pseudo_frame_synth",
+      "job_id": "12845617",
+      "story": "C2",
+      "expected_output": "pseudo_frame/results/wavlm_pseudo_frame_synth/test_metrics_tuned.json",
+      "last_state": "COMPLETED",
+      "elapsed": "00:14:20",
+      "test_f1": 0.8760, "test_auroc": 0.7631, "test_auprc": 0.9099,
+      "frame_pearson_mean": 0.4677, "frame_spearman_mean": 0.4543, "frame_auroc_mean": 0.8118,
+      "delta_vs_baseline": {"f1": 0.007, "auroc": -0.068, "auprc": -0.027, "frame_pearson": -0.098},
+      "verdict": "NEGATIVE",
+      "note": "Synth dominates train pool (5000 vs 1311 real). Both clip-level AUROC and frame-localization Pearson regress. Synth GT labels do not transfer cleanly when the baseline already has high-quality VTC+USC-SAIL pseudo-labels."
+    },
+    {
+      "variant": "wavlm_mil_hardneg_synth",
+      "job_id": "12845253",
+      "story": "C3 wavlm",
+      "expected_output": "mil/mil_results/wavlm_mil_hardneg_synth/test_metrics_tuned.json",
+      "last_state": "COMPLETED",
+      "elapsed": "00:20:44",
+      "test_f1": 0.8634, "test_auroc": 0.6568, "test_auprc": 0.8509,
+      "delta_vs_real_hardneg": {"f1": 0.0, "auroc": 0.015, "auprc": 0.007},
+      "verdict": "tiny POSITIVE",
+      "note": "Synth-mined hardnegs (1276 adult-only + 728 background-speech scenes, n=2004 cap-limited to 623) match or slightly beat RTTM-mined hardnegs (~612 windows). Cheap drop-in replacement viable."
+    },
+    {
+      "variant": "whisper_mil_hardneg_synth",
+      "job_id": "12845254",
+      "story": "C3 whisper",
+      "expected_output": "mil/mil_results/whisper_mil_hardneg_synth/test_metrics_tuned.json",
+      "last_state": "COMPLETED",
+      "elapsed": "00:56:25",
+      "test_f1": 0.8769, "test_auroc": 0.8224, "test_auprc": 0.9314,
+      "delta_vs_real_hardneg": {"f1": 0.008, "auroc": 0.004, "auprc": 0.002},
+      "real_baseline_ref": "mil/mil_results/whisper_mil_hardneg (F1=0.8688 AUROC=0.8182 AUPRC=0.9292)",
+      "verdict": "tiny POSITIVE",
+      "note": "Mirrors C3 wavlm — synth-mined hardnegs slightly beat RTTM-mined ones. Both backbones confirm synth pool is a viable cheap drop-in for the existing real-hardneg pipeline."
+    },
+    {
+      "variant": "wavlm_mil_cross_child_synth",
+      "job_id": "12845381",
+      "story": "C4 wavlm",
+      "expected_output": "mil/mil_results/wavlm_mil_cross_child_synth/test_metrics_tuned.json",
+      "last_state": "COMPLETED",
+      "elapsed": "00:35:17",
+      "test_f1": 0.8637, "test_auroc": 0.6199, "test_auprc": 0.8353,
+      "delta_vs_real_cross_child": {"f1": 0.001, "auroc": -0.070, "auprc": -0.010},
+      "real_baseline_ref": "mil/mil_results/wavlm_mil_cross_child (F1=0.8627 AUROC=0.6902 AUPRC=0.8445)",
+      "verdict": "NEGATIVE",
+      "note": "Same swamping pattern as C2 pseudo-frame: 5000 synth >> 1469 real-train means the model overfits to synth distribution, which doesn't transfer to real cross-child val/test. Cross-child was the expected best case for synth (most data-hungry split), but loss is similar to C2."
+    },
+    {
+      "variant": "whisper_mil_cross_child_synth",
+      "job_id": "12845382",
+      "story": "C4 whisper",
+      "expected_output": "mil/mil_results/whisper_mil_cross_child_synth/test_metrics_tuned.json",
+      "last_state": "COMPLETED",
+      "elapsed": "02:07:23",
+      "test_f1": 0.8594, "test_auroc": 0.5893, "test_auprc": 0.7804,
+      "delta_vs_real_cross_child": {"f1": -0.036, "auroc": -0.287, "auprc": -0.174},
+      "real_baseline_ref": "mil/mil_results/whisper_mil_cross_child (F1=0.8951 AUROC=0.8761 AUPRC=0.9538)",
+      "verdict": "STRONG NEGATIVE",
+      "note": "Much bigger drop than C4 wavlm (-0.070 AUROC). Whisper-small is more sensitive to synth swamping than WavLM-base+ in the cross-child setting. Both backbones confirm cross-child augmentation does NOT benefit from naive 5000-synth append; the real baseline (whisper-MIL on 1469 cross-child train clips) generalized better than the augmented model."
+    },
+    {
+      "variant": "seg_mil_synth_gated_attention",
+      "job_id": "12845699",
+      "story": "C5 gated_attention",
+      "expected_output": "mil/mil_results/seg_mil_synth/usc_sail_synth_combined_gated_attention/",
+      "last_state": "COMPLETED",
+      "elapsed": "00:20:45",
+      "test_f1": 0.8648, "test_auroc": 0.6361, "test_auprc": 0.8336,
+      "delta_vs_real_seg_mil": {"f1": -0.006, "auroc": 0.035, "auprc": 0.037},
+      "real_baseline_ref": "mil/mil_results/seg_mil/usc_sail_gated_attention",
+      "verdict": "mild POSITIVE"
+    },
+    {
+      "variant": "seg_mil_synth_transformer",
+      "job_id": "12845699",
+      "story": "C5 transformer",
+      "expected_output": "mil/mil_results/seg_mil_synth/usc_sail_synth_combined_transformer/",
+      "last_state": "COMPLETED",
+      "elapsed": "00:20:45",
+      "test_f1": 0.8714, "test_auroc": 0.6373, "test_auprc": 0.8294,
+      "delta_vs_real_seg_mil": {"f1": 0.0, "auroc": 0.119, "auprc": 0.040},
+      "real_baseline_ref": "mil/mil_results/seg_mil/usc_sail_transformer",
+      "verdict": "strong POSITIVE",
+      "note": "Largest delta among completed candidates. Transformer aggregator on real USC-SAIL segments was AUROC=0.518 (worst seg-MIL config); synth-augmented combined cache lifts it to 0.637 (+0.119). Suggests transformer aggregator is bottlenecked by segment-quality noise — clean synth segments unblock it."
+    },
+    {
+      "variant": "whisper_base_synth_usc_sail",
+      "job_id_history": [
+        "12845895 (FAILED 0:00:12 — ModuleNotFoundError: lightning_modules; fixed via PYTHONPATH=.)",
+        "12847606 (FAILED 0:01:44 — transformers ≥4.57 enforces 3000 mel frames; fixed via window_size 10→30 + batch_size 32→16)",
+        "12848196 (FAILED 0:00:28 — WhisperAttention(config=None) → AttributeError on _attn_implementation; fixed by passing config to WhisperAttention init in whisper-modeling/models/whisper.py:35)",
+        "12848844 (FAILED 0:00:31 — WhisperAttention.forward returns 2-tuple in newer transformers, custom code unpacks 3; fixed by robust unpack result[0],result[1] in whisper-modeling/models/whisper.py:73)"
+      ],
+      "job_id": "12849231",
+      "story": "C1",
+      "expected_output": "whisper-modeling/checkpoints/whisper_base_synth/epoch=17-val_loss=0.235.ckpt",
+      "last_state": "COMPLETED",
+      "elapsed": "00:24:51 (5th attempt; trained to early-stop at epoch 17/20; best val_loss=0.235)",
+      "test_score": 0.9223,
+      "test_loss": 0.2345,
+      "verdict": "POSITIVE — synth-only training produces non-trivial frame classifier",
+      "note": "Frame-level multi-class classifier (silence/child/adult/overlap @ 50Hz). Test accuracy 92.2% well above spec acceptance >50%. Not directly comparable to enrollment AUROC; would need to wire this checkpoint into pyannote/unified.py --diarizer usc_sail and rerun enrollment to compare against the existing pretrained whisper-base_rank8_pretrained_50k.pt. Cleared blocker that whisper-modeling pipeline can train on this cluster (4 transformers API drift patches)."
+    }
+  ],
+  "summary": {
+    "completed": 10,
+    "running": 0,
+    "positive_so_far": [
+      "C1 USC-SAIL synth-only frame classifier (test acc 0.922 frame-level — feasibility confirmed; not directly comparable to clip-level table)",
+      "C3 wavlm hardneg (+0.015 AUROC over real-mined hardnegs)",
+      "C3 whisper hardneg (+0.004 AUROC — both backbones confirm synth as drop-in)",
+      "C5 seg-MIL gated_attention (+0.035 AUROC over real USC-SAIL segments)",
+      "C5 seg-MIL transformer (+0.119 AUROC — strongest clip-level delta of all candidates)"
+    ],
+    "negative_so_far": [
+      "C2 pseudo-frame (-0.068 AUROC, -0.098 frame-Pearson)",
+      "C4 wavlm cross-child (-0.070 AUROC despite being the expected-best-case data-hungry split)",
+      "C4 whisper cross-child (-0.287 AUROC — biggest single negative; whisper more sensitive to synth swamping)"
+    ],
+    "neutral_so_far": ["C6 audio-LLM (synth demos ≈ real demos ≈ zero-shot)"],
+    "pending": []
+  },
+  "notes": [
+    "Pattern: synth helps where the baseline pipeline is information-starved (seg-MIL transformer +0.119 AUROC, C3 hardneg) and hurts where the baseline already has high-quality signal (pseudo-frame Pearson 0.566 baseline) or where synth swamps the real distribution at training time (cross-child: 1469 real << 5000 synth → overfitting to synth, both backbones — wavlm -0.070, whisper -0.287).",
+    "C1 USC-SAIL training required 4 sequential transformers-API-drift fixes against the custom WhisperWrapper (originally written for transformers ~4.30): (1) PYTHONPATH=. for lightning_modules import; (2) window_size 10→30 because Whisper encoder enforces 3000 mel frames; (3) WhisperAttention(config=config) so self.config isn't None; (4) robust unpacking of WhisperAttention.forward return (was 3-tuple, now 2-tuple). All 4 patches committed; 5th submit (12849231) trained successfully to epoch 17/20 with val_loss=0.235 and test frame-level accuracy=0.922.",
+    "Best clip-level result: C5 seg-MIL transformer (+0.119 AUROC). Cleanest negative: C4 whisper cross-child (-0.287 AUROC). Best feasibility win: C1 USC-SAIL training pipeline now works on this cluster despite custom-WhisperWrapper drift."
+  ]
+}

@@ -1,0 +1,19 @@
+variant_name: "hubert_large_mil_layersum"
+backbone: "facebook/hubert-large-ls960-ft"
+backbone_layer: -1
+window_sec: 2.0
+stride_sec: 1.0
+mil_hidden_dim: 256
+mil_dropout: 0.25
+lr: 1.0e-3
+epochs: 20
+patience: 5
+batch_size: 4
+pos_weight: null
+seed: 42
+split_dir: "whisper-modeling/seen_child_splits"
+device: "cuda"
+
+# spec-014 US1: learnable softmax over all 24 transformer layers (HuBERT-Large)
+layer_aggregation: "weighted_sum"
+layer_aggregation_skip_first: true

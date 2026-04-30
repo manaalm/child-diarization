@@ -28,7 +28,7 @@ sys.path.insert(0, _REPO)
 
 from mil.seg_dataset import SegmentBagDataset, precompute_embeddings
 from mil.seg_embedding_cache import SegmentEmbeddingCache
-from mil.seg_model import build_aggregator
+from mil.seg_model import AutoPoolAgg, DSMILAgg, GMAPAgg, build_aggregator
 from mil.mil_utils import compute_metrics, per_timepoint_metrics, save_csv, save_json, tune_threshold
 
 
@@ -70,13 +70,21 @@ def _run_inference(
     rows = []
     scores_out, labels_out = [], []
 
+    is_dsmil = isinstance(model, DSMILAgg)
     with torch.no_grad():
         for idx in range(len(ds)):
             bag, mask, label, meta = ds[idx]
             bag = bag.to(device)
             mask = mask.to(device)
-            logit, weights = model(bag, mask)
-            prob = float(torch.sigmoid(logit).item())
+            if is_dsmil:
+                logit_max, logit_attn, weights = model(bag, mask)
+                # DSMIL final score = mean of the two stream sigmoids
+                prob = float(
+                    (torch.sigmoid(logit_max) + torch.sigmoid(logit_attn)).item() / 2.0
+                )
+            else:
+                logit, weights = model(bag, mask)
+                prob = float(torch.sigmoid(logit).item())
             pred = int(prob >= threshold)
             scores_out.append(prob)
             labels_out.append(int(label))
@@ -98,7 +106,7 @@ def _run_inference(
                     top_start = segs[best_i]["start"]
                     top_end = segs[best_i]["end"]
 
-            rows.append({
+            row = {
                 "audio_path": meta["audio_path"],
                 "child_id": meta["child_id"],
                 "timepoint_norm": meta["timepoint_norm"],
@@ -109,7 +117,11 @@ def _run_inference(
                 "top_seg_start": top_start,
                 "top_seg_end": top_end,
                 "top_seg_weight": top_weight,
-            })
+            }
+            if is_dsmil:
+                row["dsmil_logit_max"] = float(logit_max.item())
+                row["dsmil_logit_attn"] = float(logit_attn.item())
+            rows.append(row)
 
     return scores_out, labels_out, pd.DataFrame(rows)
 
@@ -122,12 +134,16 @@ def _run_segment_weights(
     """Per-(clip, segment) attention weight DataFrame for attention configs."""
     model.eval()
     rows = []
+    is_dsmil = isinstance(model, DSMILAgg)
     with torch.no_grad():
         for idx in range(len(ds)):
             bag, mask, label, meta = ds[idx]
             bag = bag.to(device)
             mask = mask.to(device)
-            _, weights = model(bag, mask)
+            if is_dsmil:
+                _, _, weights = model(bag, mask)
+            else:
+                _, weights = model(bag, mask)
             if weights is None:
                 continue
             n_inst = meta["n_instances"]
@@ -173,6 +189,7 @@ def train_one_config(
     weight_decay = cfg.get("weight_decay", 0.0)
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg["lr"], weight_decay=weight_decay)
     criterion = nn.BCEWithLogitsLoss()
+    is_dsmil = isinstance(model, DSMILAgg)
 
     best_val_auroc = -1.0
     best_state: Optional[dict] = None
@@ -189,16 +206,26 @@ def train_one_config(
         for batch_start in range(0, len(indices), batch_size):
             batch_idx = indices[batch_start: batch_start + batch_size]
             optimizer.zero_grad()
-            logits = []
+            logits_max_list, logits_attn_list, logits = [], [], []
             labels_batch = []
             for i in batch_idx:
                 bag, mask, label, _ = train_ds[i]
-                logit, _ = model(bag.to(device), mask.to(device))
-                logits.append(logit)
+                if is_dsmil:
+                    logit_max, logit_attn, _ = model(bag.to(device), mask.to(device))
+                    logits_max_list.append(logit_max)
+                    logits_attn_list.append(logit_attn)
+                else:
+                    logit, _ = model(bag.to(device), mask.to(device))
+                    logits.append(logit)
                 labels_batch.append(float(label))
-            logits_t = torch.stack(logits)
             labels_t = torch.tensor(labels_batch, device=device)
-            loss = criterion(logits_t, labels_t)
+            if is_dsmil:
+                lm = torch.stack(logits_max_list)
+                la = torch.stack(logits_attn_list)
+                loss = (criterion(lm, labels_t) + criterion(la, labels_t)) / 2.0
+            else:
+                logits_t = torch.stack(logits)
+                loss = criterion(logits_t, labels_t)
             loss.backward()
             optimizer.step()
             total_loss += loss.item()
@@ -282,11 +309,42 @@ def write_config_results(
             save_csv(tp_metrics, os.path.join(out_dir, f"{split_name}_metrics_by_timepoint.csv"))
 
     # Per-segment attention weight CSVs (attention-variant configs)
-    if agg_name in ("attention", "gated_attention", "transformer"):
+    if agg_name in ("attention", "gated_attention", "transformer", "gmap", "dsmil"):
         val_sw = _run_segment_weights(model, val_ds, device)
         test_sw = _run_segment_weights(model, test_ds, device)
         save_csv(val_sw, os.path.join(out_dir, "val_segment_weights.csv"))
         save_csv(test_sw, os.path.join(out_dir, "test_segment_weights.csv"))
+
+    # AutoPool: log final learned alpha (spec-014 US6 FR-028)
+    if isinstance(model, AutoPoolAgg):
+        save_json(
+            {"final_alpha": model.alpha_value()},
+            os.path.join(out_dir, "autopool_alpha.json"),
+        )
+
+    # GMAP: per-clip per-head attention (spec-014 US6 head_attention.csv)
+    if isinstance(model, GMAPAgg):
+        for split_name, ds in [("val", val_ds), ("test", test_ds)]:
+            rows = []
+            model.eval()
+            with torch.no_grad():
+                for idx in range(len(ds)):
+                    bag, mask, label, meta = ds[idx]
+                    bag = bag.to(device)
+                    mask = mask.to(device)
+                    head_attn = model.head_attentions(bag, mask).cpu().numpy()
+                    n_inst = meta["n_instances"]
+                    for inst_idx in range(n_inst):
+                        row = {
+                            "audio_path": meta["audio_path"],
+                            "instance_idx": inst_idx,
+                        }
+                        for h in range(head_attn.shape[0]):
+                            row[f"head_{h}_weight"] = float(head_attn[h, inst_idx])
+                        rows.append(row)
+            save_csv(
+                pd.DataFrame(rows), os.path.join(out_dir, f"{split_name}_head_attention.csv")
+            )
 
 
 # ---------------------------------------------------------------------------

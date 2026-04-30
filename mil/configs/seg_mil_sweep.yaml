@@ -33,6 +33,11 @@ aggregators:
   - "noisy_or"
   - "top_k"
   - "transformer"
+  # spec-014 US5 (DSMIL) and US6 (adaptive pooling)
+  - "dsmil"
+  - "auto_pool"
+  - "exp_softmax_pool"
+  - "gmap"
 
 # Top-k aggregator: number of top-scoring instances to pool
 top_k: 3

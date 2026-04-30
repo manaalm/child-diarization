@@ -13,6 +13,7 @@
     "wavlm_mil_prob",
     "whisper_mil_prob",
     "audio_llm_prob",
+    "speaker_informed_av_prob",
     "n_adults_int",
     "n_children_int",
     "n_adults_ge2",
@@ -32,7 +33,8 @@
     "sortformer_prob",
     "wavlm_mil_prob",
     "whisper_mil_prob",
-    "audio_llm_prob"
+    "audio_llm_prob",
+    "speaker_informed_av_prob"
   ],
   "meta_features": [
     "n_adults_int",
@@ -43,7 +45,9 @@
     "has_interaction",
     "timepoint_is_36m"
   ],
+  "visual_features": [],
+  "include_visual": false,
   "seed": 42,
-  "val_threshold": 0.575,
+  "val_threshold": 0.6,
   "created": "2026-04-28"
 }

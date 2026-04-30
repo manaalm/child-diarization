@@ -1,0 +1,17 @@
+{
+  "frontend": "babar_vtc",
+  "aggregator": "dsmil",
+  "encoder": "microsoft/wavlm-base-plus",
+  "encoder_layer": -1,
+  "seed": 42,
+  "lr": 0.001,
+  "epochs": 20,
+  "patience": 5,
+  "batch_size": 32,
+  "attn_dim": 256,
+  "top_k": 3,
+  "weight_decay": 0.0,
+  "min_seg_dur_sec": 0.4,
+  "n_train_bags": 1311,
+  "n_empty_bags_train": 82
+}

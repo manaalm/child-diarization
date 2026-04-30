@@ -1,0 +1,24 @@
+variant_name: "wavlm_pseudo_frame"
+backbone: "microsoft/wavlm-base-plus"
+backbone_layer: -1
+
+# Frame head
+hidden_dim: 256
+dropout: 0.2
+
+# Train
+crop_sec: 10.0
+batch_size: 8
+num_workers: 2
+lr: 1.0e-3
+weight_decay: 1.0e-4
+epochs: 25
+patience: 5
+seed: 42
+
+# Pseudo-label loss
+confidence_weight: true   # downweight frames where source diarizers disagree (target=0.5)
+pos_weight: 3.0            # account for ~25% mean pos rate in positive clips
+
+split_dir: "whisper-modeling/seen_child_splits"
+device: "cuda"

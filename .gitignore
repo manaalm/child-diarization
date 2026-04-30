@@ -17,6 +17,8 @@ Thumbs.db
 .idea/
 *.log
 *.out
+*.err
+events.out.tfevents.*
 
 # Model checkpoints (large binary files)
 synthesis/checkpoints/
@@ -25,6 +27,7 @@ synthesis/data/**/*.wav
 synthesis/data/**/*.mp3
 *.pt
 *.pth
+*.ckpt
 
 # Video ASD pretrained checkpoints (download separately — see video/SETUP.md)
 video/pretrain/
@@ -39,6 +42,24 @@ pyannote/video_face_cache/
 whisper-modeling/usc_sail_rttm_cache/
 whisper-modeling/usc_sail_segment_cache/
 pyannote/pyannote_rttm_cache/
+pyannote/vtc_rttm_cache/
+pyannote/vbx_rttm_cache/
+baselines/parakeet_cache/
+baselines/audio_model_cache/
+av_fusion/llava_cache/
+av_fusion/av_results/asd_rttm_cache/
+
+# BabAR pipeline staging (large input audio copies)
+babar/babar_output/_input_staging/
+
+# Synth USC-SAIL training data (regeneratable from synthetic_manifest.csv)
+synth_results/usc_sail_data/
+
+# Spec-016 seg-MIL combined cache (regeneratable from build_seg_mil_synth_cache.py)
+mil/seg_mil_combined_cache/
+
+# Playlogue RTTM source data (large; not committed alongside audio)
+playlogue/rttm/
 
 # AV fusion caches (GPT-4o responses, face tracks)
 av_fusion/gpt4o_cache/*
@@ -69,6 +90,11 @@ synth_results/synthetic_scenes/json/
 # External dependency repos (cloned separately — see CLAUDE.md)
 BabAR/
 VBx/
+
+# Claude Code session state and speckit local config
+.claude/
+.specify/
+.cache/
 
 # Temp/staging files
 recover.txt

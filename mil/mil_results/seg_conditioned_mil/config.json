@@ -1,0 +1,14 @@
+{
+  "variant_name": "seg_conditioned_mil",
+  "ecapa_source": "speechbrain/spkrec-ecapa-voxceleb",
+  "babar_rttm_dir": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/babar/babar_output/rttm",
+  "cond_dim": 576,
+  "lr": 0.001,
+  "epochs": 20,
+  "patience": 5,
+  "batch_size": 8,
+  "dropout": 0.25,
+  "seed": 42,
+  "threshold": 0.6,
+  "split_dir": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/whisper-modeling/seen_child_splits"
+}

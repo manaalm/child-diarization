@@ -1,0 +1,176 @@
+{
+  "submitted_at": "2026-04-29T02:35:49",
+  "jobs": [
+    {
+      "variant": "proto_cache_seen_child",
+      "job_id": "12805726",
+      "story": "US4",
+      "expected_output": "mil/prototypes/babar_vtc.npz",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "proto_cache_cross_child",
+      "job_id": "12838076",
+      "story": "US4",
+      "expected_output": "mil/prototypes/babar_vtc_cross_child.npz",
+      "submitted_at": "2026-04-29T02:35:49",
+      "attempt": 1,
+      "last_state": "FAILED",
+      "note": "Built with --skip-uncached (1326/1469 rows retained, 114 prototypes)"
+    },
+    {
+      "variant": "wavlm_mil_layersum",
+      "job_id": "12805729",
+      "story": "US1",
+      "expected_output": "mil/mil_results/wavlm_mil_layersum/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "whisper_mil_layersum",
+      "job_id": "12805730",
+      "story": "US1",
+      "expected_output": "mil/mil_results/whisper_mil_layersum/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "hubert_large_mil_layersum",
+      "job_id": "12805731",
+      "story": "US1",
+      "expected_output": "mil/mil_results/hubert_large_mil_layersum/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "wavlm_mil_child_adapted",
+      "job_id": "12805732",
+      "story": "US2",
+      "expected_output": "mil/mil_results/wavlm_mil_child_adapted/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "wavlm_mil_acmil",
+      "job_id": "12805733",
+      "story": "US3",
+      "expected_output": "mil/mil_results/wavlm_mil_acmil/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "whisper_mil_acmil",
+      "job_id": "12805734",
+      "story": "US3",
+      "expected_output": "mil/mil_results/whisper_mil_acmil/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "wavlm_mil_tsmil_concat",
+      "job_id": "12805735",
+      "story": "US4",
+      "expected_output": "mil/mil_results/wavlm_mil_tsmil_concat/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "wavlm_mil_tsmil_film",
+      "job_id": "12805736",
+      "story": "US4",
+      "expected_output": "mil/mil_results/wavlm_mil_tsmil_film/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "whisper_mil_tsmil_concat",
+      "job_id": "12805737",
+      "story": "US4",
+      "expected_output": "mil/mil_results/whisper_mil_tsmil_concat/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "wavlm_mil_tsmil_concat_cross_child",
+      "job_id": "12838168",
+      "story": "US4",
+      "expected_output": "mil/mil_results/wavlm_mil_tsmil_concat_cross_child/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T02:35:49",
+      "attempt": 99,
+      "note": "Resubmitted after build_prototype_cache.py --skip-uncached fix (2026-04-29)",
+      "skipped_reason": "Cross-child TS-MIL is methodologically blocked: cross-child val/test children are unseen at training, so prototypes built from train CSV cannot be applied to val/test rows. Fix would require enrollment audio for val/test children \u2014 out of scope for spec-014. Job 12838168 FAILED with KeyError because all 412 val rows were dropped due to missing prototypes."
+    },
+    {
+      "variant": "seg_mil_sweep",
+      "job_id": "12805739",
+      "story": "US5+US6",
+      "expected_output": "mil/mil_results/seg_mil/all_configs.json",
+      "submitted_at": "2026-04-29T02:35:49"
+    },
+    {
+      "variant": "wavlm_mil_acmil_max",
+      "job_id": "12839667",
+      "story": "US3 (branch-aggregation extension)",
+      "expected_output": "mil/mil_results/wavlm_mil_acmil_max/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T13:13:02",
+      "last_state": "COMPLETED",
+      "test_f1": 0.8703,
+      "test_auroc": 0.7598,
+      "test_auprc": 0.8928
+    },
+    {
+      "variant": "whisper_mil_acmil_max",
+      "job_id": "12839668",
+      "story": "US3 (branch-aggregation extension)",
+      "expected_output": "mil/mil_results/whisper_mil_acmil_max/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T13:13:07",
+      "last_state": "COMPLETED",
+      "test_f1": 0.8911,
+      "test_auroc": 0.8415,
+      "test_auprc": 0.9364,
+      "note": "Best ACMIL retrain: AUROC +0.091 vs whisper_mil_acmil mean baseline (0.751)"
+    },
+    {
+      "variant": "wavlm_mil_acmil_gated",
+      "job_id": "12839669",
+      "story": "US3 (branch-aggregation extension)",
+      "expected_output": "mil/mil_results/wavlm_mil_acmil_gated/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T13:13:13",
+      "last_state": "COMPLETED",
+      "test_f1": 0.8713,
+      "test_auroc": 0.7356,
+      "test_auprc": 0.8771
+    },
+    {
+      "variant": "whisper_mil_acmil_gated",
+      "job_id": "12839670",
+      "story": "US3 (branch-aggregation extension)",
+      "expected_output": "mil/mil_results/whisper_mil_acmil_gated/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T13:13:40",
+      "last_state": "COMPLETED",
+      "test_f1": 0.8762,
+      "test_auroc": 0.7354,
+      "test_auprc": 0.8791,
+      "note": "Early-stopped at epoch 8 \u2014 gated branch unstable for whisper backbone"
+    },
+    {
+      "variant": "wavlm_mil_acmil_topk",
+      "job_id": "12839671",
+      "story": "US3 (branch-aggregation extension)",
+      "expected_output": "mil/mil_results/wavlm_mil_acmil_topk/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T13:13:48",
+      "last_state": "COMPLETED",
+      "test_f1": 0.8840,
+      "test_auroc": 0.7752,
+      "test_auprc": 0.9021,
+      "note": "k=2 top-k_mean: AUROC +0.042 vs wavlm_mil_acmil mean baseline (0.733)"
+    },
+    {
+      "variant": "whisper_mil_acmil_topk",
+      "job_id": "12839672",
+      "story": "US3 (branch-aggregation extension)",
+      "expected_output": "mil/mil_results/whisper_mil_acmil_topk/test_metrics_tuned.json",
+      "submitted_at": "2026-04-29T13:14:01",
+      "last_state": "COMPLETED",
+      "test_f1": 0.8754,
+      "test_auroc": 0.8163,
+      "test_auprc": 0.9257,
+      "note": "k=2 top-k_mean"
+    }
+  ],
+  "notes": [
+    "Cross-child arm skipped \u2014 see skipped_reason fields",
+    "ACMIL branch-aggregation retrains (max, gated, topk) added 2026-04-29T13:13. Best: whisper_mil_acmil_max (AUROC=0.842, +0.091 vs whisper mean baseline). wavlm_mil_acmil_topk also strong (+0.042 AUROC vs wavlm mean baseline)."
+  ]
+}

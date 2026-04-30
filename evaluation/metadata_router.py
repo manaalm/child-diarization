@@ -43,6 +43,7 @@ _SYSTEM_PATHS = {
     "wavlm_mil":   ("mil/mil_results/wavlm_mil/{split}_predictions.csv", "score"),
     "whisper_mil": ("mil/mil_results/whisper_mil/{split}_predictions.csv", "score"),
     "audio_llm":   ("baselines/audio_llm_baseline_runs/qwen2_audio_7b/{split}_predictions.csv", "prob"),
+    "speaker_informed_av": ("pseudo_frame/results/speaker_informed_asd/{split}_predictions.csv", "prob"),
 }
 
 MASTER_CSV = os.path.join(_REPO, "whisper-modeling/seen_child_splits/master_with_split.csv")
@@ -51,7 +52,7 @@ ENSEMBLE_TEST_CSV = os.path.join(_REPO, "ensemble_runs/test_predictions.csv")
 # ── Data loading ─────────────────────────────────────────────────────────────
 
 def load_system_scores(split: str) -> pd.DataFrame:
-    """Load all 11 systems and join on audio_path. score→prob renamed. NaN→0.5."""
+    """Load all 12 systems and join on audio_path. score→prob renamed. NaN→0.5."""
     dfs = []
     for name, (tmpl, col) in _SYSTEM_PATHS.items():
         path = os.path.join(_REPO, tmpl.format(split=split))
@@ -157,20 +158,38 @@ def save_results(out_dir: str, val_m: dict, test_m: dict, preds: pd.DataFrame, c
 SCORE_FEATS = [f"{s}_prob" for s in _SYSTEM_PATHS]
 META_FEATS = ["n_adults_int", "n_children_int", "n_adults_ge2", "n_children_ge2",
               "context_unknown", "has_interaction", "timepoint_is_36m"]
+VISUAL_FEATS = [
+    "face_count_max", "face_count_mean",
+    "face_area_max_norm", "face_area_mean_norm",
+    "face_confidence_mean", "face_track_coverage_ratio",
+    "n_distinct_tracks", "has_any_face", "eligibility_score",
+]
 
 
-def build_feature_matrix(df: pd.DataFrame) -> np.ndarray:
-    feats = SCORE_FEATS + META_FEATS
+def load_visual_features(path: str) -> pd.DataFrame:
+    """Load the per-clip visual eligibility CSV produced by
+    pseudo_frame/visual_eligibility.py. Returns a DataFrame with audio_path +
+    the columns in VISUAL_FEATS (missing columns are filled with 0)."""
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Visual feature CSV not found: {path}")
+    df = pd.read_csv(path)
+    keep = ["audio_path"] + [c for c in VISUAL_FEATS if c in df.columns]
+    return df[keep].reset_index(drop=True)
+
+
+def build_feature_matrix(df: pd.DataFrame, include_visual: bool = False) -> np.ndarray:
+    feats = SCORE_FEATS + META_FEATS + (VISUAL_FEATS if include_visual else [])
     available = [f for f in feats if f in df.columns]
-    X = df[available].fillna(0.5).to_numpy(dtype=float)
+    X = df[available].fillna(0.0).to_numpy(dtype=float)
     return X, available
 
 
-def run_metadata_stack(val_df, test_df, out_dir, seed=SEED):
-    print("\n=== Sub-feature B: Metadata-Augmented Stacker ===", flush=True)
-    X_val, feats = build_feature_matrix(val_df)
+def run_metadata_stack(val_df, test_df, out_dir, seed=SEED, include_visual=False):
+    label = "Metadata + Visual" if include_visual else "Metadata"
+    print(f"\n=== Sub-feature B: {label}-Augmented Stacker ===", flush=True)
+    X_val, feats = build_feature_matrix(val_df, include_visual=include_visual)
     y_val = val_df["label"].to_numpy(dtype=int)
-    X_test, _ = build_feature_matrix(test_df)
+    X_test, _ = build_feature_matrix(test_df, include_visual=include_visual)
     y_test = test_df["label"].to_numpy(dtype=int)
 
     results = {}
@@ -219,7 +238,10 @@ def run_metadata_stack(val_df, test_df, out_dir, seed=SEED):
 
     cfg = {"sub_feature": "B", "model_type": best_name, "features": feats,
            "score_features": SCORE_FEATS, "meta_features": META_FEATS,
-           "seed": seed, "val_threshold": best["test_m"]["threshold"], "created": "2026-04-28"}
+           "visual_features": VISUAL_FEATS if include_visual else [],
+           "include_visual": bool(include_visual),
+           "seed": seed, "val_threshold": best["test_m"]["threshold"],
+           "created": "2026-04-29" if include_visual else "2026-04-28"}
     save_results(out_dir, best["val_m"], best["test_m"], preds, cfg)
 
 
@@ -369,6 +391,11 @@ def main():
     parser.add_argument("--mode", choices=["stack", "router", "all"], default="all")
     parser.add_argument("--verify", action="store_true")
     parser.add_argument("--seed", type=int, default=SEED)
+    parser.add_argument("--visual-features",
+                        help="Path to a per-clip visual eligibility CSV "
+                             "(e.g. pseudo_frame/visual_features/visual_eligibility.csv). "
+                             "When set, augments the stacker with computed visual-quality features "
+                             "and writes results to ensemble_runs/metadata_stack_av/ instead.")
     args = parser.parse_args()
 
     if args.verify:
@@ -384,9 +411,26 @@ def main():
     test_df = load_split(test_scores, meta, "test")
     print(f"Val: {len(val_df)} clips | Test: {len(test_df)} clips", flush=True)
 
+    include_visual = bool(args.visual_features)
+    if include_visual:
+        vis_path = args.visual_features if os.path.isabs(args.visual_features) \
+                   else os.path.join(_REPO, args.visual_features)
+        vis = load_visual_features(vis_path)
+        val_df  = val_df.merge(vis, on="audio_path", how="left")
+        test_df = test_df.merge(vis, on="audio_path", how="left")
+        # Fill any clips missing from the visual table with 0
+        for col in [c for c in VISUAL_FEATS if c in val_df.columns]:
+            val_df[col]  = val_df[col].fillna(0.0)
+            test_df[col] = test_df[col].fillna(0.0)
+        print(f"  Merged visual features: {len(vis)} rows; using {len(VISUAL_FEATS)} features",
+              flush=True)
+
     if args.mode in ("stack", "all"):
-        out = os.path.join(_REPO, "ensemble_runs/metadata_stack")
-        run_metadata_stack(val_df, test_df, out, seed=args.seed)
+        out = os.path.join(_REPO,
+                           "ensemble_runs/metadata_stack_av" if include_visual
+                           else "ensemble_runs/metadata_stack")
+        run_metadata_stack(val_df, test_df, out, seed=args.seed,
+                           include_visual=include_visual)
 
     if args.mode in ("router", "all"):
         out_rule = os.path.join(_REPO, "ensemble_runs/metadata_router_rule")

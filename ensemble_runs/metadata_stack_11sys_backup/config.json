@@ -1,0 +1,49 @@
+{
+  "sub_feature": "B",
+  "model_type": "lr",
+  "features": [
+    "babar_prob",
+    "vtc_prob",
+    "vtc_kchi_prob",
+    "vbx_prob",
+    "usc_sail_prob",
+    "pyannote_prob",
+    "eend_eda_prob",
+    "sortformer_prob",
+    "wavlm_mil_prob",
+    "whisper_mil_prob",
+    "audio_llm_prob",
+    "n_adults_int",
+    "n_children_int",
+    "n_adults_ge2",
+    "n_children_ge2",
+    "context_unknown",
+    "has_interaction",
+    "timepoint_is_36m"
+  ],
+  "score_features": [
+    "babar_prob",
+    "vtc_prob",
+    "vtc_kchi_prob",
+    "vbx_prob",
+    "usc_sail_prob",
+    "pyannote_prob",
+    "eend_eda_prob",
+    "sortformer_prob",
+    "wavlm_mil_prob",
+    "whisper_mil_prob",
+    "audio_llm_prob"
+  ],
+  "meta_features": [
+    "n_adults_int",
+    "n_children_int",
+    "n_adults_ge2",
+    "n_children_ge2",
+    "context_unknown",
+    "has_interaction",
+    "timepoint_is_36m"
+  ],
+  "seed": 42,
+  "val_threshold": 0.575,
+  "created": "2026-04-28"
+}

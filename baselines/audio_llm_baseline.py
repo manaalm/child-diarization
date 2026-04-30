@@ -265,28 +265,34 @@ def _tune_threshold(y_true, y_score) -> float:
 # ---------------------------------------------------------------------------
 
 def _find_few_shot_examples(audio_path: str, train_csv_path: str,
-                             n_shot: int, seed: int):
+                             n_shot: int, seed: int, universal: bool = False):
     rng = np.random.default_rng(seed)
-    match = re.search(r"sub-([A-Za-z0-9]+)", audio_path)
-    if not match:
-        warnings.warn(f"Could not parse child_id from {audio_path!r}; skipping few-shot.")
-        return []
-
-    child_id = match.group(0)  # e.g. "sub-A1H3H9Y3T1"
     try:
         train_df = pd.read_csv(train_csv_path)
     except FileNotFoundError:
         warnings.warn(f"train CSV not found: {train_csv_path}; skipping few-shot.")
         return []
 
-    # Match child — try child_id column or parse from audio_path column
-    if "child_id" in train_df.columns:
-        child_rows = train_df[train_df["child_id"] == child_id]
-    elif "audio_path" in train_df.columns:
-        child_rows = train_df[train_df["audio_path"].str.contains(child_id, na=False)]
+    if universal:
+        # Universal-shots mode (e.g. synthetic demos): use all rows of the CSV
+        # without per-query child filtering.
+        child_rows = train_df
+        child_id = "<universal>"
     else:
-        warnings.warn("train CSV has no child_id or audio_path column; skipping few-shot.")
-        return []
+        match = re.search(r"sub-([A-Za-z0-9]+)", audio_path)
+        if not match:
+            warnings.warn(f"Could not parse child_id from {audio_path!r}; skipping few-shot.")
+            return []
+        child_id = match.group(0)  # e.g. "sub-A1H3H9Y3T1"
+
+        # Match child — try child_id column or parse from audio_path column
+        if "child_id" in train_df.columns:
+            child_rows = train_df[train_df["child_id"] == child_id]
+        elif "audio_path" in train_df.columns:
+            child_rows = train_df[train_df["audio_path"].str.contains(child_id, na=False)]
+        else:
+            warnings.warn("train CSV has no child_id or audio_path column; skipping few-shot.")
+            return []
 
     # Exclude the query clip
     if "audio_path" in child_rows.columns:
@@ -341,6 +347,9 @@ def _parse_args():
                    help="Per-clip JSON cache (default: baselines/audio_llm_cache/{model_slug})")
     p.add_argument("--prompt-template", default="zero_shot_v1")
     p.add_argument("--n-shot", type=int, default=0)
+    p.add_argument("--universal-shots", action="store_true",
+                   help="If set, --train-csv is treated as a universal demo pool "
+                        "(no per-query child_id filter). Used for synthetic shots.")
     p.add_argument("--threshold", type=float, default=None)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--device", default="cuda")
@@ -437,7 +446,8 @@ def main():
             few_shot_wavs = None
             if args.n_shot > 0:
                 ex_paths = _find_few_shot_examples(
-                    audio_path, args.train_csv, args.n_shot, args.seed
+                    audio_path, args.train_csv, args.n_shot, args.seed,
+                    universal=args.universal_shots,
                 )
                 if ex_paths:
                     few_shot_wavs = []

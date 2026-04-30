@@ -92,16 +92,16 @@ best-ratio AUPRC + 0.005 (SC-003); `metrics_by_age_band.csv` has 14-month and
 
 ### Scene Re-generation
 
-- [ ] T020 [US2] Re-generate 5000 acoustic scenes: job 12647967 skipped all 5000 (old clean-mix scenes still existed); deleted old scenes, resubmitted as job 12648742; 67/5000 generated at 35min mark — confirm complete and synthetic_manifest.csv updated (~24h total)
-- [ ] T021 [US2] Spot-check 20 output JSONs from T020 to confirm ≥12 have `rir_id ≠ null` and ≥14 have `noise_id ≠ null` (US1 spec independent test applied at full-scale)
+- [x] T020 [US2] Re-generate 5000 acoustic scenes — VERIFIED: 5000/5000 WAV+RTTM+JSON files in `synth_results/synthetic_scenes/{wav,rttm,json}/`; final job 12770080 (replacing 12647967 + 12648742). `synth_results/manifests/synthetic_manifest.csv` has 5000 rows.
+- [x] T021 [US2] Spot-check — RESOLVED via **population-level audit on all 5000 scenes** (n=20 sample was sampling-noise false alarm). Population rates: rir_id 3528/5000 = **70.6%** (config `apply_rir_probability: 0.7` ✓ matches); noise_id 3990/5000 = **79.8%** (config `apply_noise_probability: 0.8` ✓ matches). The earlier n=20 spot check yielded 13/20 noise = 65% which fell below the 14/20 (=70%) threshold by chance; 95% CI for Bernoulli(p=0.8, n=20) is [0.43, 0.83] which contains the observed value. US1 acceptance is satisfied; no rerun needed.
 
 ### Ratio Sweep & Evaluation
 
-- [ ] T022 [US2] Run ratio sweep: `sbatch synth/slurm/run_ratio_sweep.sh synth/configs/default_14_18mo.yaml`; monitor until all 6 ratio dirs contain `enroll_test_predictions.csv`
-- [ ] T023 [US2] Run evaluation: `python synth/scripts/evaluate_synthetic_augmentation.py --experiment-dir synth_results/augmentation_experiments/default_14_18mo/ --test-csv whisper-modeling/seen_child_splits/test.csv --output-dir synth_results/augmentation_experiments/default_14_18mo/ --plot` — produces `metrics_by_ratio.csv`, `metrics_by_age_band.csv`, `figures/`
-- [ ] T024 [US2] Run error analysis: `python synth/scripts/error_analysis_synthetic.py --experiment-dir synth_results/augmentation_experiments/default_14_18mo/ --test-csv whisper-modeling/seen_child_splits/test.csv --output-dir synth_results/augmentation_experiments/default_14_18mo/`
-- [ ] T025 [US2] Verify SC-003: read `metrics_by_ratio.csv`; confirm `max(auprc) >= clean_mix_baseline_auprc + 0.005`; record comparison in a brief note committed alongside results
-- [ ] T026 [US2] Commit `metrics_by_ratio.csv`, `metrics_by_age_band.csv`, `error_analysis.csv`, `figures/`, and updated `synth_results/manifests/synthetic_manifest.csv` to git
+- [x] T022 [US2] Ratio sweep — VERIFIED: all 6 ratios (0×/0.5×/1×/2×/5×/10×) have `enroll_test_predictions.csv` in `synth_results/augmentation_experiments/default_14_18mo/ratio_*/`. Final job 12838165 (~8 min).
+- [x] T023 [US2] Evaluation — VERIFIED: `metrics_by_ratio.csv`, `metrics_by_age_band.csv`, and `figures/` all present in `synth_results/augmentation_experiments/default_14_18mo/`.
+- [x] T024 [US2] Error analysis — VERIFIED: `error_analysis.csv` (544 KB), `error_counts.json`, `error_by_age_band.csv` all present.
+- [ ] T025 [US2] **SC-003 FAILED**: all 6 ratio AUPRCs bit-identical at 0.9228 → max−baseline = 0.000 < 0.005 required. Synth augmentation has zero effect on enrollment-prototype scoring (mathematically guaranteed: prototypes are computed from real enrollment audio independent of train pool). Negative result documented in CLAUDE.md "Recent Changes" and `metrics_by_ratio.csv`. No rerun planned.
+- [x] T026 [US2] Commit — VERIFIED: commits `12283e0` ("spec-010 audio LLM... + spec-008 ratio sweep null result") and `80942a7` ("spec-008/009 artifacts...") cover the artifacts.
 
 **Checkpoint**: User Story 2 complete. Acoustic-mix sweep results committed; SC-003 and SC-004 status documented. This is the canonical thesis result for synthetic augmentation.
 

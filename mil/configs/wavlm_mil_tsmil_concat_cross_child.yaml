@@ -1,0 +1,23 @@
+variant_name: "wavlm_mil_tsmil_concat_cross_child"
+backbone: "microsoft/wavlm-base-plus"
+backbone_layer: -1
+window_sec: 2.0
+stride_sec: 1.0
+mil_hidden_dim: 256
+mil_dropout: 0.25
+lr: 1.0e-3
+epochs: 25
+patience: 5
+batch_size: 8
+pos_weight: null
+seed: 42
+split_dir: "baselines/splits"
+device: "cuda"
+
+# spec-014 US4: TS-MIL on cross-child split — TS-VAD-style enrollment is hypothesized
+# to help most when the model has not seen the target child during training.
+head: "tsmil"
+tsmil_mode: "concat"
+prototype_dim: 192
+prototype_proj_dim: 64
+prototype_cache: "mil/prototypes/babar_vtc_cross_child.npz"

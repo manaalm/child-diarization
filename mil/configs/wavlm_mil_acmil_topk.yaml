@@ -1,0 +1,29 @@
+variant_name: "wavlm_mil_acmil_topk"
+backbone: "microsoft/wavlm-base-plus"
+backbone_layer: -1
+window_sec: 2.0
+stride_sec: 1.0
+mil_hidden_dim: 256
+mil_dropout: 0.25
+lr: 1.0e-3
+epochs: 25
+patience: 5
+batch_size: 8
+pos_weight: null
+seed: 42
+split_dir: "whisper-modeling/seen_child_splits"
+device: "cuda"
+
+# spec-014 US3 follow-up (post-T029): ACMIL with TOP-K MEAN aggregation.
+# Take mean of the top-2 branch logits (k=2). T029 showed that for WavLM ACMIL,
+# branches 1 (AUROC=0.714) and 3 (AUROC=0.624) carried strong alignment signal
+# while branches 0/2/4 were near-random. Top-K mean should preserve the strong
+# branches' contribution while still benefiting from ensemble effect.
+head: "acmil"
+acmil_n_branches: 5
+acmil_stkim_p: 0.5
+acmil_stkim_k_frac: 0.1
+acmil_stkim_k_cap: 10
+acmil_mba_diversity_weight: 0.1
+acmil_branch_aggregation: "topk_mean"
+acmil_branch_topk: 2

@@ -322,6 +322,68 @@ sbatch evaluation/slurm/run_short_voc_head.sh
 | Multi-child suppressor (US3) | TBD (SLURM) | TBD | — | — |
 | Short-voc head (US4) | TBD (SLURM) | TBD | — | — |
 
+### Self-Distillation: Pseudo-Frame-Label Classifier (`pseudo_frame/`)
+
+WavLM-Base+ frozen frame classifier trained on diarizer-derived pseudo-labels (mean of VTC KCHI + USC-SAIL CHI at 50 Hz). Closes the MIL → frame-detection localization gap.
+
+```bash
+# Step 1: build pseudo frame labels (one-shot, ~3 min for all 2183 clips)
+python pseudo_frame/build_pseudo_labels.py
+# Output: pseudo_frame/pseudo_labels/{<md5>.npy, index.csv}
+
+# Step 2: train + evaluate (single SLURM job, ~5 min total)
+sbatch pseudo_frame/slurm/train_pseudo.sh
+# Output: pseudo_frame/results/wavlm_pseudo_frame/{best_checkpoint.pt, config.json,
+#          training_history.csv, val/test_metrics_tuned.json, test_predictions.csv,
+#          frame_localization.json, frame_localization_per_clip.csv}
+# Logs:   logs/pseudo_frame/train_<jobid>.out
+```
+
+**Key results (pseudo-frame, seen-child test n=441):** F1=0.869, AUROC=**0.831** (+0.060 vs WavLM-MIL), AUPRC=**0.937** (+0.044). Frame-level localization vs held-out test pseudo-labels: mean per-clip Pearson **0.566** (vs MIL attention's 0.084 — ~6.7× gain). Frame Spearman 0.524, frame-AUROC 0.853.
+
+### AV Self-Distillation and Visual-Eligibility Fusion (spec-015)
+
+Four user stories layering on the pseudo-frame classifier and `av_fusion/face_track_cache/`. Shared design: frozen pretrained encoders + tiny fusion + visual-eligibility gating (audio_visual.txt §63, §151, §157).
+
+```bash
+# US1: extract per-clip visual eligibility features (CPU, ~3 min)
+python pseudo_frame/visual_eligibility.py
+# Output: pseudo_frame/visual_features/visual_eligibility.csv (n=2183)
+
+# US1: re-run metadata stacker with visual features
+python evaluation/metadata_router.py --mode stack \
+  --visual-features pseudo_frame/visual_features/visual_eligibility.csv
+# Output: ensemble_runs/metadata_stack_av/{test_metrics_tuned.json, ...}
+
+# US1: stratified ablation (mirror spec-012 ablation)
+python evaluation/metadata_stack_av_ablation.py
+# Output: ensemble_runs/metadata_stack_av/ablation/
+
+# US2/US3/US4: extract per-clip face/mouth-motion features (CPU SLURM, ~4-6h)
+sbatch pseudo_frame/slurm/extract_mouth_motion.sh
+# Sharded version for parallelism (split rows 0-2183):
+# python pseudo_frame/extract_mouth_motion.py --start-row 0    --end-row 1300 --out shard1.csv
+# python pseudo_frame/extract_mouth_motion.py --start-row 1300 --end-row 2183 --out shard2.csv
+# Output: pseudo_frame/visual_features/mouth_motion.csv
+
+# US2: AV-HuBERT-style late fusion (CPU, ~30s after extraction)
+python pseudo_frame/avhubert_late_fusion.py
+# Output: pseudo_frame/results/avhubert_lipfusion/{audio_only,always_fuse,gated_av}/
+#          subset_eligible_metrics.json, test_predictions_all.csv, config.json
+
+# US3: speaker-embedding-informed AV (Clarke 2025 simplified, CPU, ~30s)
+python pseudo_frame/speaker_informed_asd.py
+# Output: pseudo_frame/results/speaker_informed_asd/{test_metrics_tuned.json,
+#          multi_child_test_metrics.json, test_predictions.csv, config.json}
+
+# US4: audio→video clip-level pseudo-label distillation (CPU, ~30s)
+python pseudo_frame/audio2video_distill.py
+# Output: pseudo_frame/results/audio2video_distilled/{test_metrics_tuned.json,
+#          visual_student_correlation.json, test_predictions.csv, config.json}
+```
+
+**Note on US2 substitution**: AV-HuBERT requires fairseq (non-trivial install on this cluster), so US2 substitutes hand-engineered face/mouth-motion features (face/mouth intensity std + frame-to-frame motion energy on bbox crops). Architectural intent (frozen visual extractor + tiny fusion + visual-eligibility gating) is preserved. Future work: install AV-HuBERT and re-run US2/US4 with real visual-speech embeddings.
+
 ### Synthetic Data Generator (`synth/`)
 
 7-step pipeline: build segment manifest → extract segments → generate scenes → make training manifests → train at each ratio → evaluate → error analysis. No GPU required for steps 1–3.
@@ -483,6 +545,41 @@ python mil/eval_weak_diarization.py \
   --output mil/mil_results/seg_mil/weak_diarization_eval.csv
 ```
 
+### Synthetic Data Augmentation Extensions (spec-016)
+
+Six independent training-recipe variants routing the existing 5000 synth scenes into pipelines where labels are load-bearing. Builders generate per-pipeline manifests/caches; existing training scripts ingest them via standard configs.
+
+```bash
+# Step 1: build all derived synth manifests (single pass)
+python synth/scripts/build_synth_aug_manifests.py
+# Outputs: synth_results/manifests/synthetic_{hardneg,cross_child_aug,audio_llm_shots,train_aug}.csv
+
+# Step 2: per-candidate prerequisite builders
+python synth/scripts/build_cross_child_synth_split.py     # C4: baselines/splits_synth_aug/
+python synth/scripts/build_pseudo_synth_split.py          # C2/C5: whisper-modeling/seen_child_splits_synth_aug/
+python synth/scripts/build_seg_mil_synth_cache.py         # C5: mil/seg_mil_combined_cache/ (real USC-SAIL + synth GT, 7112 entries)
+python synth/scripts/build_usc_sail_synth_data.py         # C1: synth_results/usc_sail_data/{audios,labels}/{train,val}/
+python pseudo_frame/build_synth_pseudo_labels.py          # C2: appends 5000 synth GT pseudo-frames to pseudo_frame/pseudo_labels/index.csv
+
+# Step 3: submit per-candidate jobs
+sbatch mil/slurm/train_eval_spec014.sh mil/configs/wavlm_mil_hardneg_synth.yaml         # C3 wavlm
+sbatch mil/slurm/train_eval_spec014.sh mil/configs/whisper_mil_hardneg_synth.yaml       # C3 whisper
+sbatch mil/slurm/train_eval_spec014.sh mil/configs/wavlm_mil_cross_child_synth.yaml     # C4 wavlm
+sbatch mil/slurm/train_eval_spec014.sh mil/configs/whisper_mil_cross_child_synth.yaml   # C4 whisper
+sbatch pseudo_frame/slurm/train_pseudo.sh pseudo_frame/configs/wavlm_pseudo_synth.yaml  # C2
+sbatch mil/slurm/seg_mil_synth.sh                                                       # C5
+sbatch baselines/slurm/run_audio_llm_synth_shots.sh val                                 # C6 val
+sbatch baselines/slurm/run_audio_llm_synth_shots.sh test                                # C6 test (after val)
+sbatch whisper-modeling/run_train_synth.sh                                              # C1 (requires PYTHONPATH=. + window_size 30)
+
+# Audio LLM with universal synth demos (replaces per-child same-speaker demos):
+python baselines/audio_llm_baseline.py --split val --n-shot 2 --universal-shots \
+    --train-csv synth_results/manifests/synthetic_audio_llm_shots.csv \
+    --model-slug qwen2_audio_7b_synth_2shot
+```
+
+Tracker: `mil/spec016_jobs.json` (per-job state + metrics + deltas, mirrors `spec014_jobs.json` schema).
+
 ---
 
 ## Architecture
@@ -630,6 +727,15 @@ The `seen_child_splits/` approach tests enrollment-based personalization (the mo
 - `synth_results/manifests/` — `segment_manifest.csv`, `synthetic_manifest.csv`, `train_{ratio}x_manifest.csv` files (committed)
 - `synth_results/augmentation_experiments/{config_name}/` — per-ratio enrollment results, `metrics_by_ratio.csv`, `metrics_by_age_band.csv`, `error_analysis.csv`, `figures/` (committed); scene WAVs in `synth_results/synthetic_scenes/` are gitignore'd
 - `baselines/audio_llm_baseline_runs/{model_slug}/` — Audio LLM baseline results; `val_predictions.csv`, `val_metrics_tuned.json`, `test_predictions.csv`, `test_metrics_tuned.json`, `test_metrics_by_timepoint.csv`, `config.json`; cache files in `baselines/audio_llm_cache/` are gitignore'd
+- **spec-016 synth-augmentation result dirs** (per-candidate):
+  - `mil/mil_results/{wavlm,whisper}_mil_hardneg_synth/` — C3 MIL with synth-derived hardnegs
+  - `mil/mil_results/{wavlm,whisper}_mil_cross_child_synth/` — C4 MIL on cross-child + synth
+  - `mil/mil_results/seg_mil_synth/usc_sail_synth_combined_{gated_attention,transformer}/` — C5 seg-MIL with combined real+synth RTTM cache; `all_configs.json` index
+  - `pseudo_frame/results/wavlm_pseudo_frame_synth/` — C2 pseudo-frame with synth GT pseudo-labels; standard pseudo-frame layout + `frame_localization.json`
+  - `baselines/audio_llm_baseline_runs/qwen2_audio_7b_synth_2shot/` — C6 audio-LLM with universal synth demos
+  - `whisper-modeling/checkpoints/whisper_base_synth/` — C1 USC-SAIL synth-only training checkpoints (in flight)
+  - Manifests at `synth_results/manifests/synthetic_{hardneg,cross_child_aug,audio_llm_shots,train_aug}.csv`; combined RTTM cache at `mil/seg_mil_combined_cache/` (7112 entries)
+  - Aggregated job tracker: `mil/spec016_jobs.json` (mirrors `spec014_jobs.json` schema)
 
 Each folder contains:
 - `config.json` — full config
@@ -654,7 +760,24 @@ Each folder contains:
 | Sortformer | 0.844 | 0.796 | 0.899 | 0.664 | 0.841 |
 | WavLM-MIL | 0.882 | 0.807 | 0.973 | 0.771 | 0.893 |
 | Whisper-MIL | 0.886 | 0.868 | 0.904 | 0.853 | 0.946 |
+| **Whisper-MIL TS-MIL concat (spec-014 US4)** | **0.896** | **0.856** | **0.940** | **0.869** | **0.944** |
+| HuBERT-large MIL layersum (spec-014 US1) | 0.878 | 0.802 | 0.970 | 0.813 | 0.920 |
+| WavLM-MIL ACMIL (spec-014 US3, mean, NEGATIVE) | 0.870 | 0.783 | 0.979 | 0.733 | 0.877 |
+| WavLM-MIL ACMIL topk (k=2, spec-014 US3 ext) | 0.884 | 0.814 | 0.967 | 0.775 | 0.902 |
+| **Whisper-MIL ACMIL max (spec-014 US3 ext)** | **0.891** | **0.867** | **0.916** | **0.842** | **0.936** |
+| Whisper-MIL ACMIL topk (k=2, spec-014 US3 ext) | 0.875 | 0.851 | 0.901 | 0.816 | 0.926 |
+| WavLM-MIL child-adapted (spec-014 US2, NEGATIVE) | 0.863 | 0.760 | 1.000 | 0.500 | 0.760 |
 | Audio LLM (Qwen2-Audio-7B, zero-shot) | 0.871 | 0.807 | 0.946 | 0.725 | 0.853 |
+| Audio LLM 2-shot synth demos (spec-016 C6, NEUTRAL) | 0.863 | 0.783 | 0.961 | 0.713 | 0.861 |
+| Granite-Speech-1B zero-shot (NEGATIVE — null/random) | 0.863 | 0.761 | 0.997 | 0.454 | 0.726 |
+| Cohere-Transcribe ASR gap_ratio (NEGATIVE — null) | 0.863 | 0.760 | 1.000 | 0.500 | 0.760 |
+| Pseudo-frame WavLM synth-aug (spec-016 C2, NEGATIVE) | 0.876 | 0.785 | 0.991 | 0.763 | 0.910 |
+| WavLM-MIL hardneg synth-aug (spec-016 C3 wavlm) | 0.863 | 0.760 | 1.000 | 0.657 | 0.851 |
+| Whisper-MIL hardneg synth-aug (spec-016 C3 whisper) | 0.877 | 0.817 | 0.946 | 0.822 | 0.931 |
+| WavLM-MIL cross-child synth-aug (spec-016 C4 wavlm, NEGATIVE) | 0.864 | 0.760 | 1.000 | 0.620 | 0.835 |
+| Whisper-MIL cross-child synth-aug (spec-016 C4 whisper, STRONG NEGATIVE) | 0.859 | 0.755 | 0.997 | 0.589 | 0.780 |
+| Seg-MIL synth-aug transformer (spec-016 C5, POSITIVE) | 0.871 | 0.778 | 0.991 | 0.637 | 0.829 |
+| **USC-SAIL synth-only frame classifier (spec-016 C1, frame-level acc=0.922)** | n/a | n/a | n/a | n/a | n/a |
 | Parakeet TDT 0.6B (gap_ratio, NEGATIVE) | 0.863 | 0.760 | 1.000 | 0.457 | 0.731 |
 | **Ensemble (best_audio_mil, mean)** | **0.893** | — | — | **0.878** | **0.956** |
 | Metadata stacker (spec-012 US1) | 0.901 | 0.901 | 0.901 | 0.900 | 0.964 |
@@ -711,15 +834,22 @@ If audio files change, delete the relevant cache directory before re-running.
 - Deleting and regenerating only part of a scene set breaks reproducibility — always regenerate the full N scenes for a given config + seed pair
 - **Audio LLM prompt cache invalidation** — if the prompt template in `baselines/audio_llm_baseline.py` changes, delete `baselines/audio_llm_cache/{model_slug}/` before rerunning; cached logits were generated with the old prompt and will silently produce wrong results
 - **Audio LLM test-before-val guard** — `python baselines/audio_llm_baseline.py --split test` exits with code 2 if `val_metrics_tuned.json` is missing; run val first
+- **USC-SAIL training requires `PYTHONPATH=.`** — `python scripts/main.py ...` from inside `whisper-modeling/` raises `ModuleNotFoundError: lightning_modules` because `scripts/` (not `.`) is on sys.path. Set `PYTHONPATH=.` before invocation. Encoded into `whisper-modeling/run_train_synth.sh`.
+- **USC-SAIL window_size must be 30 on transformers ≥4.57** — Whisper encoder hard-checks `mel_features.length == 3000` (= 30s @ 16kHz). The original `window_size: 10` config produces 1000-frame mels and raises `ValueError: Whisper expects mel input length 3000`. Synth scenes are 30s natively, so set `window_size: 30, batch_size: 16` (memory). The original anfengxu 5k config worked on older transformers where this check was absent.
+- **Custom WhisperWrapper API drift on transformers ≥4.57** (whisper-modeling/models/whisper.py) — newer transformers changed Whisper internals: (1) `WhisperAttention.__init__` now requires `config=` arg or `self.config` is None, breaking later `_attn_implementation` access — fixed by passing `config=config`; (2) `WhisperAttention.forward` now returns 2-tuple instead of 3-tuple (dropped `past_key_value`) — fixed by robust unpacking `result[0], result[1]`. Both fixes committed.
+- **Granite-Speech requires `<|audio|>` placeholder** — `processor(text=prompt, ...)` raises "Number of audio tokens does not match number of audio features" if prompt lacks the `<|audio|>` token. `score_granite_llm` injects it automatically. Even with the fix, the 1B model produces near-random scores on zero-shot child-vocalization (AUROC≈0.45-0.50) — this is a model-capability ceiling, not a setup bug.
+- **Audio model error fallback poisons cache** — `baselines/audio_model_baseline.py` `run_inference` writes `score=0.5` to cache on any per-clip exception. If a buggy model run errors all clips, the cache fills with 431×0.5 entries. Subsequent runs see "all cached", skip model load, compute AUROC=0.5 exactly. After fixing model code, **delete the cache** before resubmitting: `rm baselines/audio_model_cache/{model_slug}{_cross_child}/{val,test}_scores.json`.
+- **Canary-Qwen-2.5b NeMo↔HF format mismatch** — `EncDecMultiTaskModel.from_pretrained("nvidia/canary-qwen-2.5b")` fails with `FileNotFoundError: model_config.yaml` because the HF-uploaded model has HF format (config.json + safetensors) but NeMo's loader expects a `.nemo` bundle with `model_config.yaml`. NeMo 2.7.3 doesn't support loading HF-only Canary uploads. Currently blocked; would require either NGC download (NeMo format) or rewriting the loader to use `transformers.AutoModel`.
 
 ## Recent Changes
+- **Spec-016 Synth Augmentation Extensions** (2026-04-29, SLURM jobs 12845253–12848196): six independent training-recipe variants routing the existing 5000-scene synth corpus into pipelines where labels are load-bearing. **Mixed results so far** (4 of 8 results in): C2 pseudo-frame synth-aug NEGATIVE (AUROC 0.831→0.763, frame-Pearson 0.566→0.468 — synth swamps real and hurts both clip-level and frame-level transfer); C3a wavlm hardneg synth tiny POSITIVE (AUROC 0.642→0.657, +0.015 — synth-mined hardnegs slightly beat RTTM-mined ones); C5 seg-MIL synth combined cache strong POSITIVE (transformer aggregator: AUROC 0.518→0.637, +0.119; gated_attention: +0.035) — clean synth segments help most where the real-segment baseline was noisiest; C6 audio-LLM 2-shot synth demos NEUTRAL (AUROC 0.725→0.713 vs zero-shot, real-2shot identical at 0.725 — few-shot is a low-leverage axis on Qwen2-Audio for this task regardless of demo source). **Pattern**: synth helps where the baseline pipeline is information-starved (seg-MIL transformer), hurts where the baseline already has high-quality signal (pseudo-frame had Pearson 0.566 from VTC+USC-SAIL averaging). Spec dir: `specs/016-synth-augmentation-extensions/{spec,plan,tasks}.md`. Helper builders in `synth/scripts/build_*` produce all 4 derived manifests/caches; `pseudo_frame/build_synth_pseudo_labels.py` appends 5000 synth GT pseudo-frames to `pseudo_frame/pseudo_labels/index.csv`. C1 USC-SAIL still in flight after two failed submissions (PYTHONPATH fix + window_size 10→30 for transformers 4.57+ mel-3000 enforcement; latest submit 12848196).
+- **ACMIL branch-aggregation extension** (2026-04-29, SLURM jobs 12839667–12839672): Added `branch_aggregation: "mean"|"max"|"topk_mean"|"gated"` parameter on `ACMILHead` (mil/mil_model.py) plus `branch_topk` and learnable `branch_gate` (init zero → sigmoid 0.5 = mean-equivalent at init); new `forward_branches(h)` method exposes per-branch logits for no-retrain inference. 6 new YAML configs at `mil/configs/{wavlm,whisper}_mil_acmil_{max,gated,topk}.yaml` retrained from scratch. **Best new result: `whisper_mil_acmil_max` F1=0.891 AUROC=0.842 AUPRC=0.936** — +0.091 AUROC vs the original mean-aggregation baseline (which was a NEGATIVE in spec-014). `wavlm_mil_acmil_topk` (k=2) also positive: AUROC=0.775 (+0.042 vs wavlm mean baseline). Whisper gated retrain early-stopped at epoch 8 (instability). Helper script: `mil/slurm/run_acmil_branch_selection.sh <results_dir>` runs `mil/eval_acmil_branch_selection.py` for no-retrain per-branch / best-branch / max-over-branches / topk_mean inference from an existing ACMIL checkpoint (jobs 12844150 wavlm + 12844151 whisper in flight; outputs `branch_selection.{csv,json}` in the results dir).
+- **Spec-014 MIL Extensions completed** (2026-04-29, SLURM jobs 12805726–12805739, fire-and-forget orchestrator `mil/slurm/run_spec014.sh`, tracker `mil/scripts/track_spec014.py`): All 11 jobs completed. **Whisper-MIL TS-MIL concat is the only positive frame-window result**: F1=0.896 AUROC=0.869 AUPRC=0.944 (vs Whisper-MIL baseline 0.886/0.853/0.946 → +0.016 AUROC). All other US1/US2/US3 frame-window variants underperform their backbone baselines. Child-adapted WavLM (US2) collapses to AUROC=0.500 (random). New seg-MIL aggregators (US5/US6) marginally improve over gated_attention: ExpSoftmaxPool +0.008 AUROC, DSMIL +0.007, AutoPool +0.005; GMAP regresses (−0.015). HuBERT-large layersum is a useful new model variant (AUROC=0.813, +0.042 vs WavLM-MIL but still below Whisper-MIL). Cross-child TS-MIL (`wavlm_mil_tsmil_concat_cross_child`) intentionally skipped — BabAR/VTC env libtorchcodec/FFmpeg conflict prevents cross-child VTC RTTM cache rebuild; marked `attempt: 99` + `skipped_reason` in `mil/spec014_jobs.json`. Synthetic scene generation (resubmit job 12770080) completed 5000 scenes (manifest: `synth_results/manifests/synthetic_manifest.csv`).
+- 014-mil-extensions-attention-and-layers: Added Python 3.11, `child-vocalizations` conda env (same as spec-009 / spec-012) + `torch`, `transformers` (WavLM/HuBERT/Whisper backbones), `numpy`, `pandas`, `scikit-learn` (metrics only); no new Python packages required for US1/US2; US3 introduces no new dependencies (ACMIL is pure PyTorch — clone reference impl from https://github.com/dazhangyu123/ACMIL but rewrite into `mil/mil_model.py` rather than vendoring the package).
 - 009-synth-rir-noise: Added Python 3.11, `child-vocalizations` conda env + pandas, scikit-learn (LR, GBM via HistGradientBoosting), numpy, torch + torchaudio (sub-features C/D only), transformers (WavLM backbone for C/D)
 - **TinyVox MIL augmentation negative result** (spec-009, 2026-04-28, job 12748294): Adding 15,550 TinyVox Providence clips (padded to 10s, label=1) to WavLM-MIL train split HURTS performance. Test AUROC=0.670 vs baseline 0.771 (delta=-0.101); F1=0.866 vs 0.882 (delta=-0.017); AUPRC=0.819 vs 0.893 (delta=-0.074). Early stopping at epoch 12. Root cause: TinyVox short clips padded with silence create uniform 0-energy windows; model overfits on pad-pattern as a positive signal → worse generalization on real clips. Results: `mil/mil_results/wavlm_mil_tinyvox/`.
-- **LocoNet-ECAPA negative result** (spec-007, 2026-04-28, job 12696180): All 109 seen children have empty LocoNet segments → zero prototype coverage → F1=0.000, AUROC=0.500, AUPRC=0.760 (all scores degenerate). Root causes: (1) **threshold bug**: `run_loconet_asd_per_track` used threshold=0.5 on raw logits — fixed to 0.0 (logit decision boundary); (2) **domain mismatch**: LocoNet trained on Hollywood AVA close-up faces; all SAILS BIDS logit scores fall in [-4.4, -1.6] range (uniformly "silent"), so even threshold=0.0 gives 0 segments. Face detection itself works (1839/2183 clips have face cache with up to 37 tracks/clip). Results: `video_asd_ecapa_enrollment_runs/loconet_ecapa/`.
-- **Hard-negative MIL negative result** (spec-012, 2026-04-28, job 12770452): Adding 344 hard-negative windows (30s Playlogue/Providence clips, CHI silent but another speaker active) to bring pos:neg to 1:1 HURTS both variants. WavLM-MIL: AUROC=0.642 vs baseline 0.771 (delta=-0.129); val AUROC never exceeded 0.572 even after 20 epochs; model degenerates to recall=1.0 at threshold=0.05. Whisper-MIL: AUROC=0.818 vs baseline 0.853 (delta=-0.035); stable training but consistent degradation. Root cause: hard negatives come from Playlogue/Providence (different acoustic domain than SAILS BIDS), introducing cross-dataset distribution shift. Domain-matched hard negatives required. Results: `mil/mil_results/{wavlm_mil_hardneg,whisper_mil_hardneg}/`.
-- **Multi-child suppressor null result** (spec-012, 2026-04-28, job 12774458): LR on WavLM mean-pool embeddings of n_children≥2 train clips (n=283) tuned to alpha=1.0 on val — suppressor score completely ignored. Overall F1=0.904/AUROC=0.892 reflects 4-system ensemble with re-tuned threshold (0.39), not suppressor effect. Multi-child clips remain harder (F1=0.837 vs 0.921 single-child) but suppressor provides no additional benefit. Results: `mil/mil_results/multi_child_suppressor/`.
-- **Metadata stacker positive result** (spec-012, 2026-04-28): LR/GBM stacker on 10 system scores + 7 BIDS metadata features achieves F1=0.901/AUROC=0.900 — project's highest AUROC (+2.2pp over best_audio_mil baseline). Results: `ensemble_runs/metadata_stack/`.
 
 ## Active Technologies
-- Python 3.11, `child-vocalizations` conda env + pandas, scikit-learn (LR, GBM via HistGradientBoosting), numpy, torch + torchaudio (sub-features C/D only), transformers (WavLM backbone for C/D) (009-synth-rir-noise)
-- CSV predictions in-place; new results written to `ensemble_runs/metadata_router_rule/`, `ensemble_runs/metadata_router_learned/`, `ensemble_runs/metadata_stack/`; suppressor/short-voc head results in `mil/mil_results/multi_child_suppressor/`, `mil/mil_results/short_voc_head/` (009-synth-rir-noise)
+- Python 3.11, `child-vocalizations` conda env (same as spec-009 / spec-012) + `torch`, `transformers` (WavLM/HuBERT/Whisper backbones), `numpy`, `pandas`, `scikit-learn` (metrics only); no new Python packages required for US1/US2; US3 introduces no new dependencies (ACMIL is pure PyTorch — clone reference impl from https://github.com/dazhangyu123/ACMIL but rewrite into `mil/mil_model.py` rather than vendoring the package). (014-mil-extensions-attention-and-layers)
+- New result directories under `mil/mil_results/`: `wavlm_mil_layersum/`, `whisper_mil_layersum/`, `hubert_large_mil_layersum/`, `wavlm_mil_child_adapted/`, `wavlm_mil_acmil/`, `whisper_mil_acmil/` (and combined `wavlm_mil_child_adapted_layersum/` if FR-010 triggers). Each follows the existing MIL output schema: `best_checkpoint.pt`, `config.json`, `val/test_metrics_tuned.json`, `val/test_predictions.csv`, `val/test_metrics_by_timepoint.csv`. New artifacts: `layer_weights.json` (US1), `branch_weights.json` (US3). (014-mil-extensions-attention-and-layers)
+- ACMIL branch-aggregation retrain dirs (2026-04-29): `mil/mil_results/{wavlm,whisper}_mil_acmil_{max,gated,topk}/`. Same output schema as parent ACMIL dir, plus `branch_diagnostics_test.json`, `branch_attention_test.csv`, `branch_weights_test.json`. Branch-selection eval (no retrain) writes `branch_selection.{csv,json}` into `mil/mil_results/{wavlm,whisper}_mil_acmil/` via `mil/eval_acmil_branch_selection.py`. (014-mil-extensions-attention-and-layers)

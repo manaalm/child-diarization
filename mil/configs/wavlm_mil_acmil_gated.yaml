@@ -1,0 +1,27 @@
+variant_name: "wavlm_mil_acmil_gated"
+backbone: "microsoft/wavlm-base-plus"
+backbone_layer: -1
+window_sec: 2.0
+stride_sec: 1.0
+mil_hidden_dim: 256
+mil_dropout: 0.25
+lr: 1.0e-3
+epochs: 25
+patience: 5
+batch_size: 8
+pos_weight: null
+seed: 42
+split_dir: "whisper-modeling/seen_child_splits"
+device: "cuda"
+
+# spec-014 US3 follow-up (post-T029): ACMIL with LEARNED PER-BRANCH GATE.
+# Adds nn.Parameter(torch.zeros(n_branches)) → sigmoid → weighted sum across
+# branches. Initialized to all-0.5 so equivalent to mean at start. Should learn
+# to upweight the strongest-aligned branches (T029: WavLM branch 1 AUROC=0.714).
+head: "acmil"
+acmil_n_branches: 5
+acmil_stkim_p: 0.5
+acmil_stkim_k_frac: 0.1
+acmil_stkim_k_cap: 10
+acmil_mba_diversity_weight: 0.1
+acmil_branch_aggregation: "gated"

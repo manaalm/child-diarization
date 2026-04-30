@@ -1,0 +1,33 @@
+# Seg-MIL synth-augmentation experiment.
+# Train on seen-child + 5000 synth scenes; real clips use USC-SAIL diarizer
+# segments, synth clips use ground-truth segments — all unified in one cache.
+encoder: "microsoft/wavlm-base-plus"
+encoder_layer: -1
+split_dir: "whisper-modeling/seen_child_splits_synth_aug"
+output_dir: "mil/mil_results/seg_mil_synth"
+embedding_cache_dir: "mil/seg_embedding_cache_synth"
+seed: 42
+min_seg_dur_sec: 0.4
+
+lr: 1.0e-3
+epochs: 20
+patience: 5
+batch_size: 32
+attn_dim: 256
+
+frontends:
+  - name: "usc_sail_synth_combined"
+    rttm_cache_dir: "mil/seg_mil_combined_cache"
+
+aggregators:
+  - "gated_attention"
+  - "transformer"
+
+top_k: 3
+transformer_config:
+  num_layers: 2
+  num_heads: 4
+  ffn_dim: 1536
+  dropout: 0.3
+  weight_decay: 0.01
+  k_max: 128

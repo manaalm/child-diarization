@@ -1,0 +1,13 @@
+{
+  "model": "nvidia/parakeet-tdt-0.6b-v2",
+  "model_slug": "parakeet_tdt_0.6b_v2",
+  "split": "test",
+  "scoring": "gap_ratio = 1 - (word_covered_seconds / clip_duration)",
+  "batch_size": 4,
+  "seed": 42,
+  "splits_dir": "baselines/splits",
+  "cache_dir": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/parakeet_cache/parakeet_tdt_0.6b_v2",
+  "output_dir": "baselines/parakeet_baseline_runs/parakeet_tdt_0.6b_v2_cross_child",
+  "n_clips": 496,
+  "timestamp": "2026-04-29T03:16:45.693990+00:00"
+}
