@@ -134,6 +134,59 @@ pattern is documented at `specs/022-pi-thesis-revisions/quickstart.md`
 and is a single config-generator + dispatcher away from being
 runnable.
 
+## BA-retune everywhere (2026-05-12 late evening)
+
+User asked for thesis tables to use balanced-accuracy threshold tuning
+instead of F1 threshold tuning, including appendices. Implemented as:
+
+1. **Bug fix in `evaluation/balanced_metrics.py`**: the loader was
+   missing the enrollment-system threshold filename (`enroll_val_metrics.json`,
+   without `_tuned` suffix). Enrollment systems were defaulting to
+   threshold=0.5, producing wrong F1-tuned values (BabAR F1=0.367 instead
+   of the correct 0.872 at val-tuned threshold 0.145). Patch adds
+   `enroll_val_metrics.json` to the threshold-loader fallback chain.
+   Re-ran balanced_metrics.py: F1-tuned summary now 324 rows with
+   corrected enrollment thresholds.
+
+2. **New utility `evaluation/retune_all_by_ba.py`** walks every (val,
+   test) prediction pair under canonical result roots and:
+   - sweeps thresholds 0.05–0.95 step 0.05 on val to maximise
+     balanced accuracy
+   - applies tuned threshold to test once (Constitution IV)
+   - records both BA-tuned metrics and the legacy F1-tuned metrics
+     for delta-audit
+   - emits `evaluation/balanced_metrics_ba_tuned_summary.csv`
+     (280 systems, 1 schema-fail on the top-level multi-column
+     ensemble file)
+
+3. **Thesis_v2 chapter 5 headline table updated** to BA-tuned values
+   (`thesis_v2/chapters/05_results.tex` Tab.~tab:headline). Most
+   non-AV non-ensemble rows now report metrics at the BA-tuned
+   threshold instead of the F1-tuned threshold. AUROC and AUPRC are
+   threshold-independent and unchanged. Footnote explains the
+   pseudo-frame BA recovery (0.55 → 0.77 for Whisper, 0.54 → 0.74
+   for WavLM).
+
+4. **Thesis_v2 appendix C corrected and extended**: (a) the
+   imbalance-aware headline table (`tab:appC-spec022-headline`) now
+   shows the corrected F1-tuned values for enrollment systems with
+   their actual val-tuned thresholds; (b) new
+   `tab:appC-spec022-ba-retune` table provides per-system F1→BA
+   threshold-retune audit with ΔF1 and ΔBA columns. Mean catalog
+   trade-off: −0.029 F1 for +0.054 BA. Max retune gain: Whisper
+   pseudo-frame +0.219 BA; max loss: −0.113 F1 (Qwen2.5-Omni at
+   threshold sweep from 0.45 → 0.85).
+
+5. **CLAUDE.md** new headline-finding paragraph documents the
+   retune at the level of "what is the new everywhere default
+   operating point".
+
+Not retuned (val_predictions.csv missing in their dir):
+- `ensemble_runs/metadata_stack`, `ensemble_runs/metadata_router_learned`,
+  similar — the ensemble-stacker variants store predictions in their
+  own dir but the val side is only available via the full ensemble
+  pipeline rerun. Their F1-tuned values stand in the headline table.
+
 ## Out-of-scope for MVP (carried forward)
 
 1. **194 new test rows have no predictions** for any existing system. They're in the new BIDS-derived test set but the systems were trained on the legacy 441-row set. Filling these in requires GPU reruns (US2 group-stratified k-fold or US3 universal-coverage eval).

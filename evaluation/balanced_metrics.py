@@ -48,6 +48,7 @@ def _load_threshold(system_dir: str) -> tuple[float, str]:
     for fname, source in (
         ("val_metrics_tuned.json", "val-tuned"),
         ("enroll_val_metrics_tuned.json", "val-tuned"),
+        ("enroll_val_metrics.json", "val-tuned-enroll"),   # enrollment runs use this naming
         ("val_metrics.json", "val-tuned-alt"),
     ):
         p = os.path.join(system_dir, fname)
