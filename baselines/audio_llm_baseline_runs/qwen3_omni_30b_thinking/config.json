@@ -1,0 +1,18 @@
+{
+  "model_name": "Qwen/Qwen3-Omni-30B-A3B-Thinking",
+  "model_slug": "qwen3_omni_30b_thinking",
+  "prompt_template": "zero_shot_v1",
+  "prompt_text": "Listen to this audio clip from a naturalistic social interaction recording. Is there a child vocalizing in this clip? Answer only: yes or no.",
+  "n_shot": 0,
+  "threshold": 0.75,
+  "val_f1": 0.8731563421828908,
+  "seed": 42,
+  "split": "seen_child_splits",
+  "n_clips_total": 635,
+  "n_clips_cached": 68,
+  "n_clips_error": 0,
+  "prediction_variance": 0.022623,
+  "degenerate_flag": false,
+  "frac_yes": 0.8567,
+  "frac_no": 0.1433
+}

@@ -1,0 +1,12 @@
+{
+  "model": "yamnet",
+  "ast_model_name": null,
+  "yamnet_env_python": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/yamnet-eval/.venv/bin/python",
+  "audioset_labels": [
+    "Child speech, kid speaking",
+    "Babbling",
+    "Baby cry, infant cry",
+    "Children shouting"
+  ],
+  "aggregation": "p_child_voc = max(P[label]) across child-vocalisation labels"
+}

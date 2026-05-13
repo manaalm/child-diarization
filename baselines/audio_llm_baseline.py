@@ -1,5 +1,9 @@
 """
-Zero-shot (and optional few-shot) child vocalization detection using Qwen2-Audio-7B-Instruct.
+Zero-shot (and optional few-shot) child vocalization detection using Qwen2.5-Omni-7B.
+
+Default model: Qwen/Qwen2.5-Omni-7B (Apache-2.0). The thinker (text-output)
+component is loaded; the talker (speech-synthesis) component is skipped to
+save GPU memory — only yes/no logits are needed.
 
 Usage:
     python baselines/audio_llm_baseline.py --split val [OPTIONS]
@@ -33,7 +37,26 @@ PROMPT_TEMPLATES = {
         "Is there a child vocalizing in this clip? "
         "Answer only: yes or no."
     ),
+    # Target-child framing — only meaningful with few-shot demos from the same
+    # child, where positive demos anchor what the target child sounds like and
+    # negative demos anchor "any speech that is not the target child."
+    "target_child_v1": (
+        "All audio clips in this conversation are from a single target child's "
+        "recording. The earlier clips with answers are demonstrations of when "
+        "that target child is or is not vocalizing. "
+        "Is the target child vocalizing in this clip? "
+        "Answer only: yes or no."
+    ),
 }
+
+# Qwen2.5-Omni's chat template requires a system prompt — the model card warns
+# that omitting it can break audio understanding. Keep it minimal so it does
+# not bias yes/no logits.
+SYSTEM_PROMPT = (
+    "You are Qwen, a virtual human developed by the Qwen Team, Alibaba Group, "
+    "capable of perceiving auditory and visual inputs, as well as generating "
+    "text and speech."
+)
 
 BABAR_BASELINES = {"f1": 0.874, "auroc": 0.820, "auprc": 0.918}
 
@@ -47,12 +70,40 @@ def _cache_path(audio_path: str, model_slug: str, cache_dir: str) -> str:
     return str(Path(cache_dir) / f"{stem}__{md5}.json")
 
 
-def _load_cache(path: str):
+def _prompt_hash(prompt_text: str) -> str:
+    """8-char SHA1 of the rendered prompt text. Used to invalidate stale caches
+    when the prompt template changes."""
+    return hashlib.sha1(prompt_text.encode()).hexdigest()[:8]
+
+
+_PROMPT_HASH_WARNED = False
+
+
+def _load_cache(path: str, expected_prompt_hash: str | None = None):
+    """Load a cache entry. If expected_prompt_hash is given, only return the
+    entry when the cached `prompt_text_hash` matches. Legacy entries (no hash
+    field) are accepted with a one-time warning per run for backwards
+    compatibility — pass `--invalidate-legacy-cache` to enforce strictly."""
+    global _PROMPT_HASH_WARNED
     try:
         with open(path) as f:
-            return json.load(f)
+            entry = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return None
+    if expected_prompt_hash is None:
+        return entry
+    cached_hash = entry.get("prompt_text_hash")
+    if cached_hash is None:
+        if not _PROMPT_HASH_WARNED:
+            print(f"  [warn] cache entries lack 'prompt_text_hash'; accepting "
+                  f"legacy caches but cannot verify prompt match. New entries "
+                  f"will record hash={expected_prompt_hash}.", flush=True)
+            _PROMPT_HASH_WARNED = True
+        return entry
+    if cached_hash != expected_prompt_hash:
+        # Stale cache — different prompt. Treat as miss; will be overwritten.
+        return None
+    return entry
 
 
 def _save_cache(path: str, entry: dict):
@@ -96,9 +147,60 @@ def _load_audio(audio_path: str):
 # T004 — Model loading
 # ---------------------------------------------------------------------------
 
-def _load_model(model_name: str, dtype: str, quantize_4bit: bool, device: str):
-    from transformers import AutoProcessor, Qwen2AudioForConditionalGeneration
+def _resolve_model_class(model_class_name, model_name: str):
+    """Map a string class name (or None) to a transformers model class.
 
+    spec-022 US3: support Qwen3-Omni (30B MoE) alongside Qwen2.5-Omni (7B).
+    Class auto-detected from the model HF name when --model-class is omitted;
+    new Qwen-Omni variants override via the flag.
+    """
+    import transformers
+
+    if model_class_name:
+        cls = getattr(transformers, model_class_name, None)
+        if cls is None:
+            raise SystemExit(
+                f"--model-class={model_class_name!r} not in transformers "
+                f"({transformers.__version__}). Likely options: "
+                "Qwen2_5OmniThinkerForConditionalGeneration, "
+                "Qwen3OmniMoeForConditionalGeneration, "
+                "AutoModelForCausalLM."
+            )
+        return cls
+
+    lname = model_name.lower()
+    if "qwen2.5-omni" in lname or "qwen2_5_omni" in lname:
+        return transformers.Qwen2_5OmniThinkerForConditionalGeneration
+    if "qwen3-omni" in lname or "qwen3.5-omni" in lname:
+        # Thinker variant matches the Qwen2.5-Omni thinker pattern (text-output);
+        # the non-Thinker class is the full audio-in/speech-out multimodal model
+        # whose forward() does not accept input_ids the way the thinker does.
+        for cand in ("Qwen3OmniMoeThinkerForConditionalGeneration",
+                     "Qwen3OmniThinkerForConditionalGeneration",
+                     "Qwen3_5OmniThinkerForConditionalGeneration",
+                     "Qwen3OmniMoeForConditionalGeneration",
+                     "Qwen3_5OmniForConditionalGeneration"):
+            cls = getattr(transformers, cand, None)
+            if cls is not None:
+                return cls
+        raise SystemExit(
+            f"No Qwen3-Omni class found in transformers {transformers.__version__}. "
+            "Upgrade transformers or pass --model-class explicitly."
+        )
+    return transformers.AutoModelForCausalLM
+
+
+def _load_model(model_name: str, dtype: str, quantize_4bit: bool, device: str,
+                model_class_name: str | None = None):
+    """Load an Omni audio LLM thinker (text-output) component.
+
+    Qwen2.5-Omni: thinker = LLM + audio/vision encoders; talker (speech synthesis)
+    skipped to save ~10 GB GPU memory.
+    Qwen3-Omni / Qwen3.5-Omni: equivalent thinker auto-detected or via --model-class.
+    """
+    from transformers import AutoProcessor
+
+    ModelCls = _resolve_model_class(model_class_name, model_name)
     torch_dtype = torch.bfloat16 if dtype == "bfloat16" else torch.float32
 
     processor = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
@@ -118,7 +220,7 @@ def _load_model(model_name: str, dtype: str, quantize_4bit: bool, device: str):
         )
         model_kwargs.pop("dtype", None)
 
-    model = Qwen2AudioForConditionalGeneration.from_pretrained(model_name, **model_kwargs)
+    model = ModelCls.from_pretrained(model_name, **model_kwargs)
     model.eval()
     return processor, model
 
@@ -145,7 +247,11 @@ def _get_yes_no_token_ids(tokenizer):
 
 def _infer_clip(processor, model, waveform_np, sr: int, prompt_text: str,
                 device: str, few_shot_examples=None):
-    conversation = []
+    # Qwen2.5-Omni requires a system prompt for audio understanding.
+    conversation = [{
+        "role": "system",
+        "content": [{"type": "text", "text": SYSTEM_PROMPT}],
+    }]
 
     # Few-shot preamble turns
     if few_shot_examples:
@@ -153,20 +259,21 @@ def _infer_clip(processor, model, waveform_np, sr: int, prompt_text: str,
             conversation.append({
                 "role": "user",
                 "content": [
-                    {"type": "audio", "audio_url": ex_wav},
+                    {"type": "audio", "audio": ex_wav},
                     {"type": "text", "text": prompt_text},
                 ],
             })
             conversation.append({
                 "role": "assistant",
-                "content": "yes" if ex_label == 1 else "no",
+                "content": [{"type": "text",
+                             "text": "yes" if ex_label == 1 else "no"}],
             })
 
     # Query turn
     conversation.append({
         "role": "user",
         "content": [
-            {"type": "audio", "audio_url": waveform_np},
+            {"type": "audio", "audio": waveform_np},
             {"type": "text", "text": prompt_text},
         ],
     })
@@ -180,8 +287,8 @@ def _infer_clip(processor, model, waveform_np, sr: int, prompt_text: str,
     for turn in conversation:
         if isinstance(turn["content"], list):
             for part in turn["content"]:
-                if part["type"] == "audio":
-                    audios.append(part["audio_url"])
+                if part.get("type") == "audio":
+                    audios.append(part["audio"])
 
     inputs = processor(
         text=text_input,
@@ -191,9 +298,26 @@ def _infer_clip(processor, model, waveform_np, sr: int, prompt_text: str,
         padding=True,
     )
 
-    # Move inputs to model device
-    inputs = {k: v.to(model.device) if hasattr(v, "to") else v
-              for k, v in inputs.items()}
+    # Move inputs to model device; cast floating-point feature tensors to the
+    # model's dtype. spec-022 US3 / Qwen3-Omni: the processor emits float32
+    # input_features but the model is loaded in bfloat16, so audio_tower's
+    # conv2d would crash with "Input type (float) and bias type (BFloat16)
+    # should be the same". Cast feature tensors (but NOT integer tensors like
+    # input_ids / attention_mask) to model dtype.
+    model_dtype = getattr(model, "dtype", None)
+    if model_dtype is None:
+        try:
+            model_dtype = next(model.parameters()).dtype
+        except StopIteration:
+            model_dtype = torch.float32
+    inputs_cast = {}
+    for k, v in inputs.items():
+        if hasattr(v, "to"):
+            v = v.to(model.device)
+            if v.is_floating_point() and v.dtype != model_dtype:
+                v = v.to(model_dtype)
+        inputs_cast[k] = v
+    inputs = inputs_cast
 
     tok = processor.tokenizer
     yes_ids, no_ids = _get_yes_no_token_ids(tok)
@@ -335,12 +459,16 @@ def _find_few_shot_examples(audio_path: str, train_csv_path: str,
 
 def _parse_args():
     p = argparse.ArgumentParser(description="Audio LLM zero-shot child vocalization baseline")
-    p.add_argument("--split", default="val", choices=["val", "test"])
+    p.add_argument("--split", default="val", choices=["val", "test", "test_all"])
     p.add_argument("--split-csv", default=None,
-                   help="Override split CSV path (default: seen_child_splits/{split}.csv)")
+                   help="Override split CSV path. Defaults: val/test -> seen_child_splits/{split}.csv; "
+                        "test_all -> all_children_splits/test_all.csv (spec 022 US3 universal coverage)")
     p.add_argument("--train-csv", default="whisper-modeling/seen_child_splits/train.csv")
-    p.add_argument("--model", default="Qwen/Qwen2-Audio-7B-Instruct")
-    p.add_argument("--model-slug", default="qwen2_audio_7b")
+    p.add_argument("--model", default="Qwen/Qwen2.5-Omni-7B")
+    p.add_argument("--model-class", default=None,
+                   help="transformers class name. Auto-detected from --model when omitted. "
+                        "Set explicitly for Qwen3-Omni: e.g., Qwen3OmniMoeForConditionalGeneration.")
+    p.add_argument("--model-slug", default="qwen25_omni_7b")
     p.add_argument("--output-dir", default=None,
                    help="Results folder (default: baselines/audio_llm_baseline_runs/{model_slug})")
     p.add_argument("--cache-dir", default=None,
@@ -365,7 +493,10 @@ def main():
 
     # Resolve defaults
     if args.split_csv is None:
-        args.split_csv = f"whisper-modeling/seen_child_splits/{args.split}.csv"
+        if args.split == "test_all":
+            args.split_csv = "whisper-modeling/all_children_splits/test_all.csv"
+        else:
+            args.split_csv = f"whisper-modeling/seen_child_splits/{args.split}.csv"
     if args.output_dir is None:
         args.output_dir = f"baselines/audio_llm_baseline_runs/{args.model_slug}"
     if args.cache_dir is None:
@@ -375,9 +506,9 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
     Path(args.cache_dir).mkdir(parents=True, exist_ok=True)
 
-    # Guard: test requires val to have already run
+    # Guard: test / test_all require val to have already run (threshold tuning)
     val_metrics_path = out_dir / "val_metrics_tuned.json"
-    if args.split == "test" and not val_metrics_path.exists():
+    if args.split in {"test", "test_all"} and not val_metrics_path.exists():
         print(f"ERROR: val_metrics_tuned.json not found at {val_metrics_path}. "
               f"Run --split val first.", file=sys.stderr)
         sys.exit(2)
@@ -400,7 +531,8 @@ def main():
 
     # Load model
     print(f"Loading model {args.model!r} ...")
-    processor, model = _load_model(args.model, args.dtype, args.quantize_4bit, args.device)
+    processor, model = _load_model(args.model, args.dtype, args.quantize_4bit, args.device,
+                                   model_class_name=args.model_class)
     print("Model loaded.\n")
 
     label_col = "label" if "label" in split_df.columns else "child_vocalizing"
@@ -420,9 +552,10 @@ def main():
         if (idx % 50 == 0) or idx == split_df.index[0]:
             print(f"  [{idx - split_df.index[0] + 1}/{len(split_df)}] {clip_id} ...")
 
-        # Try cache first
+        # Try cache first (validates prompt_text_hash to detect stale caches
+        # after prompt template edits — see fix #3 in CHANGELOG.md)
         cp = _cache_path(audio_path, args.model_slug, args.cache_dir)
-        cached = _load_cache(cp)
+        cached = _load_cache(cp, expected_prompt_hash=_prompt_hash(prompt_text))
 
         if cached is not None:
             n_cached += 1
@@ -463,6 +596,8 @@ def main():
             result["clip_id"] = clip_id
             result["audio_path"] = audio_path
             result["model_name"] = args.model
+            result["prompt_template"] = args.prompt_template
+            result["prompt_text_hash"] = _prompt_hash(prompt_text)
             result["timestamp"] = datetime.now(timezone.utc).isoformat()
             _save_cache(cp, result)
 
