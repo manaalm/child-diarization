@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import (
     average_precision_score,
+    balanced_accuracy_score,
     f1_score,
     precision_score,
     recall_score,
@@ -16,7 +17,12 @@ from sklearn.metrics import (
 
 
 def compute_metrics(y_true: List[int], y_score: List[float], threshold: float = 0.5) -> Dict[str, float]:
-    """Compute F1, precision, recall, AUROC, AUPRC at a fixed threshold."""
+    """Compute F1, precision, recall, AUROC, AUPRC, plus imbalance-aware extensions
+    (f1_macro, f1_weighted, balanced_accuracy) at a fixed threshold.
+
+    Extended 2026-05-12 (spec 022 US2 / FR-007). Existing keys preserved verbatim;
+    f1 remains binary-positive-class F1 to keep legacy headline tables stable.
+    """
     y_true = np.array(y_true, dtype=int)
     y_score = np.array(y_score, dtype=float)
     y_pred = (y_score >= threshold).astype(int)
@@ -31,6 +37,9 @@ def compute_metrics(y_true: List[int], y_score: List[float], threshold: float = 
 
     return {
         "f1": float(f1_score(y_true, y_pred, zero_division=0)),
+        "f1_macro": float(f1_score(y_true, y_pred, average="macro", zero_division=0)),
+        "f1_weighted": float(f1_score(y_true, y_pred, average="weighted", zero_division=0)),
+        "balanced_accuracy": float(balanced_accuracy_score(y_true, y_pred)),
         "precision": float(precision_score(y_true, y_pred, zero_division=0)),
         "recall": float(recall_score(y_true, y_pred, zero_division=0)),
         "auroc": auroc,
