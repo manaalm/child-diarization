@@ -47,13 +47,30 @@ def compute_metrics(y_true: List[int], y_score: List[float], threshold: float = 
     }
 
 
-def tune_threshold(val_labels: List[int], val_scores: List[float]) -> float:
-    """Sweep thresholds 0.05–0.95 and return the one maximising val F1."""
-    best_thresh, best_f1 = 0.5, -1.0
+def tune_threshold(val_labels: List[int], val_scores: List[float],
+                   objective: str = "balanced_accuracy") -> float:
+    """Sweep thresholds 0.05–0.95 and return the one maximising the named
+    objective on val.
+
+    spec 022 (2026-05-13): default flipped from `"f1"` to `"balanced_accuracy"`
+    per advisor directive — the F1-max threshold systematically picks
+    recall≈0.99 operating points on this 76%-positive split, masking imbalance
+    behavior. Balanced-accuracy max gives a more deployable operating point.
+    Pass `objective="f1"` to recover the legacy behavior.
+
+    Tie-break: closest threshold to 0.5 wins (matches the
+    `retune_all_by_ba.py` tie-break to keep the two pipelines consistent).
+    """
+    if objective not in {"balanced_accuracy", "f1"}:
+        raise ValueError(f"unknown objective: {objective!r}; expected 'balanced_accuracy' or 'f1'")
+
+    best_thresh, best_score = 0.5, -1.0
     for t in np.arange(0.05, 0.96, 0.05):
-        m = compute_metrics(val_labels, val_scores, threshold=float(t))
-        if m["f1"] > best_f1:
-            best_f1, best_thresh = m["f1"], float(t)
+        t = float(t)
+        m = compute_metrics(val_labels, val_scores, threshold=t)
+        s = m[objective]
+        if s > best_score or (s == best_score and abs(t - 0.5) < abs(best_thresh - 0.5)):
+            best_score, best_thresh = s, t
     return round(best_thresh, 4)
 
 

@@ -169,6 +169,19 @@ def _resolve_model_class(model_class_name, model_name: str):
         return cls
 
     lname = model_name.lower()
+    if "qwen2-audio" in lname or "qwen2_audio" in lname:
+        # Qwen2-Audio (e.g. Qwen/Qwen2-Audio-7B-Instruct) uses a dedicated
+        # multimodal class — NOT AutoModelForCausalLM (which doesn't recognise
+        # Qwen2AudioConfig).
+        for cand in ("Qwen2AudioForConditionalGeneration",
+                     "Qwen2AudioForCausalLM"):
+            cls = getattr(transformers, cand, None)
+            if cls is not None:
+                return cls
+        raise SystemExit(
+            f"No Qwen2-Audio class found in transformers {transformers.__version__}. "
+            "Try --model-class=Qwen2AudioForConditionalGeneration explicitly."
+        )
     if "qwen2.5-omni" in lname or "qwen2_5_omni" in lname:
         return transformers.Qwen2_5OmniThinkerForConditionalGeneration
     if "qwen3-omni" in lname or "qwen3.5-omni" in lname:
@@ -374,13 +387,15 @@ def _compute_metrics(y_true, y_score, threshold: float) -> dict:
 
 
 def _tune_threshold(y_true, y_score) -> float:
-    from sklearn.metrics import f1_score
-    best_thr, best_f1 = 0.5, -1.0
+    """Spec-022 (2026-05-13): tunes by balanced accuracy (was F1)."""
+    from sklearn.metrics import balanced_accuracy_score
+    best_thr, best_ba = 0.5, -1.0
     for thr in np.linspace(0.05, 0.95, 19):
+        thr = float(thr)
         y_pred = (np.array(y_score) >= thr).astype(int)
-        f1 = f1_score(y_true, y_pred, zero_division=0)
-        if f1 > best_f1:
-            best_f1, best_thr = f1, float(thr)
+        ba = balanced_accuracy_score(y_true, y_pred)
+        if ba > best_ba or (ba == best_ba and abs(thr - 0.5) < abs(best_thr - 0.5)):
+            best_ba, best_thr = ba, thr
     return best_thr
 
 

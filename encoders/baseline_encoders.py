@@ -906,19 +906,25 @@ def collect_predictions(model, loader, criterion, device, model_type):
 
 
 def tune_threshold_for_f1(pred_df: pd.DataFrame) -> Tuple[float, Dict[str, float]]:
+    """Despite the legacy name (kept for caller compat), tunes by balanced
+    accuracy as of spec-022 (2026-05-13). Advisor directive: balanced-accuracy
+    is the default tuning objective across the codebase."""
     y_true = pred_df["label"].to_numpy()
     y_prob = pred_df["prob"].to_numpy()
 
     thresholds = np.linspace(0.05, 0.95, 181)
     best_t = 0.5
     best_metrics = compute_metrics(y_true, y_prob, threshold=best_t)
-    best_f1 = best_metrics["f1"]
+    best_ba = best_metrics["balanced_accuracy"]
 
     for t in thresholds:
-        m = compute_metrics(y_true, y_prob, threshold=float(t))
-        if m["f1"] > best_f1:
-            best_f1 = m["f1"]
-            best_t = float(t)
+        t = float(t)
+        m = compute_metrics(y_true, y_prob, threshold=t)
+        if m["balanced_accuracy"] > best_ba or (
+            m["balanced_accuracy"] == best_ba and abs(t - 0.5) < abs(best_t - 0.5)
+        ):
+            best_ba = m["balanced_accuracy"]
+            best_t = t
             best_metrics = m
 
     return best_t, best_metrics
@@ -926,7 +932,9 @@ def tune_threshold_for_f1(pred_df: pd.DataFrame) -> Tuple[float, Dict[str, float
 
 # --- NEW: per-timepoint threshold tuning ---
 def tune_per_timepoint_thresholds(pred_df: pd.DataFrame) -> Dict[str, float]:
-    """Returns {timepoint_str: best_threshold} tuned independently per group."""
+    """Returns {timepoint_str: best_threshold} tuned independently per group.
+    Uses balanced accuracy as of spec-022 (delegates to tune_threshold_for_f1
+    which now tunes by BA despite its legacy name)."""
     thresholds = {}
     for tp, sub in pred_df.groupby("timepoint"):
         best_t, _ = tune_threshold_for_f1(sub)

@@ -80,11 +80,14 @@ def metrics(y, p, thr):
 
 
 def tune_threshold(y, p):
-    best_t, best_f1 = 0.5, -1.0
+    """Spec-022 (2026-05-13): tunes by balanced accuracy (was F1) — advisor
+    directive to default all threshold tuning to BA across the codebase."""
+    from sklearn.metrics import balanced_accuracy_score
+    best_t, best_ba = 0.5, -1.0
     for t in np.linspace(0.05, 0.95, 181):
-        f = f1_score(np.asarray(y), (np.asarray(p) >= t).astype(int), zero_division=0)
-        if f > best_f1:
-            best_f1, best_t = float(f), float(t)
+        ba = balanced_accuracy_score(np.asarray(y), (np.asarray(p) >= t).astype(int))
+        if ba > best_ba or (ba == best_ba and abs(t - 0.5) < abs(best_t - 0.5)):
+            best_ba, best_t = float(ba), float(t)
     return best_t
 
 

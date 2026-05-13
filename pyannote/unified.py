@@ -57,6 +57,10 @@ class BaseConfig:
 
     # ECAPA
     ecapa_source: str = "speechbrain/spkrec-ecapa-voxceleb"
+    # Optional path to a fine-tuned embedding state-dict checkpoint (spec-021 US4
+    # T007). When provided, ECAPAEmbedder loads this on top of the pretrained
+    # SpeechBrain weights — keys "embedding_state_dict" or raw state_dict accepted.
+    ecapa_checkpoint: str = ""
 
     # role-only threshold tuning
     duration_threshold_grid: Tuple[float, ...] = (
@@ -233,7 +237,7 @@ class SpeakerEmbedder(abc.ABC):
 
 
 class ECAPAEmbedder(SpeakerEmbedder):
-    def __init__(self, source: str, device: str):
+    def __init__(self, source: str, device: str, checkpoint: str = ""):
         from speechbrain.inference.speaker import EncoderClassifier
 
         self.model = EncoderClassifier.from_hparams(
@@ -241,6 +245,14 @@ class ECAPAEmbedder(SpeakerEmbedder):
             run_opts={"device": device},
         )
         self.device = device
+        if checkpoint:
+            ckpt = torch.load(checkpoint, map_location=device)
+            sd = ckpt.get("embedding_state_dict", ckpt)
+            missing, unexpected = self.model.mods.embedding_model.load_state_dict(
+                sd, strict=False)
+            print(f"[ECAPAEmbedder] loaded checkpoint {checkpoint} "
+                  f"(missing={len(missing)} unexpected={len(unexpected)})")
+            self.model.mods.embedding_model.eval()
 
     @torch.no_grad()
     def embed_waveform(self, wav_1d: torch.Tensor) -> np.ndarray:
@@ -683,14 +695,16 @@ def run_role_only(
 
 
 def tune_role_only_threshold(val_role_df: pd.DataFrame, cfg: BaseConfig):
+    """Spec-022 (2026-05-13): tunes by balanced accuracy (was F1)."""
+    from sklearn.metrics import balanced_accuracy_score
     y_true = val_role_df["label"].to_numpy()
     y_cont = val_role_df["score_duration_sec"].to_numpy().astype(float)
 
-    best_t, best_f1 = cfg.duration_threshold_grid[0], -1.0
+    best_t, best_ba = cfg.duration_threshold_grid[0], -1.0
     for t in cfg.duration_threshold_grid:
-        f = float(f1_score(y_true, (y_cont >= t).astype(int), zero_division=0))
-        if f > best_f1:
-            best_f1, best_t = f, t
+        ba = float(balanced_accuracy_score(y_true, (y_cont >= t).astype(int)))
+        if ba > best_ba or (ba == best_ba and abs(t - 0.5) < abs(best_t - 0.5)):
+            best_ba, best_t = ba, t
 
     best_metrics = compute_metrics(y_true, y_cont, threshold=best_t)
     return float(best_t), best_metrics
@@ -706,6 +720,7 @@ def role_df_to_pred_df(role_df: pd.DataFrame, threshold_sec: float) -> pd.DataFr
 # ---------- threshold tuning -----------------------------------
 
 def tune_similarity_threshold(val_pred_df: pd.DataFrame, cfg: BaseConfig):
+    """Spec-022 (2026-05-13): tunes by balanced accuracy (was F1)."""
     y_true = val_pred_df["label"].to_numpy()
     y_prob = val_pred_df["prob"].to_numpy()
 
@@ -717,12 +732,14 @@ def tune_similarity_threshold(val_pred_df: pd.DataFrame, cfg: BaseConfig):
 
     best_t = 0.5
     best_metrics = compute_metrics(y_true, y_prob, threshold=best_t)
-    best_f1 = best_metrics["f1"]
+    best_ba = best_metrics["balanced_accuracy"]
 
     for t in thresholds:
         m = compute_metrics(y_true, y_prob, threshold=float(t))
-        if m["f1"] > best_f1:
-            best_f1 = m["f1"]
+        if m["balanced_accuracy"] > best_ba or (
+            m["balanced_accuracy"] == best_ba and abs(float(t) - 0.5) < abs(best_t - 0.5)
+        ):
+            best_ba = m["balanced_accuracy"]
             best_t = float(t)
             best_metrics = m
 
@@ -961,6 +978,63 @@ class VBxFrontend(DiarizationFrontend):
 # Factories
 # =============================================================
 
+class JointAsrDiarFrontend(DiarizationFrontend):
+    """
+    Reads pre-computed RTTMs produced by `baselines/joint_asr_diar_batch.py`
+    (model: AlexXu811/child-adult-joint-asr-diarization). The batch script
+    writes one RTTM per clip into
+    `<results-dir>/per_file_predictions/<stem>_pred.rttm` with all child
+    segments labeled `CHI`. This frontend just looks up the RTTM by audio
+    stem and returns the CHI segments for ECAPA enrollment, matching the
+    interface of the other diarizer frontends.
+    """
+
+    def __init__(self, cfg: BaseConfig):
+        self.cfg = cfg
+        self.rttm_dir = os.environ.get(
+            "JOINT_ASR_DIAR_RTTM_DIR",
+            "/home/manaal/orcd/scratch/child-adult-diarization/"
+            "pyannote/eval_results/joint_asr_diar_sails/per_file_predictions",
+        )
+        if not os.path.isdir(self.rttm_dir):
+            raise FileNotFoundError(
+                f"joint_asr_diar RTTM dir not found: {self.rttm_dir}. "
+                "Run baselines/slurm/run_joint_asr_diar_sails.sh stage 1 first."
+            )
+
+    def _rttm_path_for(self, audio_path: str) -> str:
+        stem = Path(audio_path).stem
+        return os.path.join(self.rttm_dir, f"{stem}_pred.rttm")
+
+    @staticmethod
+    def _parse_rttm_for_chi(rttm_path: str) -> List[Dict[str, float]]:
+        segs: List[Dict[str, float]] = []
+        if not os.path.exists(rttm_path):
+            return segs
+        with open(rttm_path) as f:
+            for line in f:
+                line = line.strip()
+                if not line or not line.startswith("SPEAKER"):
+                    continue
+                parts = line.split()
+                if len(parts) < 8:
+                    continue
+                try:
+                    start, dur = float(parts[3]), float(parts[4])
+                except ValueError:
+                    continue
+                if dur <= 0:
+                    continue
+                if parts[7] == "CHI":
+                    segs.append({"start": start, "end": start + dur, "dur": dur})
+        return segs
+
+    def get_segments(self, audio_path: str, cfg: BaseConfig) -> List[Dict[str, float]]:
+        rttm = self._rttm_path_for(audio_path)
+        segs = self._parse_rttm_for_chi(rttm)
+        return [s for s in segs if s["dur"] >= cfg.min_seg_dur_sec]
+
+
 def build_frontend(name: str, cfg: BaseConfig) -> DiarizationFrontend:
     if name == "usc_sail":
         return USCSailFrontend(cfg)
@@ -982,6 +1056,8 @@ def build_frontend(name: str, cfg: BaseConfig) -> DiarizationFrontend:
         return nemo_diar.EENDEDAFrontend(cfg)
     elif name == "sortformer":
         return nemo_diar.SortformerFrontend(cfg)
+    elif name == "joint_asr_diar":
+        return JointAsrDiarFrontend(cfg)
     else:
         raise ValueError(f"Unknown diarizer: {name!r}")
 
@@ -1005,7 +1081,8 @@ def main():
     parser.add_argument(
         "--diarizer", required=True,
         choices=["usc_sail", "pyannote", "babar", "vtc", "vtc_kchi", "vbx",
-                 "talknet_asd", "ts_talknet", "loconet_ecapa", "eend_eda", "sortformer"],
+                 "talknet_asd", "ts_talknet", "loconet_ecapa", "eend_eda", "sortformer",
+                 "joint_asr_diar"],
     )
     parser.add_argument(
         "--babar-dir", default="",
@@ -1082,10 +1159,25 @@ def main():
         "--output-dir", default="",
         help="Override default results directory.",
     )
+    parser.add_argument(
+        "--ecapa-checkpoint", default="",
+        help=("Optional path to a fine-tuned ECAPA embedding state-dict "
+              "(spec-021 US4 T007). When provided, the embedder is initialised "
+              "from speechbrain/spkrec-ecapa-voxceleb and then has this "
+              "checkpoint's 'embedding_state_dict' loaded on top. Result-dir "
+              "default suffix is '_child' to avoid clobbering baseline runs."),
+    )
     args = parser.parse_args()
 
     cfg = BaseConfig()
-    cfg.results_dir = args.output_dir if args.output_dir else build_results_dir(args.diarizer)
+    cfg.ecapa_checkpoint = args.ecapa_checkpoint
+    if args.output_dir:
+        cfg.results_dir = args.output_dir
+    else:
+        cfg.results_dir = build_results_dir(args.diarizer)
+        if args.ecapa_checkpoint:
+            cfg.results_dir = cfg.results_dir.replace(
+                "_ecapa_enrollment_runs", "_ecapa_child_enrollment_runs", 1)
     if args.babar_dir:
         cfg.babar_dir = args.babar_dir
     cfg.babar_batch_size = args.babar_batch_size
@@ -1176,7 +1268,7 @@ def main():
     # Enrollment
     # ---------------------------------------------------------
     print("\nLoading ECAPA...")
-    embedder = ECAPAEmbedder(cfg.ecapa_source, cfg.device)
+    embedder = ECAPAEmbedder(cfg.ecapa_source, cfg.device, cfg.ecapa_checkpoint)
 
     print("Building child prototypes from positive train clips...")
     prototypes, child_stats_df = build_child_prototypes(train_df, frontend, embedder, cfg)
