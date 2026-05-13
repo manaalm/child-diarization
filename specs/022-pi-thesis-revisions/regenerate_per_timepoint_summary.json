@@ -1,0 +1,139 @@
+{
+  "n_prediction_files": 316,
+  "n_regenerated_ok": 298,
+  "n_schema_fail": 18,
+  "n_read_fail": 0,
+  "n_empty_after_join": 0,
+  "dry_run": false,
+  "master": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/whisper-modeling/seen_child_splits/master_with_split.csv",
+  "failures": [
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/parakeet_baseline_runs/parakeet_tdt_0.6b_v2/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/parakeet_baseline_runs/parakeet_tdt_0.6b_v2_cross_child/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/panns_baseline_runs/cnn14/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/panns_baseline_runs/cnn14_cross_child/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/panns_baseline_runs/cnn14_cross_child_clean/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/ecapa_adapter_baseline_runs/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/clap_baseline_runs/clap_htsat_fused/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/clap_baseline_runs/clap_htsat_fused_cross_child/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/raw_ecapa_baseline_runs/max/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/raw_ecapa_baseline_runs/mean/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/raw_ecapa_baseline_runs/top3/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/vad_baseline_runs/energy/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/vad_baseline_runs/energy_cross_child/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/vad_baseline_runs/silero/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baselines/vad_baseline_runs/silero_cross_child/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/joint_asr_diar_sails_runs/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/video_finetuned_talknet_runs/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "audio_path",
+        "prediction"
+      ]
+    },
+    {
+      "path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/ensemble_runs/test_predictions.csv",
+      "status": "SCHEMA_FAIL",
+      "missing": [
+        "score",
+        "prediction"
+      ]
+    }
+  ]
+}
