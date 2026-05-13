@@ -91,6 +91,14 @@ def _process(val_path: str, test_path: str, is_enroll: bool, split_tag: str) -> 
                 "split": split_tag, "status": "SCHEMA_FAIL",
                 "val_score_col": sc_val, "test_score_col": sc_test}
 
+    # Drop NaN rows defensively (some ensemble variants emit NaN scores on
+    # rows where a constituent system score is missing).
+    val_df = val_df[val_df[sc_val].notna() & val_df["label"].notna()].copy()
+    test_df = test_df[test_df[sc_test].notna() & test_df["label"].notna()].copy()
+    if len(val_df) == 0 or len(test_df) == 0:
+        return {"system_name": os.path.relpath(sys_dir, REPO_ROOT),
+                "split": split_tag, "status": "EMPTY_AFTER_NAN_DROP"}
+
     y_val = val_df["label"].astype(int).to_numpy()
     y_val_score = val_df[sc_val].astype(float).to_numpy()
     threshold_ba = _tune_by_ba(y_val, y_val_score)

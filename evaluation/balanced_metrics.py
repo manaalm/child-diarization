@@ -79,6 +79,13 @@ def _process_one(pred_path: str, system_root: str = REPO_ROOT) -> Optional[dict]
         return {"system_name": os.path.relpath(sys_dir, system_root),
                 "split": split, "status": "SCHEMA_FAIL", "missing": cols}
 
+    # Drop NaN rows defensively (some downstream ensemble variants emit
+    # NaN scores when a constituent system has no prediction for a row).
+    df = df[df[cols["score"]].notna() & df[cols["label"]].notna()].copy()
+    if len(df) == 0:
+        return {"system_name": os.path.relpath(sys_dir, system_root),
+                "split": split, "status": "EMPTY_AFTER_NAN_DROP"}
+
     threshold, threshold_source = _load_threshold(sys_dir)
 
     y_true = df[cols["label"]].astype(int).tolist()

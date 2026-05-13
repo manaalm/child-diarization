@@ -187,6 +187,43 @@ Not retuned (val_predictions.csv missing in their dir):
   own dir but the val side is only available via the full ensemble
   pipeline rerun. Their F1-tuned values stand in the headline table.
 
+### Ensemble BA-retune — attempted advanced/* rerun (2026-05-13 incident)
+
+Attempt to extend BA-retune to `ensemble_runs/advanced/*` subsystems
+by (a) patching `evaluation/advanced_ensembles.py:save_variant` to
+also dump `val_predictions.csv`, then (b) rerunning the script. The
+rerun overwrote each `advanced/*/test_predictions.csv` and
+`val_metrics_tuned.json` with degraded outputs, because the
+BIDS-corrected seen-child val/test splits (n=626/635) include rows
+for which the constituent systems' predictions don't exist (their
+val/test predictions were generated against the pre-BIDS 431/441-row
+splits). `metadata_router.load_system_scores().fillna(0.5)` filled
+the missing constituent scores with the random-classifier 0.5
+prior, dragging the ensemble's effective discriminative power
+toward the trivial floor (advanced/pure: F1 0.901 -> 0.863,
+BA 0.798 -> 0.528 across the 14 advanced/ variants).
+
+Recovery: the 14 damaged `advanced/*` rows were removed from
+`balanced_metrics_summary.csv` and `balanced_metrics_ba_tuned_summary.csv`
+to avoid them appearing in any downstream summary. Pre-damage values
+are preserved in the thesis chapter 5 headline table via the
+candidate-level ensemble rows (`candidate_with_sortformer_mean`
+BA=0.827, `candidate_best_audio_mil_mean` BA=0.806, etc.), which
+were retuned from the top-level multi-column file (n=441, intact).
+`advanced_av/*` subsystems were not touched by the rerun and retain
+their F1-tuned values (BA 0.79-0.82).
+
+Proper full recovery would require (i) rescoring every constituent
+system on the +194 newly-included BIDS test rows, then (ii)
+re-running advanced_ensembles.py against the expanded constituent
+set. This is a multi-GPU-hour task and is deferred to a future
+spec.
+
+Also added defensive NaN-drop guards to both
+`evaluation/balanced_metrics.py` and
+`evaluation/retune_all_by_ba.py` so similar damage in the future
+doesn't crash the pipeline.
+
 ## Out-of-scope for MVP (carried forward)
 
 1. **194 new test rows have no predictions** for any existing system. They're in the new BIDS-derived test set but the systems were trained on the legacy 441-row set. Filling these in requires GPU reruns (US2 group-stratified k-fold or US3 universal-coverage eval).
