@@ -1,0 +1,35 @@
+{
+  "k": 3,
+  "seed": 42,
+  "master": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/whisper-modeling/seen_child_splits/master_with_split.csv",
+  "n_total": 3145,
+  "n_children_total": 130,
+  "overall_positive_rate": 0.7408585055643879,
+  "pos_rate_per_fold": [
+    0.747483989021043,
+    0.7513631406761178,
+    0.7259911894273128
+  ],
+  "pos_rate_gap_max_minus_min": 0.02537195124880498,
+  "fold_sizes": [
+    {
+      "fold": 0,
+      "n_test": 1093,
+      "n_children_test": 43,
+      "test_prevalence": 0.747
+    },
+    {
+      "fold": 1,
+      "n_test": 917,
+      "n_children_test": 42,
+      "test_prevalence": 0.751
+    },
+    {
+      "fold": 2,
+      "n_test": 1135,
+      "n_children_test": 45,
+      "test_prevalence": 0.726
+    }
+  ],
+  "stratification_guard_pass": true
+}

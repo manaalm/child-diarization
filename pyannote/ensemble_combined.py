@@ -246,6 +246,11 @@ def run_ensemble(val_mat, test_mat, system_names, ensemble_name):
         "lr_weights": dict(zip(feat_cols, lr.coef_[0].tolist())),
         "lr_test_proba": lr_test_proba.tolist(),
         "mean_test_proba": mean_test.tolist(),
+        # spec-022 polish: also expose val-side probabilities so balanced-
+        # accuracy tuning (or any val-tuned recalibration) can be done
+        # without re-running the ensemble pipeline.
+        "lr_val_proba": lr_val_proba.tolist(),
+        "mean_val_proba": mean_val.tolist(),
     }
 
 
@@ -273,7 +278,8 @@ def main():
     ENSEMBLE_SUBSETS["all_available"] = available
 
     all_results = {}
-    test_proba_cols = {}  # name → array for predictions CSV
+    test_proba_cols = {}  # name → array for test predictions CSV
+    val_proba_cols  = {}  # name → array for val  predictions CSV (spec-022)
 
     print("\n" + "=" * 60)
     print("ENSEMBLE RESULTS")
@@ -306,6 +312,8 @@ def main():
         # Store proba for predictions CSV
         test_proba_cols[f"{subset_name}_mean"] = result["mean_test_proba"]
         test_proba_cols[f"{subset_name}_lr"]   = result["lr_test_proba"]
+        val_proba_cols[f"{subset_name}_mean"]  = result["mean_val_proba"]
+        val_proba_cols[f"{subset_name}_lr"]    = result["lr_val_proba"]
 
         print(f"\n[{subset_name}] {result['systems']}")
         for sname, sauc in result["individual_test_auroc"].items():
@@ -334,6 +342,18 @@ def main():
             test_base[col_name] = proba_arr
 
     test_base.to_csv(os.path.join(args.results_dir, "test_predictions.csv"), index=False)
+
+    # spec-022 polish: write val_predictions.csv with the same multi-column
+    # structure so per-candidate balanced-accuracy tuning is reproducible.
+    val_base = loaded[base_sys]["val"][["audio_path", "label"]].copy()
+    val_full_path = _rp("babar_ecapa_enrollment_runs/enroll_val_predictions.csv")
+    if os.path.exists(val_full_path):
+        tp_df = pd.read_csv(val_full_path)[["audio_path", "timepoint_norm"]]
+        val_base = val_base.merge(tp_df, on="audio_path", how="left")
+    for col_name, proba_arr in val_proba_cols.items():
+        if len(proba_arr) == len(val_base):
+            val_base[col_name] = proba_arr
+    val_base.to_csv(os.path.join(args.results_dir, "val_predictions.csv"), index=False)
 
     print(f"\nResults saved to {args.results_dir}")
 

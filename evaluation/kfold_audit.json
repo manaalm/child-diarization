@@ -1,0 +1,433 @@
+{
+  "audits": [
+    {
+      "system": "fused_attn_unfreeze2",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baseline_results_seen_child/fused_attn_unfreeze2_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baseline_results_seen_child/fused_attn_unfreeze2_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baseline_results_seen_child/fused_attn_unfreeze2_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "fused_attn_unfreeze2_whisper_large",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "fused_attn_unfreeze2_whisper_medium",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "wavlm_mil",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/wavlm_mil_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/wavlm_mil_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/wavlm_mil_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "wavlm_pseudo_frame",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pseudo_frame/results/wavlm_pseudo_frame_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pseudo_frame/results/wavlm_pseudo_frame_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pseudo_frame/results/wavlm_pseudo_frame_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "whisper_medium_mil",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_medium_mil_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_medium_mil_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_medium_mil_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "whisper_mil",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "whisper_mil_acmil_max",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_acmil_max_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_acmil_max_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_acmil_max_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "whisper_mil_cross_child",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_cross_child_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_cross_child_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_cross_child_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "whisper_mil_tsmil_concat",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_tsmil_concat_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_tsmil_concat_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/mil/mil_results/whisper_mil_tsmil_concat_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    },
+    {
+      "system": "whisper_pseudo_frame",
+      "n_fold_dirs": 3,
+      "fold_dirs": [
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pseudo_frame/results/whisper_pseudo_frame_kfold3_f0",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pseudo_frame/results/whisper_pseudo_frame_kfold3_f1",
+        "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pseudo_frame/results/whisper_pseudo_frame_kfold3_f2"
+      ],
+      "per_fold_overlap": [
+        {
+          "fold": 0,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 1,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        },
+        {
+          "fold": 2,
+          "train_test_intersect": 109,
+          "train_val_intersect": 109,
+          "val_test_intersect": 109,
+          "n_train_children": 109,
+          "n_val_children": 109,
+          "n_test_children": 109
+        }
+      ],
+      "verdict": "WITHIN-CHILD (same children in train+test of every fold)"
+    }
+  ]
+}
