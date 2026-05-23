@@ -1,0 +1,17 @@
+{
+  "variant": "cv_stacked",
+  "seed": 42,
+  "n_splits": 5,
+  "first_stage_models": [
+    "pure",
+    "isotonic_weighted",
+    "rank_stacker",
+    "pair_disagreement"
+  ],
+  "second_stage_coefs": {
+    "pure": 1.6601,
+    "isotonic_weighted": 1.8039,
+    "rank_stacker": 1.5994,
+    "pair_disagreement": 1.4572
+  }
+}

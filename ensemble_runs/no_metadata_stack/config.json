@@ -1,0 +1,37 @@
+{
+  "variant": "pure",
+  "model_type": "lr",
+  "features": [
+    "babar_prob",
+    "vtc_prob",
+    "vtc_kchi_prob",
+    "vbx_prob",
+    "usc_sail_prob",
+    "pyannote_prob",
+    "eend_eda_prob",
+    "sortformer_prob",
+    "wavlm_mil_prob",
+    "whisper_mil_prob",
+    "audio_llm_prob",
+    "speaker_informed_av_prob",
+    "timepoint_is_36m"
+  ],
+  "score_features": [
+    "babar_prob",
+    "vtc_prob",
+    "vtc_kchi_prob",
+    "vbx_prob",
+    "usc_sail_prob",
+    "pyannote_prob",
+    "eend_eda_prob",
+    "sortformer_prob",
+    "wavlm_mil_prob",
+    "whisper_mil_prob",
+    "audio_llm_prob",
+    "speaker_informed_av_prob"
+  ],
+  "audio_covariates": [],
+  "seed": 42,
+  "n_val": 431,
+  "n_test": 441
+}

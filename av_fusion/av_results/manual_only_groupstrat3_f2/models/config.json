@@ -1,0 +1,77 @@
+{
+  "run": {
+    "seed": 42,
+    "feature_dir": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/av_fusion/av_results/manual_only_groupstrat3_f2",
+    "models_trained": [
+      "audio_only",
+      "video_only",
+      "always_fuse",
+      "gated_av"
+    ]
+  },
+  "xgboost": {
+    "n_estimators": 100,
+    "max_depth": 3,
+    "learning_rate": 0.1,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "use_label_encoder": false,
+    "eval_metric": "logloss",
+    "random_state": 42
+  },
+  "feature_columns": {
+    "audio_only": [
+      "existing_audio_score",
+      "age_band_binary"
+    ],
+    "visual_only": [
+      "manual_face_visibility_norm",
+      "manual_quality_norm",
+      "child_of_interest_clear_binary",
+      "n_people_total",
+      "multi_person_clip",
+      "age_band_binary",
+      "n_faces_detected_mean",
+      "n_face_tracks",
+      "max_face_track_fraction_clip",
+      "child_visible_score",
+      "off_camera_likely_score",
+      "visual_eligibility_score"
+    ],
+    "always_fuse": [
+      "manual_face_visibility_norm",
+      "manual_quality_norm",
+      "child_of_interest_clear_binary",
+      "n_people_total",
+      "multi_person_clip",
+      "age_band_binary",
+      "n_faces_detected_mean",
+      "n_face_tracks",
+      "max_face_track_fraction_clip",
+      "child_visible_score",
+      "off_camera_likely_score",
+      "visual_eligibility_score"
+    ],
+    "gated_av": [
+      "manual_face_visibility_norm",
+      "manual_quality_norm",
+      "child_of_interest_clear_binary",
+      "n_people_total",
+      "multi_person_clip",
+      "age_band_binary",
+      "n_faces_detected_mean",
+      "n_face_tracks",
+      "max_face_track_fraction_clip",
+      "child_visible_score",
+      "off_camera_likely_score",
+      "visual_eligibility_score"
+    ]
+  },
+  "late_fusion_alpha": 0.4,
+  "models_saved": {
+    "audio_only": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/av_fusion/av_results/manual_only_groupstrat3_f2/models/audio_only.pkl",
+    "video_only": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/av_fusion/av_results/manual_only_groupstrat3_f2/models/video_only.pkl",
+    "always_fuse": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/av_fusion/av_results/manual_only_groupstrat3_f2/models/always_fuse_av.pkl",
+    "gated_av": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/av_fusion/av_results/manual_only_groupstrat3_f2/models/gated_av.pkl"
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "synthetic_scene_id": "v4_14_18mo_42_001209",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 2.9406352538478813,
+  "adult_present": true,
+  "adult_duration_sec": 26.594282835286055,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 19.52,
+  "rir_id": "Room128-00071",
+  "noise_id": "noise-free-sound-0446",
+  "generation_config_name": "v4_14_18mo",
+  "generation_config_hash": "77bfdc3440a0",
+  "random_seed": 1251,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_426-122821-0004",
+      "source_dataset": "librispeech",
+      "start_sec": 0.0,
+      "end_sec": 3.3489593920783323,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "librispeech_1088-134318-0013",
+      "source_dataset": "world_childrenized_librispeech",
+      "start_sec": 3.4269015840015498,
+      "end_sec": 4.404185740364837,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_3440-171009-0031",
+      "source_dataset": "librispeech",
+      "start_sec": 4.370388119111072,
+      "end_sec": 9.336542757021002,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "prov_adult_alex_030410_MOT_2319578_2321920",
+      "source_dataset": "world_childrenized_providence_adults",
+      "start_sec": 9.428881579586644,
+      "end_sec": 9.528881579586644,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_8063-274115-0000",
+      "source_dataset": "librispeech",
+      "start_sec": 9.62783967744224,
+      "end_sec": 14.648105600748654,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "librispeech_2691-156755-0036",
+      "source_dataset": "cleese_childrenized_librispeech",
+      "start_sec": 14.758414601036163,
+      "end_sec": 15.156191681424186,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_lily_010827_MOT_3065480_3067748",
+      "source_dataset": "providence_adults",
+      "start_sec": 15.08196203397187,
+      "end_sec": 22.837708892315817,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "prov_adult_lily_020108_MOT_2023885_2024708",
+      "source_dataset": "cleese_childrenized_providence_adults",
+      "start_sec": 22.874934772382474,
+      "end_sec": 24.116476539052673,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_696-93314-0027",
+      "source_dataset": "librispeech",
+      "start_sec": 24.116298197952368,
+      "end_sec": 26.659794606497037,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "librispeech_1841-179183-0011",
+      "source_dataset": "cleese_childrenized_librispeech",
+      "start_sec": 26.7145024356893,
+      "end_sec": 26.938534686115673,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_87-121553-0032",
+      "source_dataset": "librispeech",
+      "start_sec": 27.040340384897238,
+      "end_sec": 30.0,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v4/wav/v4_14_18mo_42_001209.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v4/rttm/v4_14_18mo_42_001209.rttm"
+}

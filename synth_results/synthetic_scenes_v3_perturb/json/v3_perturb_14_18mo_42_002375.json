@@ -1,0 +1,84 @@
+{
+  "synthetic_scene_id": "v3_perturb_14_18mo_42_002375",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 1.7219178460183313,
+  "adult_present": true,
+  "adult_duration_sec": 10.875183826879175,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 4.19,
+  "rir_id": "Room155-00095",
+  "noise_id": "noise-free-sound-0672",
+  "generation_config_name": "v3_perturb_14_18mo",
+  "generation_config_hash": "39ab9ae31841",
+  "random_seed": 2417,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_ethan_010700_MOT_2594860_2596953",
+      "source_dataset": "providence_adults",
+      "start_sec": 0.0,
+      "end_sec": 4.815084127032186,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_vh_smithf_122880_123460_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 6.094978650185096,
+      "end_sec": 6.665087917387489,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "playlogue_ADULT_ew_42pc_12033_781640_783760",
+      "source_dataset": "playlogue_adults",
+      "start_sec": 6.965117221744653,
+      "end_sec": 12.365954578353225,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_ew_42pc_21121_553340_555380_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 13.44044725654709,
+      "end_sec": 13.740938404493457,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_ethan_010714_MOT_719576_723730",
+      "source_dataset": "providence_adults",
+      "start_sec": 14.616559756199619,
+      "end_sec": 15.275822099438034,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_gleason_father_john_1004440_1005040_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 16.331973116350994,
+      "end_sec": 17.183290547220565,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/wav/v3_perturb_14_18mo_42_002375.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/rttm/v3_perturb_14_18mo_42_002375.rttm"
+}

@@ -1,0 +1,17 @@
+variant_name: "whisper_mil_hardneg_synth_v4"
+backbone: "openai/whisper-small"
+backbone_layer: -1
+window_sec: 2.0
+stride_sec: 1.0
+mil_hidden_dim: 256
+mil_dropout: 0.25
+lr: 1.0e-3
+epochs: 20
+patience: 5
+batch_size: 8
+pos_weight: null
+seed: 42
+split_dir: "whisper-modeling/seen_child_splits"
+device: "cuda"
+extra_negatives_csv: "synth_results/manifests/synthetic_hardneg_v4.csv"
+extra_negatives_cap: 623

@@ -1,0 +1,88 @@
+project:
+  name: v4_14_18mo
+  sample_rate: 16000
+  random_seed: 42
+
+scene:
+  duration_sec: 30.0
+  n_scenes: 2000   # reduced from 5000 to fit in 8 h SLURM (slow per-scene
+                   # cost on the 362k-row manifest); 2000 still beats the
+                   # spec-018 v3 cross-child sample size and per Zhang 2024
+                   # quality-of-augmentation matters more than volume.
+  target_age_band: 14_18_months
+  max_speakers: 3
+
+# v4 corpus combines v2 real segments with three new childrenization
+# pipelines (WORLD spectral warp + F0 lift, CLEESE phase vocoder, and
+# cross-lingual TinyVox kNN-VC). The base manifest must already include
+# all of these source_dataset entries (build via build_v4_corpus.py).
+sources:
+  child_segments:
+    - providence
+    - tinyvox
+    - playlogue
+    # Childrenized adult speech contributes to the child pool:
+    - world_childrenized_librispeech
+    - world_childrenized_providence_adults
+    - world_childrenized_playlogue_adults
+    - cleese_childrenized_librispeech
+    - cleese_childrenized_providence_adults
+    - cleese_childrenized_playlogue_adults
+    # Cross-lingual TinyVox VC outputs (one source_dataset per language):
+    - cross_lingual_vc_tinyvox_Biling
+    - cross_lingual_vc_tinyvox_French
+    - cross_lingual_vc_tinyvox_German
+    - cross_lingual_vc_tinyvox_Romance
+    - cross_lingual_vc_tinyvox_Spanish
+    - cross_lingual_vc_tinyvox_Clinical
+  adult_segments: [providence_adults, librispeech, playlogue_adults]
+  noise: [musan_noise, musan_music]
+  rirs: [rirs_noises, mit_ir_survey]
+
+sampling:
+  positive_scene_probability: 0.50
+  adult_only_negative_probability: 0.25
+  background_speech_negative_probability: 0.15
+  noise_only_negative_probability: 0.10
+  overlap_probability: 0.25
+  short_child_vocalization_probability: 0.30
+  short_threshold_sec: 0.5
+  other_child_probability: 0.10
+
+turn_taking:
+  # Empirical turn-taking distributions fit from real
+  # Providence + Playlogue RTTM (synth/scripts/fit_empirical_turn_taking.py).
+  # We default to Gaussian sampling with literature priors (Hilbrink 2015 /
+  # Casillas 2016) below. Bootstrap mode (`sampling_mode: bootstrap`) draws
+  # from the RTTM-derived pool which has 5x longer child turns (RTTM
+  # aggregates utterances differently than the conversational "turn" the
+  # developmental literature measures); enable for an A/B comparison only.
+  empirical_path: "synth_results/manifests/empirical_turn_taking.json"
+  sampling_mode: gaussian
+  child_turn_duration_mean_sec: 0.7   # Hilbrink 2015 prelinguistic regime
+  child_turn_duration_std_sec: 0.4
+  adult_turn_duration_mean_sec: 2.5
+  adult_turn_duration_std_sec: 1.0
+  pause_mean_sec: 1.2
+  pause_std_sec: 0.5
+  overlap_probability: 0.15
+  overlap_dur_mean_sec: 0.4
+  overlap_dur_std_sec: 0.2
+  n_turns_min: 2
+  n_turns_max: 20
+
+mixing:
+  snr_db_min: 0
+  snr_db_max: 25
+  apply_rir_probability: 0.7
+  apply_noise_probability: 0.8
+  crossfade_ms: 20.0
+  peak_normalize: true
+  save_stems: false
+  rir_dir: "/orcd/scratch/orcd/008/manaal/child-adult-diarization/data/rir/simulated_rirs_16k"
+  noise_dir: "/orcd/scratch/orcd/008/manaal/child-adult-diarization/data/noise/musan/noise"
+
+labels:
+  generate_rttm: true
+  generate_clip_labels: true
+  target_child_label: TARGET_CHILD

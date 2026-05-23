@@ -1,0 +1,72 @@
+=== SC-002 verification ===
+distinct 4dp numbers in writeup: 51
+distinct 4dp expected values:    63
+writeup numbers NOT matching any JSON value (deltas / older / rounded): []
+JSON values NOT quoted in writeup (intentional omissions): [0.8833, 0.8936, 0.9004, 0.9008, 0.9033, 0.9043, 0.9075, 0.9112, 0.9128, 0.9476, 0.9532, 0.9559]
+
+Headline rows — direct check:
+  [MISS] 0.9532  auprc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f0/test_metrics_tuned.json
+  [OK] 0.8929  auroc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f0/test_metrics_tuned.json
+  [MISS] 0.9043  f1      baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f0/test_metrics_tuned.json
+  [MISS] 0.8833  auprc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f1/test_metrics_tuned.json
+  [OK] 0.804  auroc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f1/test_metrics_tuned.json
+  [MISS] 0.8936  f1      baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f1/test_metrics_tuned.json
+  [MISS] 0.9559  auprc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f2/test_metrics_tuned.json
+  [OK] 0.8783  auroc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f2/test_metrics_tuned.json
+  [MISS] 0.9008  f1      baseline_results_seen_child/fused_attn_unfreeze2_whisper_large_kfold3_f2/test_metrics_tuned.json
+  [MISS] 0.9112  auprc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f0/test_metrics_tuned.json
+  [OK] 0.8488  auroc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f0/test_metrics_tuned.json
+  [MISS] 0.9004  f1      baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f0/test_metrics_tuned.json
+  [MISS] 0.9476  auprc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f1/test_metrics_tuned.json
+  [OK] 0.9001  auroc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f1/test_metrics_tuned.json
+  [MISS] 0.9033  f1      baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f1/test_metrics_tuned.json
+  [MISS] 0.9128  auprc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f2/test_metrics_tuned.json
+  [OK] 0.8332  auroc   baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f2/test_metrics_tuned.json
+  [MISS] 0.9075  f1      baseline_results_seen_child/fused_attn_unfreeze2_whisper_medium_kfold3_f2/test_metrics_tuned.json
+  [OK] 0.8404  auprc   joint_asr_diar_ecapa_enrollment_runs/enroll_test_metrics.json
+  [OK] 0.6631  auroc   joint_asr_diar_ecapa_enrollment_runs/enroll_test_metrics.json
+  [OK] 0.7516  f1      joint_asr_diar_ecapa_enrollment_runs/enroll_test_metrics.json
+  [OK] 0.7766  auprc   joint_asr_diar_sails_runs/test_metrics_tuned.json
+  [OK] 0.5542  auroc   joint_asr_diar_sails_runs/test_metrics_tuned.json
+  [OK] 0.8634  f1      joint_asr_diar_sails_runs/test_metrics_tuned.json
+  [OK] 0.9525  auprc   mil/mil_results/whisper_large_mil/test_metrics_tuned.json
+  [OK] 0.8671  auroc   mil/mil_results/whisper_large_mil/test_metrics_tuned.json
+  [OK] 0.8934  f1      mil/mil_results/whisper_large_mil/test_metrics_tuned.json
+  [OK] 0.9066  auprc   mil/mil_results/whisper_mil_cross_child_synth_v4/test_metrics_tuned.json
+  [OK] 0.7795  auroc   mil/mil_results/whisper_mil_cross_child_synth_v4/test_metrics_tuned.json
+  [OK] 0.8799  f1      mil/mil_results/whisper_mil_cross_child_synth_v4/test_metrics_tuned.json
+  [OK] 0.9413  auprc   mil/mil_results/whisper_mil_hardneg_synth_v4/test_metrics_tuned.json
+  [OK] 0.8388  auroc   mil/mil_results/whisper_mil_hardneg_synth_v4/test_metrics_tuned.json
+  [OK] 0.8787  f1      mil/mil_results/whisper_mil_hardneg_synth_v4/test_metrics_tuned.json
+  [OK] 0.9544  auprc   pseudo_frame/results/whisper_pseudo_frame/test_metrics_tuned.json
+  [OK] 0.8806  auroc   pseudo_frame/results/whisper_pseudo_frame/test_metrics_tuned.json
+  [OK] 0.8725  f1      pseudo_frame/results/whisper_pseudo_frame/test_metrics_tuned.json
+  [OK] 0.9527  auprc   pseudo_frame/results/whisper_pseudo_frame_kfold3_f0/test_metrics_tuned.json
+  [OK] 0.8876  auroc   pseudo_frame/results/whisper_pseudo_frame_kfold3_f0/test_metrics_tuned.json
+  [OK] 0.8519  f1      pseudo_frame/results/whisper_pseudo_frame_kfold3_f0/test_metrics_tuned.json
+  [OK] 0.9365  auprc   pseudo_frame/results/whisper_pseudo_frame_kfold3_f1/test_metrics_tuned.json
+  [OK] 0.862  auroc   pseudo_frame/results/whisper_pseudo_frame_kfold3_f1/test_metrics_tuned.json
+  [OK] 0.8446  f1      pseudo_frame/results/whisper_pseudo_frame_kfold3_f1/test_metrics_tuned.json
+  [OK] 0.9654  auprc   pseudo_frame/results/whisper_pseudo_frame_kfold3_f2/test_metrics_tuned.json
+  [OK] 0.9018  auroc   pseudo_frame/results/whisper_pseudo_frame_kfold3_f2/test_metrics_tuned.json
+  [OK] 0.8949  f1      pseudo_frame/results/whisper_pseudo_frame_kfold3_f2/test_metrics_tuned.json
+
+k-fold quoted statistics:
+  [OK] 0.8638  ('pseudo-frame', 'f1', 'mean')
+  [OK] 0.0272  ('pseudo-frame', 'f1', 'std')
+  [OK] 0.8838  ('pseudo-frame', 'auroc', 'mean')
+  [OK] 0.0202  ('pseudo-frame', 'auroc', 'std')
+  [OK] 0.9515  ('pseudo-frame', 'auprc', 'mean')
+  [OK] 0.0145  ('pseudo-frame', 'auprc', 'std')
+  [OK] 0.8607  ('fused-medium', 'auroc', 'mean')
+  [OK] 0.035  ('fused-medium', 'auroc', 'std')
+  [OK] 0.9037  ('fused-medium', 'f1', 'mean')
+  [OK] 0.0036  ('fused-medium', 'f1', 'std')
+  [OK] 0.9239  ('fused-medium', 'auprc', 'mean')
+  [OK] 0.0206  ('fused-medium', 'auprc', 'std')
+  [OK] 0.8584  ('fused-large', 'auroc', 'mean')
+  [OK] 0.0477  ('fused-large', 'auroc', 'std')
+  [OK] 0.8996  ('fused-large', 'f1', 'mean')
+  [OK] 0.0055  ('fused-large', 'f1', 'std')
+  [OK] 0.9308  ('fused-large', 'auprc', 'mean')
+  [OK] 0.0412  ('fused-large', 'auprc', 'std')

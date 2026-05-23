@@ -1,0 +1,37 @@
+{
+  "run_name": "manual_only_cross_child_bids",
+  "n_clips": 3314,
+  "n_train": 2128,
+  "n_val": 444,
+  "n_test": 742,
+  "audio_score_available_val": 444,
+  "audio_score_available_test": 742,
+  "feature_sources": {
+    "manual_annotations": [
+      "Video_Quality_Child_Face_Visibility",
+      "Video_Quality_Child_Body_Visibility",
+      "Video_Quality_Child_Hand_Visibility",
+      "Video_Quality_Lighting",
+      "Video_Quality_Resolution",
+      "Video_Quality_Motion",
+      "Child_of_interest_clear",
+      "#_adults",
+      "#_children",
+      "Body_Parts_Visible",
+      "Angle_of_Body"
+    ],
+    "derived_manual": [
+      "child_of_interest_clear_binary",
+      "manual_face_visibility_norm",
+      "manual_quality_norm",
+      "n_people_total",
+      "multi_person_clip",
+      "age_band_binary"
+    ],
+    "automatic_visual": [],
+    "asd": [],
+    "audio": [
+      "existing_audio_score"
+    ]
+  }
+}

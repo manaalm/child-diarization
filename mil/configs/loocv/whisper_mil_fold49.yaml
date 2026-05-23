@@ -1,0 +1,15 @@
+variant_name: whisper_mil_loocv_f49
+backbone: openai/whisper-small
+backbone_layer: -1
+window_sec: 2.0
+stride_sec: 1.0
+mil_hidden_dim: 256
+mil_dropout: 0.25
+lr: 0.001
+epochs: 20
+patience: 5
+batch_size: 8
+pos_weight: null
+seed: 42
+split_dir: whisper-modeling/seen_child_splits_loocv/fold_49
+device: cuda

@@ -1,0 +1,111 @@
+{
+  "synthetic_scene_id": "v4_14_18mo_42_001593",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 2.86324977029716,
+  "adult_present": true,
+  "adult_duration_sec": 5.463593412325757,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 1.85,
+  "rir_id": "Room136-00020",
+  "noise_id": "noise-free-sound-0672",
+  "generation_config_name": "v4_14_18mo",
+  "generation_config_hash": "77bfdc3440a0",
+  "random_seed": 1635,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_ethan_010006_MOT_1481526_1484046",
+      "source_dataset": "providence_adults",
+      "start_sec": 0.0,
+      "end_sec": 2.804164302800883,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "providence_lily_010213_3123748_3125755",
+      "source_dataset": "providence",
+      "start_sec": 2.7872267574959073,
+      "end_sec": 3.2637073159635372,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_lily_010701_MOT_207656_209913",
+      "source_dataset": "providence_adults",
+      "start_sec": 3.2572159031311276,
+      "end_sec": 3.9830168778091384,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "librispeech_229-130880-0093",
+      "source_dataset": "world_childrenized_librispeech",
+      "start_sec": 3.9765254649767288,
+      "end_sec": 4.962490581118953,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_5049-25947-0039",
+      "source_dataset": "librispeech",
+      "start_sec": 4.9619500486701655,
+      "end_sec": 6.695578183517029,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "librispeech_6880-216547-0094",
+      "source_dataset": "world_childrenized_librispeech",
+      "start_sec": 6.706884368228366,
+      "end_sec": 7.734135404864225,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_4859-29340-0008",
+      "source_dataset": "librispeech",
+      "start_sec": 7.727643992031815,
+      "end_sec": 7.827643992031815,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "prov_adult_lily_010912_MOT_2675353_2677186",
+      "source_dataset": "world_childrenized_providence_adults",
+      "start_sec": 7.851743519455897,
+      "end_sec": 8.225296578507344,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_ethan_001121_MOT_2342356_2345316",
+      "source_dataset": "providence_adults",
+      "start_sec": 8.343271080846906,
+      "end_sec": 8.443271080846905,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v4/wav/v4_14_18mo_42_001593.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v4/rttm/v4_14_18mo_42_001593.rttm"
+}

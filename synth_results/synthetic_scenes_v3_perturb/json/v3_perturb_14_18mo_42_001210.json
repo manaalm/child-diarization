@@ -1,0 +1,129 @@
+{
+  "synthetic_scene_id": "v3_perturb_14_18mo_42_001210",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 3.967004326850505,
+  "adult_present": true,
+  "adult_duration_sec": 23.14811793986016,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 23.11,
+  "rir_id": "Room051-00091",
+  "noise_id": "noise-free-sound-0802",
+  "generation_config_name": "v3_perturb_14_18mo",
+  "generation_config_hash": "39ab9ae31841",
+  "random_seed": 1252,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "playlogue_ADULT_ew_42ec_21191_39700_47060",
+      "source_dataset": "playlogue_adults",
+      "start_sec": 0.0,
+      "end_sec": 3.6344773005689386,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "providence_lily_010618_1447008_1448275",
+      "source_dataset": "providence",
+      "start_sec": 4.837040192932998,
+      "end_sec": 5.744528601860276,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "playlogue_ADULT_cameron_aae_B5_37_59_PE_O22_43120_43419",
+      "source_dataset": "playlogue_adults",
+      "start_sec": 6.875465995132327,
+      "end_sec": 11.380062420939854,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_ew_42pc_22148_444280_444700_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 11.20286787175993,
+      "end_sec": 12.230808234943133,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "playlogue_ADULT_vh_smartf_128360_130620",
+      "source_dataset": "playlogue_adults",
+      "start_sec": 11.608335664744077,
+      "end_sec": 16.585235792804006,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "providence_ethan_010218_3667941_3670011",
+      "source_dataset": "providence",
+      "start_sec": 16.417821305745672,
+      "end_sec": 16.624946340403735,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_alex_010908_MOT_1784856_1785883",
+      "source_dataset": "providence_adults",
+      "start_sec": 17.69502418577638,
+      "end_sec": 21.062852898106627,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_ew_42ec_11053_370960_371979_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 20.520815782875896,
+      "end_sec": 21.435921267039642,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_2764-36616-0001",
+      "source_dataset": "librispeech",
+      "start_sec": 22.174096075818486,
+      "end_sec": 26.696071434428717,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "tinyvox_Davis_Rowan_010227_3117959_3119052",
+      "source_dataset": "tinyvox",
+      "start_sec": 26.542225961224506,
+      "end_sec": 27.45157099714272,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_150-126112-0006",
+      "source_dataset": "librispeech",
+      "start_sec": 27.85765998551671,
+      "end_sec": 30.0,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/wav/v3_perturb_14_18mo_42_001210.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/rttm/v3_perturb_14_18mo_42_001210.rttm"
+}

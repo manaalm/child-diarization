@@ -1,0 +1,129 @@
+{
+  "synthetic_scene_id": "v3_perturb_14_18mo_42_000344",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 2.169576279498947,
+  "adult_present": true,
+  "adult_duration_sec": 20.782267128046442,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 14.23,
+  "rir_id": "Room019-00094",
+  "noise_id": "noise-free-sound-0484",
+  "generation_config_name": "v3_perturb_14_18mo",
+  "generation_config_hash": "39ab9ae31841",
+  "random_seed": 386,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "playlogue_ADULT_vh_smithf_606520_607060",
+      "source_dataset": "playlogue_adults",
+      "start_sec": 0.0,
+      "end_sec": 4.0032058638219645,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "tinyvox_Davis_Hannah_010500_3040618_3043354",
+      "source_dataset": "tinyvox",
+      "start_sec": 4.965357229408254,
+      "end_sec": 5.449479350377697,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "playlogue_ADULT_vh_vailf_249880_251620",
+      "source_dataset": "playlogue_adults",
+      "start_sec": 6.60804344988276,
+      "end_sec": 10.148347877264895,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_vh_raidf_186020_187800_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 10.864814370244767,
+      "end_sec": 11.252701743029736,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_1183-128659-0006",
+      "source_dataset": "librispeech",
+      "start_sec": 12.116242660059491,
+      "end_sec": 16.76606838810271,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "tinyvox_Davis_Hannah_010312_1639795_1642795",
+      "source_dataset": "tinyvox",
+      "start_sec": 17.35458160501377,
+      "end_sec": 18.24046045155592,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "playlogue_ADULT_ew_42ec_12011_953980_954480",
+      "source_dataset": "playlogue_adults",
+      "start_sec": 18.387423781908197,
+      "end_sec": 21.00647120893704,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "providence_lily_010326_494818_500121",
+      "source_dataset": "providence",
+      "start_sec": 21.12663079488206,
+      "end_sec": 21.380367618513645,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_7178-34645-0009",
+      "source_dataset": "librispeech",
+      "start_sec": 21.888786188356548,
+      "end_sec": 27.827495003971382,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_ew_54ec_12015_48480_49839_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 28.631551433965175,
+      "end_sec": 28.789502549535978,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_445-123857-0013",
+      "source_dataset": "librispeech",
+      "start_sec": 29.968825133844554,
+      "end_sec": 30.0,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/wav/v3_perturb_14_18mo_42_000344.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/rttm/v3_perturb_14_18mo_42_000344.rttm"
+}

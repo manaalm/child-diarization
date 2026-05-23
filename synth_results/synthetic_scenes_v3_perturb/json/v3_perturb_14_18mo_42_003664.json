@@ -1,0 +1,48 @@
+{
+  "synthetic_scene_id": "v3_perturb_14_18mo_42_003664",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 0.799180609908066,
+  "adult_present": true,
+  "adult_duration_sec": 2.6251869733776036,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 9.91,
+  "rir_id": "Room182-00040",
+  "noise_id": "noise-free-sound-0303",
+  "generation_config_name": "v3_perturb_14_18mo",
+  "generation_config_hash": "39ab9ae31841",
+  "random_seed": 3706,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_909-131045-0020",
+      "source_dataset": "librispeech",
+      "start_sec": 0.0,
+      "end_sec": 2.6251869733776036,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "tinyvox_Davis_Nate_010517_1633166_1636166",
+      "source_dataset": "tinyvox",
+      "start_sec": 3.3856154774167546,
+      "end_sec": 4.184796087324821,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/wav/v3_perturb_14_18mo_42_003664.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/rttm/v3_perturb_14_18mo_42_003664.rttm"
+}

@@ -1,0 +1,52 @@
+{
+  "run_name": "auto_visual_bids",
+  "n_clips": 3145,
+  "n_train": 1884,
+  "n_val": 626,
+  "n_test": 635,
+  "audio_score_available_val": 626,
+  "audio_score_available_test": 635,
+  "feature_sources": {
+    "manual_annotations": [
+      "Video_Quality_Child_Face_Visibility",
+      "Video_Quality_Child_Body_Visibility",
+      "Video_Quality_Child_Hand_Visibility",
+      "Video_Quality_Lighting",
+      "Video_Quality_Resolution",
+      "Video_Quality_Motion",
+      "Child_of_interest_clear",
+      "#_adults",
+      "#_children",
+      "Body_Parts_Visible",
+      "Angle_of_Body"
+    ],
+    "derived_manual": [
+      "child_of_interest_clear_binary",
+      "manual_face_visibility_norm",
+      "manual_quality_norm",
+      "n_people_total",
+      "multi_person_clip",
+      "age_band_binary"
+    ],
+    "automatic_visual": [
+      "n_faces_detected_mean",
+      "n_faces_detected_max",
+      "n_face_tracks",
+      "max_face_track_duration_sec",
+      "max_face_track_fraction_clip",
+      "mean_face_detection_confidence",
+      "max_face_detection_confidence",
+      "mean_face_box_area_fraction",
+      "max_face_box_area_fraction",
+      "min_face_box_area_fraction",
+      "face_center_motion_std",
+      "visual_quality_score",
+      "child_visible_score",
+      "off_camera_likely_score"
+    ],
+    "asd": [],
+    "audio": [
+      "existing_audio_score"
+    ]
+  }
+}

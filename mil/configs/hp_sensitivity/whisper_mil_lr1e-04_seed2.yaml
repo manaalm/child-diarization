@@ -1,0 +1,15 @@
+variant_name: whisper_mil_lr1e-04_seed2
+backbone: openai/whisper-small
+backbone_layer: -1
+window_sec: 2.0
+stride_sec: 1.0
+mil_hidden_dim: 256
+mil_dropout: 0.25
+lr: 0.0001
+epochs: 20
+patience: 5
+batch_size: 8
+pos_weight: null
+seed: 2
+split_dir: whisper-modeling/seen_child_splits
+device: cuda

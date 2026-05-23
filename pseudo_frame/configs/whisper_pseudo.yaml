@@ -1,0 +1,25 @@
+variant_name: "whisper_pseudo_frame"
+backbone: "openai/whisper-small"
+backbone_layer: -1
+
+# Frame head (Whisper-small d_model = 768, same as WavLM-Base+)
+hidden_dim: 256
+dropout: 0.2
+
+# Train. Whisper hard-requires 30s mel; the model pads each crop_sec
+# crop to 30s internally and truncates output to the valid frame count.
+crop_sec: 10.0
+batch_size: 8
+num_workers: 2
+lr: 1.0e-3
+weight_decay: 1.0e-4
+epochs: 25
+patience: 5
+seed: 42
+
+# Pseudo-label loss (same as WavLM)
+confidence_weight: true
+pos_weight: 3.0
+
+split_dir: "whisper-modeling/seen_child_splits"
+device: "cuda"

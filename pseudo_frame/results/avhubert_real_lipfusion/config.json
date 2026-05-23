@@ -1,0 +1,17 @@
+{
+  "spec": "017",
+  "us": "US1",
+  "feature_source": "real AV-HuBERT-Large embeddings (T120 output, mean+std+max+p95 pooled per clip)",
+  "n_avh_features": 4096,
+  "n_elig_features": 9,
+  "fusion_configs": [
+    "audio_only",
+    "always_fuse",
+    "gated_av"
+  ],
+  "alpha_always_fuse": 0.15000000000000002,
+  "alpha_gated": 0.1,
+  "tau_eligibility": 0.1,
+  "seed": 42,
+  "audio_baseline_dir": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/pseudo_frame/results/wavlm_pseudo_frame"
+}

@@ -1,0 +1,18 @@
+{
+  "model_name": "Qwen/Qwen2.5-Omni-7B",
+  "model_slug": "qwen25_omni_7b",
+  "prompt_template": "zero_shot_v1",
+  "prompt_text": "Listen to this audio clip from a naturalistic social interaction recording. Is there a child vocalizing in this clip? Answer only: yes or no.",
+  "n_shot": 0,
+  "threshold": 0.25,
+  "val_f1": 0.874880611270296,
+  "seed": 42,
+  "split": "seen_child_splits",
+  "n_clips_total": 635,
+  "n_clips_cached": 175,
+  "n_clips_error": 0,
+  "prediction_variance": 0.052831,
+  "degenerate_flag": false,
+  "frac_yes": 0.9386,
+  "frac_no": 0.0614
+}

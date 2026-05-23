@@ -1,0 +1,13 @@
+{
+  "system": "joint_asr_diar_sails",
+  "model": "AlexXu811/child-adult-joint-asr-diarization",
+  "score_type": "chi_duration_fraction",
+  "predictions_dir": "pyannote/eval_results/joint_asr_diar_sails/per_file_predictions",
+  "val_csv": "whisper-modeling/seen_child_splits/val.csv",
+  "test_csv": "whisper-modeling/seen_child_splits/test.csv",
+  "n_val": 431,
+  "n_test": 441,
+  "n_val_missing_rttm": 0,
+  "n_test_missing_rttm": 0,
+  "tuned_threshold": 0.0
+}

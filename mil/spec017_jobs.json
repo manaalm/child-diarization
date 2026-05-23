@@ -1,0 +1,88 @@
+{
+  "spec": "017-avhubert-and-voice-transfer",
+  "submitted_at": "2026-05-02",
+  "real_baselines": {
+    "us1_substitute": {
+      "audio_only":  {"f1": 0.868, "auroc": 0.831, "auprc": 0.937, "source": "pseudo_frame/results/wavlm_pseudo_frame/test_metrics_tuned.json (audio-only baseline reused as the spec-015 substitute audio_only)"},
+      "always_fuse": {"f1": 0.861, "auroc": 0.755, "auprc": 0.908, "source": "pseudo_frame/results/avhubert_lipfusion/always_fuse/test_metrics_tuned.json"},
+      "gated_av":    {"f1": 0.859, "auroc": 0.733, "auprc": 0.893, "source": "pseudo_frame/results/avhubert_lipfusion/gated_av/test_metrics_tuned.json"}
+    },
+    "us2_seen_child_wavlm_mil":          {"f1": 0.882, "auroc": 0.771, "auprc": 0.893, "source": "mil/mil_results/wavlm_mil/test_metrics_tuned.json"},
+    "us2_seen_child_voice_transfer_lr":  {"f1": 0.871, "auroc": 0.750, "auprc": 0.893, "source": "spec-016 follow-up #1 (mean-feature voice transfer LR, NEUTRAL)"}
+  },
+  "jobs": [
+    {
+      "candidate": "T120",
+      "name": "extract_avhubert_bulk",
+      "slurm_job_id": 13065756,
+      "previous_attempts": [
+        {"job_id": 13062790, "state": "FAILED", "reason": "set -u + unset LD_LIBRARY_PATH in conda activate hook"},
+        {"job_id": 13062964, "state": "CANCELLED", "reason": "torch 1.13 doesn't support sm_90 (H100); upgraded to torch 2.1+cu121"},
+        {"job_id": 13063411, "state": "CANCELLED", "reason": "pooled_stats lambda for p95 didn't accept axis= kwarg; fixed all 4 stat fns to take a single arg"},
+        {"job_id": 13063603, "state": "CANCELLED", "reason": "I/O bottleneck: cap.set(POS_FRAMES) per video frame over NFS = ~100 s/clip; rewrote to sequential read (single forward pass through video, ~5-10 s/clip)"}
+      ],
+      "submitted_at": "2026-05-02 17:55",
+      "completed_at": "2026-05-02 18:35",
+      "state": "COMPLETED",
+      "outputs": {
+        "pooled_csv": "pseudo_frame/visual_features/avhubert_pooled.csv (1660 rows × 4097 cols [audio_path + 4096 pooled features])",
+        "per_clip_npy_dir": "pseudo_frame/visual_features/avhubert_embeddings/ (~1647 .npy files, 750×1024 each)"
+      },
+      "stats": {"done": 1647, "skipped": 13, "failed": 523, "total": 2183, "fail_reason": "no face_track_cache or no usable track"}
+    },
+    {
+      "candidate": "T140",
+      "name": "avhubert_real_late_fusion_lr",
+      "ran_at": "2026-05-02 18:38",
+      "state": "COMPLETED",
+      "test_metrics": {
+        "audio_only":  {"f1": 0.868, "auroc": 0.831, "note": "identical to spec-015 substitute baseline (audio path unchanged)"},
+        "always_fuse": {"f1": 0.843, "auroc": 0.708, "alpha": 0.15},
+        "gated_av":    {"f1": 0.822, "auroc": 0.708, "alpha": 0.10, "tau": 0.10, "n_eligible": 392}
+      },
+      "delta_vs_substitute_baseline": {
+        "audio_only":  {"f1": 0.000, "auroc": 0.000},
+        "always_fuse": {"f1": -0.018, "auroc": -0.047},
+        "gated_av":    {"f1": -0.037, "auroc": -0.025}
+      },
+      "verdict": "NEGATIVE-DEEPENED. Acceptance criterion (always_fuse OR gated_av AUROC >= audio_only 0.831) FAILED — best fusion AUROC is 0.708, ~0.12 below audio_only. Real AV-HuBERT-Large embeddings perform WORSE than the spec-015 hand-engineered substitute (-0.047 AUROC on always_fuse, -0.025 on gated_av). Diagnosis: visual-only LR shows extreme val/test gap (val AUROC 0.981 → test 0.667), classic overfit on 4096+9 features against 431 val clips. The richer feature space does not generalize across the seen-child split. Implication: the spec-015 finding (`visual fusion hurts the audio-only baseline on this task`) is NOT a substitute-feature artifact — it persists with proper visual-speech embeddings. Visual modality is not the missing ingredient here; the audio pseudo-frame baseline is already capturing whatever visual information would help."
+    },
+    {
+      "candidate": "T130",
+      "name": "knnvc_voice_convert_bulk",
+      "slurm_job_id": 13062965,
+      "previous_attempts": [
+        {"job_id": 13062791, "state": "FAILED", "reason": "set -u + unset LD_LIBRARY_PATH in conda activate hook"}
+      ],
+      "submitted_at": "2026-05-02 17:00",
+      "state": "COMPLETED",
+      "outputs": {
+        "manifest": "synth_results/manifests/synthetic_voice_converted.csv (1090 rows from 109 children)",
+        "audio_dir": "synth_results/voice_converted/<child_id>/*.wav (109 child dirs)"
+      }
+    },
+    {
+      "candidate": "T150+T152",
+      "name": "build_split_and_train_wavlm_mil_knnvc",
+      "slurm_job_id": 13063412,
+      "submitted_at": "2026-05-02 17:15",
+      "completed_at": "2026-05-02 17:39",
+      "state": "COMPLETED",
+      "outputs": {
+        "split_dir": "baselines/splits_synth_aug_knnvc/ (train: 1311 real + 1010 knnvc = 2321; val/test untouched)",
+        "result_dir": "mil/mil_results/wavlm_mil_knnvc/"
+      },
+      "test_metrics": {"f1": 0.863, "precision": 0.760, "recall": 1.000, "auroc": 0.536, "auprc": 0.783, "threshold": 0.5},
+      "val_metrics":  {"f1": 0.847, "precision": 0.735, "recall": 1.000, "auroc": 0.547, "auprc": 0.753, "threshold": 0.5},
+      "delta_vs_baseline": {"f1": -0.019, "auroc": -0.235, "auprc": -0.110},
+      "verdict": "STRONG NEGATIVE. Model collapsed to predict-all-positive (F1=trivial-positive floor of 0.86; AUROC near-random 0.54). Diagnosis: HiFiGAN vocoder signature overfit — the converted audio carries an artifact pattern that the WavLM-MIL backbone latches on as a positive marker, but val/test are real audio so the artifact is absent and the model has no actual class signal. Confirms the plan's risk-register concern (likelihood medium-high). Echoes the TinyVox padding-shortcut precedent: synth signal that's separable from real on a non-task-relevant axis poisons clip-level training. Implication: frame-level voice transfer alone does NOT close the spec-016 follow-up #1 NEUTRAL — the binding constraint is artifact-realism, not voice-identity-fidelity. T160 (cross-child variant) is SKIPPED per the conditional in T160."
+    }
+  ],
+  "summary": {
+    "us1_verdict": "NEGATIVE-DEEPENED. Real AV-HuBERT-Large LR fusion is worse than spec-015 hand-engineered substitute (best fusion test AUROC 0.708 vs substitute always_fuse 0.755 / gated_av 0.733; both ~-0.12 below audio_only 0.831). Visual modality fails harder with richer features due to LR overfit (val AUROC 0.981 → test 0.667 with 4105 features × 431 val clips).",
+    "us2_verdict": "STRONG NEGATIVE. WavLM-MIL on KNN-VC-converted positives collapsed to predict-all-positive (test AUROC 0.536 vs WavLM-MIL real baseline 0.771; ΔAUROC -0.235). HiFiGAN vocoder signature overfit confirmed.",
+    "joint_verdict": "Both spec-017 attack vectors (richer visual features, frame-level voice transfer) bombed. The spec-015 substitute and spec-016 follow-up #1 NEUTRAL results were NOT artifacts of impoverished implementations — they reflect real saturation. (a) Visual modality is not missing signal that proper AV-HuBERT can supply; the audio pseudo-frame baseline already captures what visual would. (b) Voice-transfer-as-augmentation fails on a different axis than mean-pooling: KNN-VC's HiFiGAN signature is too distinct from real audio. Both attack vectors in §18.7.4 (i) and (ii) are now closed; remaining viable direction is (iii) localization on the synth holdout.",
+    "tasks_completed": ["T100", "T101", "T102", "T103", "T104", "T110", "T111", "T120", "T130", "T140", "T150", "T151", "T152", "T170", "T171", "T172", "T173"],
+    "tasks_skipped": ["T160 (cross-child US2; conditional on T152 POSITIVE — T152 was strong NEGATIVE)"]
+  }
+}

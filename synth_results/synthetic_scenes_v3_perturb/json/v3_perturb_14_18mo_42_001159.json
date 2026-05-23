@@ -1,0 +1,48 @@
+{
+  "synthetic_scene_id": "v3_perturb_14_18mo_42_001159",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 0.37336804417937675,
+  "adult_present": true,
+  "adult_duration_sec": 3.462022796936974,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 14.06,
+  "rir_id": "Room140-00013",
+  "noise_id": "noise-free-sound-0797",
+  "generation_config_name": "v3_perturb_14_18mo",
+  "generation_config_hash": "39ab9ae31841",
+  "random_seed": 1201,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_458-126290-0019",
+      "source_dataset": "librispeech",
+      "start_sec": 0.0,
+      "end_sec": 3.462022796936974,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "tinyvox_Davis_Martin_010608_839949_841997",
+      "source_dataset": "tinyvox",
+      "start_sec": 4.852311962595955,
+      "end_sec": 5.225680006775332,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/wav/v3_perturb_14_18mo_42_001159.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/rttm/v3_perturb_14_18mo_42_001159.rttm"
+}

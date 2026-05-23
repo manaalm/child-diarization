@@ -1,0 +1,26 @@
+variant_name: "whisper_mil_tsmil_concat_bids"
+backbone: "openai/whisper-small"
+backbone_layer: -1
+window_sec: 2.0
+stride_sec: 1.0
+mil_hidden_dim: 256
+mil_dropout: 0.25
+lr: 1.0e-3
+epochs: 25
+patience: 5
+batch_size: 8
+pos_weight: null
+seed: 42
+split_dir: "whisper-modeling/seen_child_splits"
+device: "cuda"
+
+# spec-014 US4 TS-MIL on Whisper-small, retrained on the BIDS-expanded training pool
+# (spec-022 US1). The prototype cache is rebuilt from the BIDS-corrected train CSV
+# so that all 130 children's (child, timepoint) cells are represented; the legacy
+# `mil/prototypes/babar_vtc.npz` cache (Apr 29) covers only the 109 pre-BIDS children
+# and orphans 94 test clips on the BIDS-expanded test set.
+head: "tsmil"
+tsmil_mode: "concat"
+prototype_dim: 192
+prototype_proj_dim: 64
+prototype_cache: "mil/prototypes/babar_vtc_bids.npz"

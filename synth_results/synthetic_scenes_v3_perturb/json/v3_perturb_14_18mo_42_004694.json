@@ -1,0 +1,120 @@
+{
+  "synthetic_scene_id": "v3_perturb_14_18mo_42_004694",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 2.5071001106222486,
+  "adult_present": true,
+  "adult_duration_sec": 12.638800285696753,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 1.55,
+  "rir_id": "Room010-00026",
+  "noise_id": "noise-free-sound-0599",
+  "generation_config_name": "v3_perturb_14_18mo",
+  "generation_config_hash": "39ab9ae31841",
+  "random_seed": 4736,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "playlogue_ADULT_ew_42pc_22120_683260_686180",
+      "source_dataset": "playlogue_adults",
+      "start_sec": 0.0,
+      "end_sec": 5.24623880891473,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_gleason_father_theresa_1130420_1131020_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 4.796096973084044,
+      "end_sec": 5.626299737794032,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_8629-261139-0060",
+      "source_dataset": "librispeech",
+      "start_sec": 6.570210019569998,
+      "end_sec": 7.147732947641016,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_ew_42pc_12029_839720_840500_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 7.1852042066818935,
+      "end_sec": 7.840189827884364,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_3982-178459-0032",
+      "source_dataset": "librispeech",
+      "start_sec": 9.036115861943276,
+      "end_sec": 11.666352832830096,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "tinyvox_Providence_William_010619_2898033_2900170",
+      "source_dataset": "tinyvox",
+      "start_sec": 12.404069387083029,
+      "end_sec": 12.510425689793342,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "playlogue_ADULT_ew_42pc_11053_427920_428340",
+      "source_dataset": "playlogue_adults",
+      "start_sec": 13.31787351093149,
+      "end_sec": 15.175878511999963,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_ew_42ec_12015_568820_569120_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 15.393828044195233,
+      "end_sec": 15.850507222140283,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_6064-56165-0012",
+      "source_dataset": "librispeech",
+      "start_sec": 16.68522147664614,
+      "end_sec": 19.012018053401853,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "tinyvox_Davis_Rebecca_010209_3507188_3510188",
+      "source_dataset": "tinyvox",
+      "start_sec": 20.0797263445694,
+      "end_sec": 20.538602588623828,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/wav/v3_perturb_14_18mo_42_004694.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/rttm/v3_perturb_14_18mo_42_004694.rttm"
+}

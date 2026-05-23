@@ -1,0 +1,20 @@
+variant_name: "wavlm_mil_knnvc"
+backbone: "microsoft/wavlm-base-plus"
+backbone_layer: -1
+window_sec: 2.0
+stride_sec: 1.0
+mil_hidden_dim: 256
+mil_dropout: 0.25
+lr: 1.0e-3
+epochs: 20
+patience: 5
+batch_size: 8
+pos_weight: null
+seed: 42
+split_dir: "whisper-modeling/seen_child_splits"
+device: "cuda"
+# spec-017 US2: KNN-VC voice-converted positives. The extra_negatives_* hook
+# concatenates rows verbatim (label column is honored), so passing label=1 rows
+# adds positives. Cap at the manifest size (~1010) so all converted rows are used.
+extra_negatives_csv: "synth_results/manifests/synthetic_voice_converted.csv"
+extra_negatives_cap: 1010

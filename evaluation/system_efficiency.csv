@@ -1,0 +1,19 @@
+system,family,backbone,backbone_params_m,head_params_m,total_params_m,flops_per_30s_clip_g,train_gpu_hours,inference_regime,notes
+whisper_mil,MIL,Whisper-small encoder,88.0,0.5,88.5,265.5,"~3 (single A100, 1311 train clips × 20 ep)",gpu_required,Backbone frozen; only ABMIL head + classifier trained.
+whisper_mil_tsmil_concat,MIL,Whisper-small encoder,88.0,1.1,89.1,267.3,~3 (whisper_mil + ECAPA proto pre-step),gpu_required,Adds ECAPA-conditioning concat (+~0.6M params).
+wavlm_mil,MIL,WavLM-Base+,94.0,0.5,94.5,283.5,~3 (single A100),gpu_required,Backbone frozen; ABMIL head trained.
+hubert_large_mil_layersum,MIL,HuBERT-large,317.0,1.5,318.5,955.5,~6 (larger backbone),gpu_required,Spec-014 US1 weighted-layer-sum; 24 layers × scalar gate.
+wavlm_pseudo_frame,self-distill,WavLM-Base+,94.0,0.5,94.5,283.5,~0.3 (5 min total per CLAUDE.md),gpu_required,Frozen WavLM + tiny Conv1d frame classifier.
+usc_sail_whisper,diarizer (frame),Whisper-base + LoRA r=8,74.0,1.6,75.6,226.8,documented 50k-step pretrain (anfengxu),gpu_required,LoRA fc1/fc2 each layer; 4-class output.
+pyannote_diarization,diarizer (segment),PyanNet + WeSpeaker ECAPA,24.7,0.0,24.7,74.1,0 (pretrained),external_subprocess,speaker-diarization-community-1 pipeline.
+vtc_2.0,diarizer (segment),PyanNet (BabAR-trained),17.0,0.0,17.0,51.0,0,external_subprocess,Fine-tuned PyanNet; same arch as pyannote frontend.
+vtc_kchi,diarizer (segment),PyanNet,17.0,0.0,17.0,51.0,0,external_subprocess,Output identical to BabAR on short BIDS clips.
+babar,diarizer (segment),PyanNet + phoneme model,22.0,0.0,22.0,66.0,0,external_subprocess,Phoneme step is no-op on BIDS short clips.
+vbx,diarizer (clustering),pyannote VAD + ECAPA + VB-HMM,24.7,0.0,24.7,74.1,0,external_subprocess,VB-HMM clustering; collapses to 1 spk on long-form.
+sortformer,diarizer (neural),NeMo diar_sortformer_4spk-v1,92.0,0.0,92.0,276.0,0,external_subprocess,Pretrained 4-speaker mixtures; 90s chunked.
+eend_eda,diarizer (neural),ESPnet horiguchi 6spk,35.0,0.0,35.0,105.0,0,external_subprocess,Encoder-decoder + attractors; 90s chunked.
+ecapa_enrollment_head,enrollment,ECAPA-TDNN (speechbrain),6.2,0.0,6.2,18.6,0,cpu_fast,Cosine-similarity head; no learned params.
+audio_llm_qwen2,audio LLM,Qwen2-Audio-7B-Instruct,7400.0,0.0,7400.0,7400.0,0 (zero-shot),gpu_required,FLOPs: ~1 forward over short context.
+best_audio_mil_ensemble,ensemble,mean of 4 MIL outputs,0.0,0.0,0.0,0.0,0 (post-hoc),cpu_fast,No new params; sum cost of 4 base systems.
+metadata_stacker,ensemble,logistic regression,0.0,0.05,0.05,0.0,<0.01 (sklearn),cpu_fast,12 sys probs + metadata → LR. Cost dominated by base.
+av_fusion_gated,AV fusion,BabAR-prob × XGBoost(visual),17.0,0.05,17.05,51.0,<0.5 (XGB on 1311 clips),cpu_fast,Audio: BabAR scores. Visual: XGBoost on visual eligibility.

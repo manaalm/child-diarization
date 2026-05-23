@@ -1,0 +1,63 @@
+project:
+  name: v3_perturb_14_18mo
+  sample_rate: 16000
+  random_seed: 42
+
+scene:
+  duration_sec: 30.0
+  n_scenes: 5000
+  target_age_band: 14_18_months
+  max_speakers: 3
+
+sources:
+  child_segments: [providence, tinyvox, playlogue]
+  adult_segments: [providence_adults, librispeech, playlogue_adults]
+  noise: [musan_noise, musan_music]
+  rirs: [rirs_noises, mit_ir_survey]
+
+sampling:
+  positive_scene_probability: 0.50
+  adult_only_negative_probability: 0.25
+  background_speech_negative_probability: 0.15
+  noise_only_negative_probability: 0.10
+  overlap_probability: 0.25
+  short_child_vocalization_probability: 0.30
+  short_threshold_sec: 0.5
+  other_child_probability: 0.10
+
+turn_taking:
+  child_turn_duration_mean_sec: 0.6
+  child_turn_duration_std_sec: 0.3
+  adult_turn_duration_mean_sec: 3.5
+  adult_turn_duration_std_sec: 1.5
+  pause_mean_sec: 0.8
+  pause_std_sec: 0.3
+  n_turns_min: 2
+  n_turns_max: 20
+
+mixing:
+  snr_db_min: 0
+  snr_db_max: 25
+  apply_rir_probability: 0.7
+  apply_noise_probability: 0.8
+  crossfade_ms: 20.0
+  peak_normalize: true
+  save_stems: false
+  rir_dir: "/orcd/scratch/orcd/008/manaal/child-adult-diarization/data/rir/simulated_rirs_16k"
+  noise_dir: "/orcd/scratch/orcd/008/manaal/child-adult-diarization/data/noise/musan/noise"
+  # --- Phase B / spec-018 per-segment perturbation (v3) ---
+  # VTLP: spectral-envelope warp; preserves segment length and original phase.
+  # Speed: resample-and-relabel; both pitch and tempo shift by `factor`.
+  # alpha/factor in [0.9, 1.1] — within-class vocal-tract variation, no
+  # cross-age drift (child F0~350Hz stays ~315-385Hz; adult F0~150Hz stays ~135-165Hz).
+  vtlp_probability: 0.5
+  vtlp_alpha_min: 0.9
+  vtlp_alpha_max: 1.1
+  speed_probability: 0.5
+  speed_factor_min: 0.9
+  speed_factor_max: 1.1
+
+labels:
+  generate_rttm: true
+  generate_clip_labels: true
+  target_child_label: TARGET_CHILD

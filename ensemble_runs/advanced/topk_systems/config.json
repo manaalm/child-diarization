@@ -1,0 +1,22 @@
+{
+  "variant": "topk_systems",
+  "seed": 42,
+  "k": 6,
+  "features": [
+    "whisper_mil_prob",
+    "babar_prob",
+    "vtc_kchi_prob",
+    "vtc_prob",
+    "audio_llm_prob",
+    "vbx_prob",
+    "timepoint_is_36m"
+  ],
+  "selected_val_aurocs": [
+    0.8839,
+    0.8334,
+    0.8334,
+    0.7996,
+    0.7943,
+    0.7542
+  ]
+}

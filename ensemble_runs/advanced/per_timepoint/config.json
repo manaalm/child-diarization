@@ -1,0 +1,29 @@
+{
+  "variant": "per_timepoint",
+  "seed": 42,
+  "features": [
+    "babar_prob",
+    "vtc_prob",
+    "vtc_kchi_prob",
+    "vbx_prob",
+    "usc_sail_prob",
+    "pyannote_prob",
+    "eend_eda_prob",
+    "sortformer_prob",
+    "wavlm_mil_prob",
+    "whisper_mil_prob",
+    "audio_llm_prob",
+    "speaker_informed_av_prob",
+    "pseudo_frame_wavlm_prob"
+  ],
+  "per_tp": {
+    "14mo": {
+      "n_val": 324,
+      "n_test": 322
+    },
+    "36mo": {
+      "n_val": 302,
+      "n_test": 313
+    }
+  }
+}

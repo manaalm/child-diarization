@@ -1,0 +1,35 @@
+{
+  "variant": "isotonic_weighted",
+  "seed": 42,
+  "calibration": "isotonic",
+  "system_weights": {
+    "babar_prob": 0.1545,
+    "vtc_prob": 0.1247,
+    "vtc_kchi_prob": 0.1545,
+    "vbx_prob": 0.0898,
+    "usc_sail_prob": 0.0011,
+    "pyannote_prob": 0.001,
+    "eend_eda_prob": 0.0024,
+    "sortformer_prob": 0.0349,
+    "wavlm_mil_prob": 0.0895,
+    "whisper_mil_prob": 0.2048,
+    "audio_llm_prob": 0.1204,
+    "speaker_informed_av_prob": 0.0011,
+    "pseudo_frame_wavlm_prob": 0.0213
+  },
+  "system_val_auroc": {
+    "babar_prob": 0.8334,
+    "vtc_prob": 0.7996,
+    "vtc_kchi_prob": 0.8334,
+    "vbx_prob": 0.7542,
+    "usc_sail_prob": 0.5285,
+    "pyannote_prob": 0.5273,
+    "eend_eda_prob": 0.5417,
+    "sortformer_prob": 0.6584,
+    "wavlm_mil_prob": 0.7537,
+    "whisper_mil_prob": 0.8839,
+    "audio_llm_prob": 0.7943,
+    "speaker_informed_av_prob": 0.5281,
+    "pseudo_frame_wavlm_prob": 0.6239
+  }
+}

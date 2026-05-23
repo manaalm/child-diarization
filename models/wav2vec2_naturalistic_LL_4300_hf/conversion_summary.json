@@ -1,0 +1,16 @@
+{
+  "source_ckpt": "models/wav2vec2_naturalistic_LL_4300_hf/staging/LL_4300/checkpoint_best.pt",
+  "hf_base_config": "facebook/wav2vec2-base",
+  "n_state_keys": 218,
+  "n_unused": 7,
+  "unused_keys_sample": [
+    "quantizer.vars",
+    "quantizer.weight_proj.weight",
+    "quantizer.weight_proj.bias",
+    "project_q.weight",
+    "project_q.bias",
+    "final_proj.weight",
+    "final_proj.bias"
+  ],
+  "output_dir": "models/wav2vec2_naturalistic_LL_4300_hf"
+}

@@ -1,0 +1,37 @@
+run,gpu_hours,kwh_compute,kwh_with_pue,kg_co2eq
+"USC-SAIL Whisper LoRA pretrain (50k steps, anfengxu)",60.0,24.0,36.0,8.64
+"Child-adapted WavLM SSL pretrain (50k steps, spec-009 US3)",48.0,19.2,28.8,6.912
+K-fold seen-child trained models (4 systems × 3 folds),36.0,14.4,21.6,5.184
+Synth augmentation training × 6 ratios × 2 backbones,36.0,14.4,21.6,5.184
+Spec-016 candidate trainings (9 candidates × 2 versions),36.0,14.4,21.6,5.184
+Spec-014 MIL extensions full sweep (11 jobs),24.0,9.6,14.4,3.456
+"Segment-instance MIL sweep (28 configs, spec-004)",24.0,9.6,14.4,3.456
+"Whisper-MIL ACMIL variants (spec-014 US3 ext, 6 configs)",18.0,7.2,10.8,2.592
+"Audio LLM Qwen2-Audio-7B inference (val + test, base)",8.0,3.2,4.8,1.152
+"Audio LLM Qwen2-Audio-7B inference (2-shot, val + test)",8.0,3.2,4.8,1.152
+USC-SAIL fine-tune on BIDS,6.0,2.4,3.6,0.864
+HuBERT-large MIL layersum (spec-014 US1),6.0,2.4,3.6,0.864
+Hard-negative MIL × 2 backbones (spec-013),6.0,2.4,3.6,0.864
+Spec-012 short-voc head (US4),4.0,1.6,2.4,0.576
+Audio LLM cross-child variant,4.0,1.6,2.4,0.576
+Whisper-MIL TS-MIL concat (spec-014 US4),3.0,1.2,1.8,0.432
+WavLM-MIL TinyVox aug (spec-009),3.0,1.2,1.8,0.432
+WavLM-MIL frame-window training,3.0,1.2,1.8,0.432
+Whisper-MIL frame-window training,3.0,1.2,1.8,0.432
+"BabAR / VTC / VTC-KCHI inference (RTTM gen, 2.1k clips)",2.0,0.8,1.2,0.288
+VBx inference (2.1k clips),2.0,0.8,1.2,0.288
+Pyannote inference (2.1k clips),1.5,0.6,0.9,0.216
+K-fold seen-child enrollment (7 diarizers × 3 folds),1.5,0.6,0.9,0.216
+Sortformer inference (2.1k clips),1.0,0.4,0.6,0.144
+EEND-EDA inference (2.1k clips),1.0,0.4,0.6,0.144
+Pseudo-frame C1-distill (spec-016 follow-up #8),0.5,0.2,0.3,0.072
+Pseudo-frame synth-aug (spec-016 C2),0.5,0.2,0.3,0.072
+ECAPA enrollment runs × 8 diarizers,0.5,0.2,0.3,0.072
+Cross-child enrollment runs (5 of 8 completed),0.5,0.2,0.3,0.072
+Spec-012 multi-child suppressor (US3),0.5,0.2,0.3,0.072
+AV fusion training (manual_only + agebandfix),0.5,0.2,0.3,0.072
+Pseudo-frame WavLM training (spec-013 US6),0.3,0.12,0.18,0.043
+Voice transfer experiment (spec-016 follow-up #1),0.3,0.12,0.18,0.043
+"Synth scene generation v1 (5000 scenes, CPU)",0.0,0.0,0.0,0.0
+"Synth scene generation v2 (5000 scenes, CPU)",0.0,0.0,0.0,0.0
+Spec-012 metadata stacker / router (CPU sklearn),0.0,0.0,0.0,0.0

@@ -1,0 +1,66 @@
+{
+  "synthetic_scene_id": "v4_14_18mo_42_001533",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 0.9047545408709272,
+  "adult_present": true,
+  "adult_duration_sec": 15.914820759047826,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 7.22,
+  "rir_id": "Room110-00040",
+  "noise_id": "noise-free-sound-0516",
+  "generation_config_name": "v4_14_18mo",
+  "generation_config_hash": "77bfdc3440a0",
+  "random_seed": 1575,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_ethan_010105_MOT_768773_769980",
+      "source_dataset": "providence_adults",
+      "start_sec": 0.0,
+      "end_sec": 5.771558127315709,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "xlingvc_S7Y0I2P0S8_dfe9e3aba9",
+      "source_dataset": "cross_lingual_vc_tinyvox_French",
+      "start_sec": 5.912090493721686,
+      "end_sec": 6.716845034592612,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_alex_011006_MOT_1441653_1444490",
+      "source_dataset": "providence_adults",
+      "start_sec": 6.710353621760202,
+      "end_sec": 16.85361625349232,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_ew_54ec_22104_458340_459780_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 16.84712484065991,
+      "end_sec": 16.94712484065991,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v4/wav/v4_14_18mo_42_001533.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v4/rttm/v4_14_18mo_42_001533.rttm"
+}

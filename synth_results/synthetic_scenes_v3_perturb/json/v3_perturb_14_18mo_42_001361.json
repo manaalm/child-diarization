@@ -1,0 +1,138 @@
+{
+  "synthetic_scene_id": "v3_perturb_14_18mo_42_001361",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 5.014857925935068,
+  "adult_present": true,
+  "adult_duration_sec": 15.749933327121768,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 3.23,
+  "rir_id": null,
+  "noise_id": "noise-free-sound-0762",
+  "generation_config_name": "v3_perturb_14_18mo",
+  "generation_config_hash": "39ab9ae31841",
+  "random_seed": 1403,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_625-132118-0050",
+      "source_dataset": "librispeech",
+      "start_sec": 0.0,
+      "end_sec": 1.9881593103681015,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_gleason_mother_david_1087000_1088160_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 3.0061042743499575,
+      "end_sec": 3.8589893771066555,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_alex_020102_MOT_1840966_1845118",
+      "source_dataset": "providence_adults",
+      "start_sec": 3.296262764029439,
+      "end_sec": 5.315787981616111,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "providence_lily_010618_820465_821753",
+      "source_dataset": "providence",
+      "start_sec": 4.766488833890562,
+      "end_sec": 5.511150567042759,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_lily_020215b_MOT_498425_500573",
+      "source_dataset": "providence_adults",
+      "start_sec": 6.280806041485183,
+      "end_sec": 7.069122086931036,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_cameron_aae_B3_31_47_PE_S22_109980_110560_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 8.107708050032985,
+      "end_sec": 9.553940603231359,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_lily_010213_MOT_180321_186681",
+      "source_dataset": "providence_adults",
+      "start_sec": 9.539837327843598,
+      "end_sec": 13.305102395056387,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_cameron_sae_B1_17_55_PE_O22_148000_148980_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 13.997178378670258,
+      "end_sec": 14.960210087621927,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_4441-76262-0010",
+      "source_dataset": "librispeech",
+      "start_sec": 14.339204300663786,
+      "end_sec": 18.12036253776707,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_ew_54ec_22140_188340_189240_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 18.723488246231177,
+      "end_sec": 19.394673396682155,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_lily_010213_MOT_180321_186681",
+      "source_dataset": "providence_adults",
+      "start_sec": 18.909281237878783,
+      "end_sec": 22.316790687283852,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "providence_alex_010427_651146_652183",
+      "source_dataset": "providence",
+      "start_sec": 23.115436147169728,
+      "end_sec": 23.45229782459488,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/wav/v3_perturb_14_18mo_42_001361.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/rttm/v3_perturb_14_18mo_42_001361.rttm"
+}

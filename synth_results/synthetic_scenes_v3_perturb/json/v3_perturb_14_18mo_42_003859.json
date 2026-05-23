@@ -1,0 +1,84 @@
+{
+  "synthetic_scene_id": "v3_perturb_14_18mo_42_003859",
+  "duration_sec": 30.0,
+  "sample_rate": 16000,
+  "target_age_band": "14_18_months",
+  "scene_type": "positive",
+  "target_child_present": true,
+  "target_child_vocalized": true,
+  "target_child_duration_sec": 2.29324870390289,
+  "adult_present": true,
+  "adult_duration_sec": 10.908246083290942,
+  "non_target_child_present": false,
+  "other_child_duration_sec": 0.0,
+  "overlap_present": false,
+  "max_overlap_speakers": 1,
+  "mean_snr_db": 18.44,
+  "rir_id": null,
+  "noise_id": "noise-free-sound-0738",
+  "generation_config_name": "v3_perturb_14_18mo",
+  "generation_config_hash": "39ab9ae31841",
+  "random_seed": 3901,
+  "source_segments": [
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "prov_adult_lily_010912_MOT_2769900_2774585",
+      "source_dataset": "providence_adults",
+      "start_sec": 0.0,
+      "end_sec": 4.389485513133809,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "playlogue_CHI_ew_42ec_12003_536620_539240_14_18_months",
+      "source_dataset": "playlogue",
+      "start_sec": 5.22230217898662,
+      "end_sec": 6.407351635621735,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_696-93314-0055",
+      "source_dataset": "librispeech",
+      "start_sec": 7.52294998494489,
+      "end_sec": 11.514964344556816,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "tinyvox_Davis_Georgia_010611_2530910_2533910",
+      "source_dataset": "tinyvox",
+      "start_sec": 12.249156217973262,
+      "end_sec": 12.900973245086437,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "ADULT_0",
+      "segment_id": "librispeech_5750-100289-0055",
+      "source_dataset": "librispeech",
+      "start_sec": 12.365836492234246,
+      "end_sec": 14.892582702779453,
+      "gain_db": 0.0,
+      "rir_id": null
+    },
+    {
+      "speaker_label": "TARGET_CHILD",
+      "segment_id": "tinyvox_Davis_Cameron_010206_1002018_1004407",
+      "source_dataset": "tinyvox",
+      "start_sec": 14.5881845482442,
+      "end_sec": 15.0445667683988,
+      "gain_db": 0.0,
+      "rir_id": null
+    }
+  ],
+  "speakers": [
+    "ADULT_0",
+    "TARGET_CHILD"
+  ],
+  "audio_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/wav/v3_perturb_14_18mo_42_003859.wav",
+  "rttm_path": "/orcd/scratch/orcd/008/manaal/child-adult-diarization/synth_results/synthetic_scenes_v3_perturb/rttm/v3_perturb_14_18mo_42_003859.rttm"
+}

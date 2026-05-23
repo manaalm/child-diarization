@@ -1,0 +1,18 @@
+{
+  "model_name": "Qwen/Qwen2.5-Omni-7B",
+  "model_slug": "qwen25_omni_7b_target_5shot",
+  "prompt_template": "target_child_v1",
+  "prompt_text": "All audio clips in this conversation are from a single target child's recording. The earlier clips with answers are demonstrations of when that target child is or is not vocalizing. Is the target child vocalizing in this clip? Answer only: yes or no.",
+  "n_shot": 5,
+  "threshold": 0.2,
+  "val_f1": 0.8631284916201117,
+  "seed": 42,
+  "split": "seen_child_splits",
+  "n_clips_total": 441,
+  "n_clips_cached": 0,
+  "n_clips_error": 0,
+  "prediction_variance": 0.029697,
+  "degenerate_flag": false,
+  "frac_yes": 0.9229,
+  "frac_no": 0.0771
+}

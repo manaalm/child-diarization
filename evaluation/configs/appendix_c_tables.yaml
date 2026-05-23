@@ -1,0 +1,108 @@
+# Auto-rendered Appendix C tables for thesis_v2/appendices/C_full_results.tex.
+#
+# Each entry below corresponds to one LaTeX table whose data rows are spliced
+# between marker comments (% BEGIN AUTO:<id> ... % END AUTO:<id>) in the .tex
+# file. Numbers come from source JSON/CSV files — never hand-typed.
+#
+# Two row-source modes:
+#   1. "per_row": each row is hand-listed with its own source path + metadata
+#      cells; numeric cells come from JSON keys in the listed source.
+#   2. "groupstrat_aggregate": for each system slug, the renderer auto-discovers
+#      every fold dir matching <root>/<slug>_groupstrat3_f{0,1,2}/ that has a
+#      test_metrics_tuned.json, then emits a single row with mean±std across
+#      completed folds plus a "k / 3" fold-count cell.
+#
+# Cell formatting: 3 decimal places for numeric cells. Cells in `bold_when`
+# clauses are wrapped in \textbf{}.
+
+tables:
+  # Compact 6-row ablation in main text (chapters/05_results.tex,
+  # tab:enc-ablation-compact). Identical sources to enc-full; "pooling" and
+  # "finetune" are merged into a single cell to match the chapter's column layout.
+  - id: enc-ablation-compact
+    target_tex: thesis_v2/chapters/05_results.tex
+    mode: per_row
+    columns: [backbone, pooling_ft, f1, auroc, auprc]
+    json_keys:
+      f1: f1
+      auroc: auroc
+      auprc: auprc
+    rows:
+      - { source: "baseline_results_seen_child/wavlm_mean",            meta: { backbone: "WavLM-Base+",   pooling_ft: "mean (frozen)" } }
+      - { source: "baseline_results_seen_child/wavlm_attn",            meta: { backbone: "WavLM-Base+",   pooling_ft: "attention (frozen)" } }
+      - { source: "baseline_results_seen_child/whisper_mean",          meta: { backbone: "Whisper-small", pooling_ft: "mean (frozen)" } }
+      - { source: "baseline_results_seen_child/whisper_attn",          meta: { backbone: "Whisper-small", pooling_ft: "attention (frozen)" } }
+      - { source: "baseline_results_seen_child/fused_attn",            meta: { backbone: "Whisper+WavLM", pooling_ft: "attention (frozen)" } }
+      - { source: "baseline_results_seen_child/fused_attn_unfreeze2",  meta: { backbone: "Whisper+WavLM", pooling_ft: "attention + PU last 2" }, bold_row: true }
+
+  - id: enc-full
+    mode: per_row
+    columns: [backbone, pooling, finetune, f1, auroc, auprc]
+    json_keys:
+      f1: f1
+      auroc: auroc
+      auprc: auprc
+    rows:
+      - { source: "baseline_results_seen_child/whisper_mean",                meta: { backbone: "Whisper-small",  pooling: "mean",             finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/whisper_attn",                meta: { backbone: "Whisper-small",  pooling: "attention",        finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/whisper_attn_lw",             meta: { backbone: "Whisper-small",  pooling: "attn + LW",        finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/whisper_stats_lw",            meta: { backbone: "Whisper-small",  pooling: "stats + LW",       finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/whisper_attn_ptt",            meta: { backbone: "Whisper-small",  pooling: "attn + PTT",       finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/whisper_attn_aug",            meta: { backbone: "Whisper-small",  pooling: "attn + aug",       finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/whisper_attn_aug_ptt",        meta: { backbone: "Whisper-small",  pooling: "attn + aug + PTT", finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/whisper_attn_unfreeze2",      meta: { backbone: "Whisper-small",  pooling: "attention",        finetune: "PU last 2" } }
+      - { source: "baseline_results_seen_child/wavlm_mean",                  meta: { backbone: "WavLM-Base+",    pooling: "mean",             finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/wavlm_attn",                  meta: { backbone: "WavLM-Base+",    pooling: "attention",        finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/wavlm_attn_lw",               meta: { backbone: "WavLM-Base+",    pooling: "attn + LW",        finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/wavlm_stats_lw",              meta: { backbone: "WavLM-Base+",    pooling: "stats + LW",       finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/fused_attn",                  meta: { backbone: "Whisper+WavLM",  pooling: "attention",        finetune: "frozen" } }
+      - { source: "baseline_results_seen_child/fused_attn_unfreeze2",        meta: { backbone: "Whisper+WavLM",  pooling: "attention",        finetune: "PU last 2" }, bold_row: true }
+
+  - id: enc-cross-full
+    mode: per_row
+    columns: [variant, f1, precision, recall, auroc, auprc, notes]
+    json_keys:
+      f1: f1
+      precision: precision
+      recall: recall
+      auroc: auroc
+      auprc: auprc
+    rows:
+      - { source: "baselines/baseline_results/whisper_mean",            meta: { variant: "whisper\\_mean",            notes: "tied for best AUROC" } }
+      - { source: "baselines/baseline_results/whisper_attn",            meta: { variant: "whisper\\_attn",            notes: "frozen attn pool" } }
+      - { source: "baselines/baseline_results/whisper_attn_lw",         meta: { variant: "whisper\\_attn\\_lw",       notes: "AUROC collapse vs seen-child" } }
+      - { source: "baselines/baseline_results/whisper_attn_ptt",        meta: { variant: "whisper\\_attn\\_ptt",      notes: "per-timepoint thresholds" } }
+      - { source: "baselines/baseline_results/whisper_attn_aug",        meta: { variant: "whisper\\_attn\\_aug",      notes: "+ synth aug" } }
+      - { source: "baselines/baseline_results/whisper_attn_aug_ptt",    meta: { variant: "whisper\\_attn\\_aug\\_ptt", notes: "+ synth aug + PTT" } }
+      - { source: "baselines/baseline_results/whisper_attn_unfreeze2",  meta: { variant: "whisper\\_attn\\_unfreeze2", notes: "PU last 2 layers" } }
+      - { source: "baselines/baseline_results/whisper_stats_lw",        meta: { variant: "whisper\\_stats\\_lw",      notes: "stats + LW" } }
+      - { source: "baselines/baseline_results/wavlm_mean",              meta: { variant: "wavlm\\_mean",              notes: "frozen mean" } }
+      - { source: "baselines/baseline_results/wavlm_attn",              meta: { variant: "wavlm\\_attn",              notes: "frozen attn" } }
+      - { source: "baselines/baseline_results/wavlm_attn_lw",           meta: { variant: "wavlm\\_attn\\_lw",         notes: "+ LW" } }
+      - { source: "baselines/baseline_results/wavlm_stats_lw",          meta: { variant: "wavlm\\_stats\\_lw",        notes: "stats + LW" } }
+      - { source: "baselines/baseline_results/fused_attn",              meta: { variant: "fused\\_attn",              notes: "Whisper $\\oplus$ WavLM" } }
+      - { source: "baselines/baseline_results/fused_attn_lw",           meta: { variant: "fused\\_attn\\_lw",         notes: "safest cross-child" }, bold_row: true }
+      - { source: "baselines/baseline_results/fused_attn_unfreeze2",    meta: { variant: "fused\\_attn\\_unfreeze2",  notes: "best F\\textsubscript{1}; AUROC negative-transfer" }, bold_row: true }
+
+  - id: enc-groupstrat3
+    mode: groupstrat_aggregate
+    root: "baseline_results_seen_child"
+    columns: [system, f1, auroc, auprc, folds]
+    json_keys:
+      f1: f1
+      auroc: auroc
+      auprc: auprc
+    systems:
+      - { slug: "whisper_attn",                              display: "whisper\\_attn" }
+      - { slug: "whisper_attn_lw",                           display: "whisper\\_attn\\_lw" }
+      - { slug: "whisper_attn_ptt",                          display: "whisper\\_attn\\_ptt" }
+      - { slug: "whisper_attn_aug",                          display: "whisper\\_attn\\_aug" }
+      - { slug: "whisper_attn_aug_ptt",                      display: "whisper\\_attn\\_aug\\_ptt" }
+      - { slug: "whisper_attn_unfreeze2",                    display: "whisper\\_attn\\_unfreeze2" }
+      - { slug: "whisper_stats_lw",                          display: "whisper\\_stats\\_lw" }
+      - { slug: "wavlm_attn_lw",                             display: "wavlm\\_attn\\_lw" }
+      - { slug: "wavlm_stats_lw",                            display: "wavlm\\_stats\\_lw" }
+      - { slug: "fused_attn",                                display: "fused\\_attn" }
+      - { slug: "fused_attn_unfreeze2",                      display: "fused\\_attn\\_unfreeze2" }
+      - { slug: "fused_attn_unfreeze2_whisper_medium",       display: "fused\\_attn\\_unfreeze2\\_whisper\\_medium" }
+      - { slug: "fused_attn_unfreeze2_whisper_large",        display: "fused\\_attn\\_unfreeze2\\_whisper\\_large" }

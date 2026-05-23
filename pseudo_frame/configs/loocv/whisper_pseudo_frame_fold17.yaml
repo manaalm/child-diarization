@@ -1,0 +1,17 @@
+variant_name: whisper_pseudo_frame_loocv_f17
+backbone: openai/whisper-small
+backbone_layer: -1
+hidden_dim: 256
+dropout: 0.2
+crop_sec: 10.0
+batch_size: 8
+num_workers: 2
+lr: 0.001
+weight_decay: 0.0001
+epochs: 25
+patience: 5
+seed: 42
+confidence_weight: true
+pos_weight: 3.0
+split_dir: whisper-modeling/seen_child_splits_loocv/fold_17
+device: cuda

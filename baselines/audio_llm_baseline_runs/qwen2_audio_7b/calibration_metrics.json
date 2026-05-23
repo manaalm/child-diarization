@@ -1,0 +1,13 @@
+{
+  "brier": 0.1949,
+  "ece": 0.1869,
+  "mce": 0.942,
+  "recall_at_fpr_5pct": 0.0896,
+  "auroc": 0.7251,
+  "n": 441,
+  "n_pos": 335,
+  "n_neg": 106,
+  "source_predictions_csv": "baselines/audio_llm_baseline_runs/qwen2_audio_7b/test_predictions.csv",
+  "binning": "10 equal-width bins on [0,1]",
+  "computed_by": "evaluation/audio_llm_calibration.py (one-shot from test_predictions.csv)"
+}
